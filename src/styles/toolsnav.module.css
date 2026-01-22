@@ -1,0 +1,71 @@
+.navbar {
+  position: sticky;
+  top: 60px;
+  z-index: 90;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.scrollWrap {
+  display: flex;
+  flex-wrap: wrap; /* ✅ allows multiple rows instead of horizontal scroll */
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  font-size: 0.95rem;
+  border-radius: 30px;
+  border: 1px solid transparent;
+  background: #f9f9f9;
+  color: var(--brand-text);
+  font-weight: 500;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.link:hover {
+  background: linear-gradient(
+    90deg,
+    var(--brand-primary) 0%,
+    var(--brand-secondary) 100%
+  );
+  color: #fff;
+}
+
+.active {
+  background: linear-gradient(
+    90deg,
+    var(--brand-primary) 0%,
+    var(--brand-secondary) 100%
+  );
+  color: #fff;
+  box-shadow: 0 3px 12px rgba(93, 63, 211, 0.2);
+}
+
+.icon {
+  font-size: 1rem;
+}
+
+/* Mobile view - tighter spacing and center alignment */
+@media (max-width: 600px) {
+  .scrollWrap {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .link {
+    font-size: 0.85rem;
+    padding: 7px 14px;
+  }
+}

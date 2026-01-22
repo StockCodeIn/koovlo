@@ -1,0 +1,49 @@
+/* src/styles/toolinfo.module.css */
+.container {
+  margin-top: 40px;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  border: 1px solid #eee;
+}
+
+.container h3 {
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  color: var(--brand-text);
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  padding: 10px 15px;
+  border: none;
+  background: #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s;
+}
+
+.tab.active {
+  background: var(--brand-primary);
+  color: white;
+}
+
+.content {
+  line-height: 1.6;
+  color: var(--brand-text);
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 15px;
+  }
+  .tabs {
+    flex-direction: column;
+  }
+}

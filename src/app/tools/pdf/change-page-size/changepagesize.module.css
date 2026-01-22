@@ -1,0 +1,414 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.converter {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin: 2rem 0;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.inputSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.fileInput {
+  position: relative;
+}
+
+.hiddenInput {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.fileLabel {
+  display: block;
+  padding: 1rem;
+  border: 2px dashed #007bff;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.fileLabel:hover {
+  border-color: #0056b3;
+  background: #f0f8ff;
+}
+
+.fileInfo {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.fileInfo p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.sizeSelector {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.sizeSelector h3 {
+  margin: 0 0 1rem 0;
+  color: #495057;
+  font-size: 1.1rem;
+}
+
+.sizeOptions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.sizeBtn {
+  padding: 1rem;
+  border: 2px solid #e9ecef;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.sizeBtn:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+
+.sizeBtn.active {
+  border-color: #007bff;
+  background: #f0f8ff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+}
+
+.sizeName {
+  font-weight: 600;
+  color: #495057;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.sizeDesc {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+.sizePoints {
+  font-size: 0.8rem;
+  color: #6c757d;
+  font-family: monospace;
+}
+
+.customSize {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.customSize h3 {
+  margin: 0 0 1rem 0;
+  color: #495057;
+  font-size: 1.1rem;
+}
+
+.dimensionInputs {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.unitSelector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.unitSelector label {
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.unitSelect {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: white;
+  cursor: pointer;
+}
+
+.unitSelect:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.dimensionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dimensionGroup label {
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.dimensionInput {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+
+.dimensionInput:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.convertBtn {
+  padding: 1rem 2rem;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.convertBtn:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.convertBtn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.error {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #f5c6cb;
+  margin-top: 1rem;
+}
+
+.previewSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.previewSection h3 {
+  margin: 0;
+  color: #495057;
+  font-size: 1.2rem;
+}
+
+.pagePreview {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.pageCanvas {
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 0.707; /* A4 aspect ratio */
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pageContent {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.sizeIndicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6c757d;
+  text-align: center;
+  padding: 1rem;
+}
+
+.pageDimensions {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-family: monospace;
+}
+
+.pageAspect {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.sizeGuide {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  padding: 1rem;
+}
+
+.sizeGuide h4 {
+  margin: 0 0 1rem 0;
+  color: #495057;
+  font-size: 1rem;
+}
+
+.guideContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.guideItem {
+  font-size: 0.9rem;
+  color: #495057;
+  line-height: 1.4;
+}
+
+.guideItem strong {
+  color: #007bff;
+}
+
+.aspectRatios {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  padding: 1rem;
+}
+
+.aspectRatios h4 {
+  margin: 0 0 1rem 0;
+  color: #495057;
+  font-size: 1rem;
+}
+
+.ratios {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.ratio {
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.ratio strong {
+  color: #007bff;
+}
+
+.warning {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.warning h4 {
+  margin: 0 0 1rem 0;
+  color: #856404;
+  font-size: 1rem;
+}
+
+.warning ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.warning li {
+  margin: 0.25rem 0;
+  color: #856404;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .converter {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .sizeOptions {
+    grid-template-columns: 1fr;
+  }
+
+  .ratios {
+    grid-template-columns: 1fr;
+  }
+
+  .fileLabel {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .convertBtn {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .pageCanvas {
+    max-width: 100%;
+  }
+
+  .previewSection {
+    gap: 1rem;
+  }
+}

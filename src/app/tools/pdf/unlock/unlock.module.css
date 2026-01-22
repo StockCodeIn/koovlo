@@ -1,0 +1,135 @@
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.box {
+  max-width: 720px;
+  width: 100%;
+  background: #fff;
+  padding: 36px 24px;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px; /* Emoji aur text ke beech space */
+}
+
+.icon {
+  /* Emoji ka asli color dikhane ke liye ispar koi gradient nahi lagana */
+  background: none;
+  -webkit-text-fill-color: initial; 
+}
+
+.textGradient {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.fileInput {
+  margin: 20px 0;
+}
+
+.fileInput {
+  display: inline-block;
+  background: gray;
+  border: 2px dashed #ddd;
+  margin-right: 10px;
+  border-radius: 12px;
+  /* padding: 20px; */
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+.fileInput:hover {
+  border-color: var(--brand-primary);
+}
+
+.fileInput input {
+  display: none;
+} 
+
+.uploadLabel {
+  color: #fff;
+  padding: 30px 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-block;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+
+.passwordBox {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.passwordBox label {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.passwordBox input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.passwordBox input:focus {
+  border-color: blue;
+}
+
+.button {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.2s, background 0.3s;
+  margin-top: 20px;
+}
+
+.button:hover {
+  transform: scale(1.05);
+}
+
+.message {
+  margin-top: 16px;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.notice {
+  margin-top: 24px;
+  font-size: 0.85rem;
+  color: #666;
+  background: #f9f9f9;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-align: left;
+}

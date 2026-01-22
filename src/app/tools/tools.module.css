@@ -1,0 +1,99 @@
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 40px 20px 80px;
+}
+
+.mainTitle {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 40px;
+  
+  /* Gradient Logic */
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* Extra Safety (Inhe add kar lene se text katega nahi) */
+  display: block; 
+  padding: 4px 0; /* Kabhi-kabhi gradient cut hone se bachata hai */
+  width: fit-content; /* Center align ke sath iska use dhyan se karein */
+  margin-left: auto;
+  margin-right: auto;
+}
+.section {
+  margin-bottom: 60px;
+}
+
+.section h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--brand-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+/* --- Card hover animation tweak --- */
+.grid :global(.card) {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Mobile Optimization --- */
+@media (max-width: 600px) {
+  .mainTitle {
+    font-size: 1.8rem;
+  }
+
+  .section h2 {
+    font-size: 1.1rem;
+  }
+
+  .container {
+    padding: 20px 14px 60px;
+  }
+
+  .grid {
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .mainTitle {
+    font-size: 1.5rem;
+  }
+
+  .section h2 {
+    font-size: 1rem;
+  }
+
+  .container {
+    padding: 15px 10px 40px;
+  }
+
+  .grid {
+    gap: 10px;
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,417 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.tool {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #343a40;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  font-size: 2rem;
+}
+
+.inputSection {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.studentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.studentRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.studentNumber {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #007bff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.nameInput,
+.scoreInput {
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.nameInput:focus,
+.scoreInput:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.nameInput {
+  flex: 2;
+  min-width: 150px;
+}
+
+.scoreInput {
+  flex: 1;
+  min-width: 100px;
+  text-align: center;
+}
+
+.removeBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #dc3545;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.removeBtn:hover {
+  background: #c82333;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.addBtn,
+.calculateBtn,
+.clearBtn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.addBtn {
+  background: #28a745;
+  color: white;
+}
+
+.addBtn:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.calculateBtn {
+  background: #007bff;
+  color: white;
+}
+
+.calculateBtn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.clearBtn {
+  background: #6c757d;
+  color: white;
+}
+
+.clearBtn:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.resultsSection {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.resultsSection h3 {
+  margin: 0 0 1.5rem 0;
+  color: #343a40;
+  text-align: center;
+  font-size: 1.3rem;
+}
+
+.rankingsTable {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.tableHeader,
+.tableRow {
+  display: grid;
+  grid-template-columns: 80px 2fr 1fr 1fr 80px;
+  gap: 1rem;
+  padding: 1rem;
+  align-items: center;
+}
+
+.tableHeader {
+  background: #007bff;
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+.tableRow {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.tableRow:last-child {
+  border-bottom: none;
+}
+
+.tableRow:nth-child(even) {
+  background: #f8f9fa;
+}
+
+.rank {
+  font-weight: bold;
+  color: #007bff;
+  text-align: center;
+}
+
+.name {
+  font-weight: 500;
+}
+
+.score {
+  text-align: center;
+  font-weight: 500;
+}
+
+.percentile {
+  text-align: center;
+  color: #28a745;
+  font-weight: 500;
+}
+
+.grade {
+  text-align: center;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #e9ecef;
+  color: #495057;
+}
+
+.statistics {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.statistics h4 {
+  margin: 0 0 1rem 0;
+  color: #495057;
+  text-align: center;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.statCard {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  text-align: center;
+  border: 1px solid #dee2e6;
+}
+
+.statLabel {
+  color: #6c757d;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.gradeScale {
+  background: #fff3cd;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #ffc107;
+}
+
+.gradeScale h4 {
+  margin: 0 0 1rem 0;
+  color: #856404;
+  text-align: center;
+}
+
+.scaleGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+.scaleItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+}
+
+.gradeLetter {
+  font-weight: bold;
+  color: #007bff;
+  font-size: 1.1rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .tool {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .studentRow {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .studentNumber {
+    align-self: flex-start;
+  }
+
+  .nameInput,
+  .scoreInput {
+    width: 100%;
+  }
+
+  .tableHeader,
+  .tableRow {
+    grid-template-columns: 60px 1fr;
+    gap: 0.5rem;
+  }
+
+  .tableHeader span:not(:first-child) {
+    display: none;
+  }
+
+  .tableRow .rank {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .tableRow .name {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .tableRow .score {
+    grid-column: 1;
+    grid-row: 2;
+    text-align: left;
+  }
+
+  .tableRow .percentile {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: left;
+  }
+
+  .tableRow .grade {
+    grid-column: 1;
+    grid-row: 3;
+    text-align: left;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .scaleGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .inputSection {
+    padding: 1rem;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .addBtn,
+  .calculateBtn,
+  .clearBtn {
+    width: 100%;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .scaleGrid {
+    grid-template-columns: 1fr;
+  }
+}

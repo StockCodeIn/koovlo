@@ -1,0 +1,422 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.tool {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #343a40;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  font-size: 2rem;
+}
+
+.tracker {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.headerSection {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.classInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.classInfo label {
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.classNameInput {
+  padding: 8px 12px;
+  border: 2px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #007bff;
+}
+
+.classNameInput:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.viewToggle {
+  display: flex;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.viewToggle button {
+  padding: 8px 16px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.viewToggle button.active {
+  background: #007bff;
+  color: white;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.addBtn,
+.addDateBtn,
+.exportBtn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.addBtn {
+  background: #28a745;
+  color: white;
+}
+
+.addBtn:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.addDateBtn {
+  background: #007bff;
+  color: white;
+}
+
+.addDateBtn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.exportBtn {
+  background: #6c757d;
+  color: white;
+}
+
+.exportBtn:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.dailyView {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  overflow: hidden;
+}
+
+.datesHeader {
+  display: flex;
+  background: #007bff;
+  color: white;
+  font-weight: 500;
+}
+
+.studentColumn {
+  flex: 2;
+  padding: 1rem;
+  min-width: 200px;
+}
+
+.dateColumn {
+  flex: 1;
+  padding: 0.5rem;
+  text-align: center;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.date {
+  font-size: 0.9rem;
+}
+
+.removeDateBtn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.removeDateBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.removeDateBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.attendanceGrid {
+  display: flex;
+  flex-direction: column;
+}
+
+.studentRow {
+  display: flex;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.studentRow:last-child {
+  border-bottom: none;
+}
+
+.studentInfo {
+  flex: 2;
+  padding: 1rem;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.studentNameInput {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.studentNameInput:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.removeStudentBtn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #dc3545;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.removeStudentBtn:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.removeStudentBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.attendanceCell {
+  flex: 1;
+  padding: 0.5rem;
+  display: flex;
+  justify-content: center;
+  min-width: 80px;
+}
+
+.attendanceCell select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  text-align: center;
+}
+
+.attendanceCell select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.summaryView {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  padding: 2rem;
+}
+
+.summaryHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.summaryHeader h3 {
+  margin: 0 0 0.5rem 0;
+  color: #343a40;
+}
+
+.summaryHeader p {
+  margin: 0;
+  color: #6c757d;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.summaryCard {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.summaryCard h4 {
+  margin: 0 0 1rem 0;
+  color: #343a40;
+  text-align: center;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.stat {
+  text-align: center;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 6px;
+}
+
+.statValue {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .dailyView {
+    overflow-x: auto;
+  }
+
+  .datesHeader,
+  .studentRow {
+    min-width: 600px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .tool {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .headerSection {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions {
+    justify-content: center;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .studentColumn,
+  .studentInfo {
+    min-width: 150px;
+  }
+
+  .dateColumn,
+  .attendanceCell {
+    min-width: 60px;
+  }
+
+  .date {
+    font-size: 0.8rem;
+  }
+
+  .studentNameInput {
+    font-size: 14px; /* Prevent zoom on iOS */
+    padding: 6px 8px;
+  }
+
+  .attendanceCell select {
+    font-size: 12px;
+    padding: 4px 6px;
+  }
+}

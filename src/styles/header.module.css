@@ -1,0 +1,70 @@
+/* src/styles/header.module.css */
+.header {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: var(--container-max);
+  margin: auto;
+  padding: 14px 24px;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.nav {
+  display: flex;
+  gap: 24px;
+}
+
+.nav a {
+  color: #fff;
+  font-weight: 500;
+  transition: opacity var(--transition-fast);
+}
+
+.nav a:hover {
+  opacity: 0.8;
+}
+
+/* Mobile Menu */
+.menuButton {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .menuButton {
+    display: block;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #fff;
+  }
+
+  .nav {
+    display: none;
+    flex-direction: column;
+    background: var(--brand-primary);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 56px;
+    padding: 20px;
+  }
+
+  .nav.show {
+    display: flex;
+  }
+}

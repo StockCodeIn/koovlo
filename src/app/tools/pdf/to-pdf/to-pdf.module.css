@@ -1,0 +1,86 @@
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.box {
+  max-width: 700px;
+  width: 100%;
+  background: #fff;
+  padding: 30px 24px;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px; /* Emoji aur text ke beech space */
+}
+
+.icon {
+  /* Emoji ka asli color dikhane ke liye ispar koi gradient nahi lagana */
+  background: none;
+  -webkit-text-fill-color: initial; 
+}
+
+.textGradient {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.fileInput {
+  margin: 20px 0;
+}
+
+.uploadLabel {
+  background: var(--brand-primary, #2f80ed);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-block;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.uploadLabel:hover {
+  background: var(--brand-secondary, #56ccf2);
+}
+
+.fileList {
+  list-style: none;
+  text-align: left;
+  font-size: 0.9rem;
+  margin: 10px 0 20px;
+  color: #555;
+}
+
+.button {
+  background: var(--brand-primary, #2f80ed);
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.2s, background 0.3s;
+}
+
+.button:hover {
+  transform: scale(1.05);
+  background: var(--brand-secondary, #56ccf2);
+}
+
+.message {
+  margin-top: 16px;
+  color: #333;
+  font-size: 0.95rem;
+}

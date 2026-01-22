@@ -1,0 +1,336 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.tool {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #343a40;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  font-size: 2rem;
+}
+
+.calculator {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  margin: 2rem 0;
+}
+
+.inputSection {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.textInput {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.textInput label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.textInput textarea {
+  padding: 1rem;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 200px;
+  transition: border-color 0.2s;
+}
+
+.textInput textarea:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.wpmInput {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wpmInput label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.wpmInput input {
+  padding: 10px;
+  border: 2px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 1rem;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.wpmInput input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.level {
+  font-size: 0.9rem;
+  color: #28a745;
+  font-weight: 500;
+  text-align: center;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.calculateBtn,
+.clearBtn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.calculateBtn {
+  background: #28a745;
+  color: white;
+}
+
+.calculateBtn:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.clearBtn {
+  background: #dc3545;
+  color: white;
+}
+
+.clearBtn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.samples {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.samples h4 {
+  margin: 0 0 1rem 0;
+  color: #495057;
+}
+
+.sampleButtons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sampleBtn {
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.sampleBtn:hover {
+  background: #0056b3;
+}
+
+.results {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 2px solid #28a745;
+  margin-top: 2rem;
+}
+
+.results h3 {
+  margin: 0 0 1.5rem 0;
+  color: #28a745;
+  text-align: center;
+  font-size: 1.3rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.statCard {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid #dee2e6;
+  transition: transform 0.2s;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.statValue {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 0.5rem;
+}
+
+.statLabel {
+  color: #6c757d;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tips {
+  background: #e7f3ff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+}
+
+.tips h4 {
+  margin: 0 0 1rem 0;
+  color: #007bff;
+  text-align: center;
+}
+
+.speedGuide {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.speedRange {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+}
+
+.range {
+  font-weight: bold;
+  color: #007bff;
+  min-width: 120px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .tool {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .inputSection {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .textInput textarea {
+    min-height: 150px;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .calculateBtn,
+  .clearBtn {
+    width: 100%;
+  }
+
+  .sampleButtons {
+    flex-direction: column;
+  }
+
+  .sampleBtn {
+    width: 100%;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .speedRange {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .range {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .calculator {
+    padding: 1rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statCard {
+    padding: 1rem;
+  }
+
+  .statValue {
+    font-size: 1.5rem;
+  }
+}

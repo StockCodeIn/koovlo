@@ -1,0 +1,148 @@
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 50px 20px;
+}
+
+.box {
+  max-width: 1000px;
+  width: 100%;
+  background: #fff;
+  padding: 40px 24px;
+  border-radius: 16px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.icon {
+  font-size: 1.8rem;
+}
+
+.textGradient {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.fileInput {
+  display: inline-block;
+  background: gray;
+  border: 2px dashed #ddd;
+  /* margin-right: 10px; */
+  border-radius: 12px;
+  padding: 30px;
+  cursor: pointer;
+  /* width: 200px; */
+  transition: border-color 0.3s ease;
+}
+
+.fileInput:hover {
+  border-color: var(--brand-primary);
+}
+
+.fileInput input {
+  display: none;
+}
+
+.fileInput span {
+  font-weight: 500;
+  color: var(--brand-text);
+}
+
+.metaGrid {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  text-align: left;
+}
+
+.editSection,
+.infoSection {
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+/* ✅ Scoped h2 selectors (fixes the build error) */
+.editSection h2,
+.infoSection h2 {
+  font-size: 1.2rem;
+  margin-bottom: 14px;
+  color: var(--brand-primary);
+}
+
+.inputGroup {
+  margin-bottom: 16px;
+}
+
+.inputGroup label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.inputGroup input:focus {
+  border-color: var(--brand-primary);
+}
+
+.infoSection ul {
+  list-style: none;
+  padding: 0;
+}
+
+.infoSection li {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: #444;
+}
+
+.button {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: transform 0.2s ease;
+}
+
+.button:hover {
+  transform: scale(1.05);
+}
+
+.message {
+  margin-top: 20px;
+  color: #333;
+  font-weight: 500;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .metaGrid {
+    grid-template-columns: 1fr;
+  }
+}

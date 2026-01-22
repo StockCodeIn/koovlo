@@ -1,0 +1,146 @@
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.box {
+  max-width: 800px;
+  width: 100%;
+  background: #fff;
+  padding: 30px 20px;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px; /* Emoji aur text ke beech space */
+}
+
+.icon {
+  /* Emoji ka asli color dikhane ke liye ispar koi gradient nahi lagana */
+  background: none;
+  -webkit-text-fill-color: initial; 
+}
+
+.textGradient {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.fileInput {
+  margin: 20px 0;
+}
+
+.fileInput {
+  display: inline-block;
+  background: gray;
+  border: 2px dashed #ddd;
+  margin-right: 10px;
+  border-radius: 12px;
+  /* padding: 20px; */
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+.fileInput:hover {
+  border-color: var(--brand-primary);
+}
+
+.fileInput input {
+  display: none;
+} 
+
+.uploadLabel {
+  /* background: linear-gradient(90deg, #0072ff, #00c6ff); */
+  color: #fff;
+  padding: 30px 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-block;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.uploadLabel:hover {
+  transform: scale(1.05);
+}
+
+.controls {
+  text-align: left;
+  margin: 20px auto;
+  max-width: 400px;
+}
+
+.controls label {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.controls input[type="text"],
+.select {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 4px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.controls input[type="range"] {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.switchRow {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.switchRow button,
+.uploadBtn {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #f9f9f9;
+  cursor: pointer;
+}
+
+.switchRow button.active,
+.uploadBtn:hover {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  color: #fff;
+  border-color: #00aaff;
+}
+
+.button {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 20px;
+  transition: transform 0.2s;
+}
+
+.button:hover {
+  transform: scale(1.05);
+}
+
+.message {
+  margin-top: 14px;
+  color: #444;
+}

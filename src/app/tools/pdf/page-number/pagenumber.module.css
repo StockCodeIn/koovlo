@@ -1,0 +1,110 @@
+.container {
+  display: flex;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.box {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+  padding: 40px 24px;
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.textGradient {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.fileInput {
+  display: inline-block;
+  background: gray;
+  border: 2px dashed #ddd;
+  margin-right: 10px;
+  border-radius: 12px;
+  padding: 30px;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.fileInput:hover {
+  border-color: var(--brand-primary);
+}
+
+.fileInput input {
+  display: none;
+}
+
+.fileInput span {
+  font-weight: 500;
+  color: var(--brand-text);
+}
+
+.settings {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  text-align: left;
+}
+
+.settings label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.settings input,
+.settings select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.button {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: transform 0.2s;
+}
+
+.button:hover {
+  transform: scale(1.05);
+}
+
+.message {
+  margin-top: 14px;
+  color: #333;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .box {
+    padding: 24px 16px;
+  }
+
+  .pageTitle {
+    font-size: 1.6rem;
+  }
+}

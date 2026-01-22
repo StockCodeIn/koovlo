@@ -1,0 +1,133 @@
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 60px 20px 80px;
+  text-align: center;
+}
+
+.box {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 40px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px; /* Emoji aur text ke beech space */
+}
+
+.icon {
+  /* Emoji ka asli color dikhane ke liye ispar koi gradient nahi lagana */
+  background: none;
+  -webkit-text-fill-color: initial; 
+}
+
+.textGradient {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.box p {
+  color: var(--brand-muted);
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
+.fileInput {
+  display: inline-block;
+  background: gray;
+  margin-right: 10px;
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.fileInput:hover {
+  border-color: var(--brand-primary);
+}
+
+.fileInput input {
+  display: none;
+}
+
+.fileInput span {
+  font-weight: 500;
+  color: var(--brand-text);
+}
+
+.button {
+  margin-top: 24px;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  color: #fff;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.message {
+  margin-top: 18px;
+  font-size: 0.95rem;
+  color: var(--brand-primary);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .box {
+    padding: 30px 16px;
+  }
+
+  .box h1 {
+    font-size: 1.6rem;
+  }
+
+  .button {
+    width: 100%;
+  }
+}
+.qualitySelect {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.qualitySelect label {
+  font-weight: 500;
+  margin-right: 8px;
+  color: var(--color-text, #333);
+}
+
+.qualitySelect select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.qualitySelect select:hover {
+  border-color: var(--color-accent, #0070f3);
+}
