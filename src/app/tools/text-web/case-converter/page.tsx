@@ -1,12 +1,48 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ToolInfo from '@/components/ToolInfo';
 import styles from './caseconverter.module.css';
+
+interface HistoryItem {
+  id: string;
+  inputPreview: string;
+  outputPreview: string;
+  caseType: string;
+  words: number;
+  characters: number;
+  createdAt: string;
+}
 
 export default function CaseConverter() {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [lastSaved, setLastSaved] = useState('');
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('case-converter-data');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        setInputText(data.inputText || '');
+        setOutputText(data.outputText || '');
+        setHistory(data.history || []);
+      } catch (e) {
+        console.error('Error loading data:', e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(
+      'case-converter-data',
+      JSON.stringify({ inputText, outputText, history })
+    );
+    setLastSaved(new Date().toLocaleTimeString());
+  }, [inputText, outputText, history]);
 
   const convertCase = (type: string) => {
     let result = '';
@@ -64,6 +100,21 @@ export default function CaseConverter() {
         result = inputText;
     }
     setOutputText(result);
+
+    if (inputText.trim()) {
+      const words = inputText.trim().split(/\s+/).length;
+      const characters = inputText.length;
+      const newItem: HistoryItem = {
+        id: Date.now().toString(),
+        inputPreview: inputText.trim().slice(0, 160) + (inputText.trim().length > 160 ? '...' : ''),
+        outputPreview: result.trim().slice(0, 160) + (result.trim().length > 160 ? '...' : ''),
+        caseType: type,
+        words,
+        characters,
+        createdAt: new Date().toISOString()
+      };
+      setHistory([newItem, ...history].slice(0, 50));
+    }
   };
 
   const copyToClipboard = async () => {
@@ -80,10 +131,72 @@ export default function CaseConverter() {
     setOutputText('');
   };
 
+  const swapTexts = () => {
+    if (!outputText) return;
+    setInputText(outputText);
+    setOutputText(inputText);
+  };
+
+  const deleteHistoryItem = (id: string) => {
+    setHistory(history.filter(item => item.id !== id));
+  };
+
+  const clearHistory = () => {
+    if (confirm('Are you sure you want to clear all history?')) {
+      setHistory([]);
+    }
+  };
+
+  const getAnalytics = () => {
+    const totalConversions = history.length;
+    const totalWords = history.reduce((sum, item) => sum + item.words, 0);
+    const totalCharacters = history.reduce((sum, item) => sum + item.characters, 0);
+    const averageWords = totalConversions > 0 ? Math.round(totalWords / totalConversions) : 0;
+
+    return { totalConversions, totalWords, totalCharacters, averageWords };
+  };
+
+  const analytics = getAnalytics();
+
   return (
     <main className={styles.container}>
-      <h1>Case Converter</h1>
-      <p>Convert text between different case styles instantly.</p>
+      <div className={styles.header}>
+        <h1 className={styles.title}>🔄 Case Converter</h1>
+        <p className={styles.subtitle}>Convert text between different case styles instantly.</p>
+        <div className={styles.dataInfo}>
+          <span className={styles.infoItem}>💾 <strong>Auto-Save:</strong> Your text is saved</span>
+          <span className={styles.infoSeparator}>•</span>
+          <span className={styles.infoItem}>{lastSaved && <><strong>Last saved:</strong> {lastSaved}</>}</span>
+          <span className={styles.infoSeparator}>•</span>
+          <span className={styles.infoItem}>📈 <strong>{history.length}</strong> conversions</span>
+        </div>
+      </div>
+
+      {(inputText.trim() || history.length > 0) && (
+        <div className={styles.smartDashboard}>
+          <div className={styles.dashboardSection}>
+            <h3>📊 Live Stats</h3>
+            <div className={styles.statsGrid}>
+              <div className={styles.statCard}>
+                <span className={styles.statNumber}>{inputText.trim() ? inputText.trim().split(/\s+/).length : 0}</span>
+                <span className={styles.statName}>Words</span>
+              </div>
+              <div className={styles.statCard}>
+                <span className={styles.statNumber}>{inputText.length}</span>
+                <span className={styles.statName}>Characters</span>
+              </div>
+              <div className={styles.statCard}>
+                <span className={styles.statNumber}>{outputText.length}</span>
+                <span className={styles.statName}>Output Length</span>
+              </div>
+              <div className={styles.statCard}>
+                <span className={styles.statNumber}>{history.length}</span>
+                <span className={styles.statName}>Conversions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className={styles.converter}>
         <div className={styles.inputSection}>
@@ -127,6 +240,17 @@ export default function CaseConverter() {
               iNvErSe
             </button>
           </div>
+          <div className={styles.quickActions}>
+            <button onClick={swapTexts} className={styles.quickBtn} disabled={!outputText}>
+              ↕️ Swap
+            </button>
+            <button onClick={() => setShowAnalytics(!showAnalytics)} className={styles.quickBtn}>
+              📈 Analytics
+            </button>
+            <button onClick={() => setShowHistory(!showHistory)} className={styles.quickBtn}>
+              📋 History
+            </button>
+          </div>
         </div>
 
         <div className={styles.outputSection}>
@@ -147,6 +271,59 @@ export default function CaseConverter() {
           </div>
         </div>
       </div>
+
+      {showAnalytics && history.length > 0 && (
+        <div className={styles.analyticsSection}>
+          <h3>📊 Detailed Analytics</h3>
+          <div className={styles.analyticsGrid}>
+            <div className={styles.analyticsCard}>
+              <h4>Usage Summary</h4>
+              <div className={styles.analyticsMetric}>
+                <span>Total Conversions</span>
+                <span className={styles.metricValue}>{analytics.totalConversions}</span>
+              </div>
+              <div className={styles.analyticsMetric}>
+                <span>Total Words</span>
+                <span className={styles.metricValue}>{analytics.totalWords}</span>
+              </div>
+              <div className={styles.analyticsMetric}>
+                <span>Total Characters</span>
+                <span className={styles.metricValue}>{analytics.totalCharacters}</span>
+              </div>
+              <div className={styles.analyticsMetric}>
+                <span>Avg Words/Conversion</span>
+                <span className={styles.metricValue}>{analytics.averageWords}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showHistory && history.length > 0 && (
+        <div className={styles.historySection}>
+          <div className={styles.historyHeader}>
+            <h3>📋 Conversion History</h3>
+            <button onClick={clearHistory} className={styles.clearBtn}>Clear All</button>
+          </div>
+          <div className={styles.historyList}>
+            {history.map(item => (
+              <div key={item.id} className={styles.historyCard}>
+                <div className={styles.historyCardHeader}>
+                  <span className={styles.historyDate}>{new Date(item.createdAt).toLocaleString()}</span>
+                  <button onClick={() => deleteHistoryItem(item.id)} className={styles.deleteBtn}>Delete</button>
+                </div>
+                <div className={styles.historyMeta}>Type: {item.caseType}</div>
+                <p className={styles.historyText}><strong>Input:</strong> {item.inputPreview}</p>
+                <p className={styles.historyText}><strong>Output:</strong> {item.outputPreview}</p>
+                <div className={styles.historyStats}>
+                  <span>{item.words} words</span>
+                  <span>{item.characters} chars</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <ToolInfo
         howItWorks="Enter or paste your text in the input area<br>Choose the desired case conversion from the options<br>View the converted text in the output area<br>Copy the result or clear to start over"

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { PDFDocument } from 'pdf-lib';
 import ToolInfo from '@/components/ToolInfo';
 import styles from './duplicate.module.css';
 
@@ -10,22 +11,49 @@ export default function DuplicatePages() {
   const [duplicateCount, setDuplicateCount] = useState(1);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [totalPages, setTotalPages] = useState<number | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const handleFile = useCallback((selectedFile: File) => {
+    if (selectedFile.type !== 'application/pdf') {
+      setError('Please select a valid PDF file.');
+      return;
+    }
+    setPdfFile(selectedFile);
+    setError('');
+    setSuccess('');
+    // Get total pages
+    selectedFile.arrayBuffer().then(bytes => {
+      PDFDocument.load(bytes).then(pdf => {
+        setTotalPages(pdf.getPageCount());
+      }).catch(() => {
+        setTotalPages(null);
+      });
+    });
+  }, []);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      if (selectedFile.type !== 'application/pdf') {
-        setError('Please select a PDF file');
-        return;
-      }
-      setPdfFile(selectedFile);
-      setError('');
-      // In a real implementation, we'd get total pages from pdf-lib
-      // For now, we'll set a placeholder
-      setTotalPages(null);
-    }
+    if (selectedFile) handleFile(selectedFile);
   };
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const droppedFile = e.dataTransfer.files[0];
+    if (droppedFile) handleFile(droppedFile);
+  }, [handleFile]);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback(() => {
+    setDragOver(false);
+  }, []);
 
   const parsePageRanges = (input: string): number[] => {
     if (!input.trim()) return [];
@@ -80,18 +108,66 @@ export default function DuplicatePages() {
 
       setProcessing(true);
       setError('');
+      setSuccess('');
+      setProgress(10);
 
-      // In a real implementation, this would use pdf-lib
-      // For now, we'll show a placeholder
-      setError('PDF page duplication requires pdf-lib. This feature is under development.');
+      const arrayBuffer = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const originalPageCount = pdfDoc.getPageCount();
 
-      setTimeout(() => {
+      // Validate pages exist
+      const invalidPages = pages.filter(p => p > originalPageCount);
+      if (invalidPages.length > 0) {
+        setError(`Invalid page numbers: ${invalidPages.join(', ')}`);
         setProcessing(false);
-      }, 2000);
+        return;
+      }
 
+      setProgress(30);
+
+      const newPdf = await PDFDocument.create();
+      const originalPages = pdfDoc.getPages();
+
+      // Add pages in order, duplicating specified pages
+      for (let i = 0; i < originalPages.length; i++) {
+        const pageIndex = i;
+        const pageNumber = i + 1;
+
+        // Add the original page
+        const [copiedPage] = await newPdf.copyPages(pdfDoc, [pageIndex]);
+        newPdf.addPage(copiedPage);
+
+        // Add duplicates if this page is selected
+        if (pages.includes(pageNumber)) {
+          for (let dup = 0; dup < duplicateCount; dup++) {
+            const [duplicatedPage] = await newPdf.copyPages(pdfDoc, [pageIndex]);
+            newPdf.addPage(duplicatedPage);
+          }
+        }
+
+        setProgress(30 + Math.round(((i + 1) / originalPages.length) * 60));
+      }
+
+      setProgress(95);
+
+      const pdfBytes = await newPdf.save();
+      const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${pdfFile.name.replace('.pdf', '')}-duplicated.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      const finalPageCount = newPdf.getPageCount();
+      setProgress(100);
+      setSuccess(`Successfully duplicated ${pages.length} page(s) ${duplicateCount} time(s) each. Final PDF has ${finalPageCount} pages (was ${originalPageCount}).`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid page specification');
+      setError(err instanceof Error ? err.message : 'Failed to duplicate pages');
     }
+
+    setProcessing(false);
+    setTimeout(() => setProgress(0), 1000);
   };
 
   const getPagePreview = () => {
@@ -105,69 +181,123 @@ export default function DuplicatePages() {
     }
   };
 
+  const clearFile = () => {
+    setPdfFile(null);
+    setPagesToDuplicate('');
+    setTotalPages(null);
+    setError('');
+    setSuccess('');
+  };
+
+  const handleQuickAction = (action: string) => {
+    if (!totalPages) return;
+
+    switch (action) {
+      case 'first':
+        setPagesToDuplicate('1');
+        break;
+      case 'last':
+        setPagesToDuplicate(totalPages.toString());
+        break;
+      case 'first-two':
+        setPagesToDuplicate('1,2');
+        break;
+      case 'all':
+        setPagesToDuplicate(`1-${totalPages}`);
+        break;
+    }
+  };
+
   return (
     <main className={styles.container}>
-      <h1>Duplicate PDF Pages</h1>
-      <p>Create copies of specific pages within your PDF document</p>
+      <h1 className={styles.pageTitle}>
+        <span className={styles.icon}>📋</span>
+        <span className={styles.textGradient}>Duplicate PDF Pages</span>
+      </h1>
+      <p className={styles.description}>Create copies of specific pages within your PDF document</p>
 
       <div className={styles.converter}>
         <div className={styles.inputSection}>
-          <div className={styles.fileInput}>
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={handleFileSelect}
-              className={styles.hiddenInput}
-              id="pdf-file"
-            />
-            <label htmlFor="pdf-file" className={styles.fileLabel}>
-              {pdfFile ? pdfFile.name : 'Choose PDF File'}
-            </label>
+          <div
+            className={`${styles.dropZone} ${dragOver ? styles.dragOver : ''}`}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+          >
+            <div className={styles.fileInput}>
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={handleFileSelect}
+                className={styles.hiddenInput}
+                id="pdf-file"
+              />
+              <label htmlFor="pdf-file" className={styles.fileLabel}>
+                {pdfFile ? pdfFile.name : '📂 Choose PDF File'}
+              </label>
+            </div>
+            <p className={styles.dropText}>or drag and drop your PDF here</p>
           </div>
 
           {pdfFile && (
             <div className={styles.fileInfo}>
               <p><strong>File:</strong> {pdfFile.name} ({(pdfFile.size / 1024 / 1024).toFixed(2)} MB)</p>
               {totalPages && <p><strong>Total Pages:</strong> {totalPages}</p>}
+              <button onClick={clearFile} className={styles.clearBtn}>Change File</button>
             </div>
           )}
 
-          <div className={styles.pageInput}>
-            <label htmlFor="pages">Pages to Duplicate:</label>
-            <textarea
-              id="pages"
-              value={pagesToDuplicate}
-              onChange={(e) => setPagesToDuplicate(e.target.value)}
-              placeholder="e.g., 1,3,5-7,10"
-              className={styles.pageTextarea}
-              rows={3}
-            />
-            <div className={styles.inputHelp}>
-              <p><strong>Examples:</strong></p>
-              <ul>
-                <li>Single page: <code>5</code></li>
-                <li>Multiple pages: <code>1,3,5</code></li>
-                <li>Page range: <code>5-10</code></li>
-                <li>Mixed: <code>1,3,5-7,10</code></li>
-              </ul>
+          {pdfFile && (
+            <div className={styles.pageInput}>
+              <label htmlFor="pages">Pages to Duplicate:</label>
+              <textarea
+                id="pages"
+                value={pagesToDuplicate}
+                onChange={(e) => setPagesToDuplicate(e.target.value)}
+                placeholder="e.g., 1,3,5-7,10"
+                className={styles.pageTextarea}
+                rows={3}
+                disabled={processing}
+              />
+              <div className={styles.inputHelp}>
+                <p><strong>Examples:</strong></p>
+                <ul>
+                  <li>Single page: <code>5</code></li>
+                  <li>Multiple pages: <code>1,3,5</code></li>
+                  <li>Page range: <code>5-10</code></li>
+                  <li>Mixed: <code>1,3,5-7,10</code></li>
+                </ul>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className={styles.duplicateOptions}>
-            <label htmlFor="count">Number of Copies per Page:</label>
-            <select
-              id="count"
-              value={duplicateCount}
-              onChange={(e) => setDuplicateCount(parseInt(e.target.value))}
-              className={styles.countSelect}
-            >
-              <option value={1}>1 copy</option>
-              <option value={2}>2 copies</option>
-              <option value={3}>3 copies</option>
-              <option value={4}>4 copies</option>
-              <option value={5}>5 copies</option>
-            </select>
-          </div>
+          {pdfFile && (
+            <div className={styles.duplicateOptions}>
+              <label htmlFor="count">Number of Copies per Page:</label>
+              <select
+                id="count"
+                value={duplicateCount}
+                onChange={(e) => setDuplicateCount(parseInt(e.target.value))}
+                className={styles.countSelect}
+                disabled={processing}
+              >
+                <option value={1}>1 copy</option>
+                <option value={2}>2 copies</option>
+                <option value={3}>3 copies</option>
+                <option value={4}>4 copies</option>
+                <option value={5}>5 copies</option>
+              </select>
+            </div>
+          )}
+
+          {processing && (
+            <div className={styles.progressContainer}>
+              <div className={styles.progressBar}>
+                <div className={styles.progressFill} style={{ width: `${progress}%` }}></div>
+              </div>
+              <p>{progress}% complete</p>
+            </div>
+          )}
 
           <button
             onClick={duplicatePages}
@@ -178,6 +308,7 @@ export default function DuplicatePages() {
           </button>
 
           {error && <div className={styles.error}>{error}</div>}
+          {success && <div className={styles.success}>{success}</div>}
         </div>
 
         <div className={styles.previewSection}>
@@ -227,29 +358,37 @@ export default function DuplicatePages() {
             </div>
           </div>
 
-          <div className={styles.quickActions}>
-            <h4>Quick Actions</h4>
-            <div className={styles.actionButtons}>
-              <button
-                onClick={() => setPagesToDuplicate('1')}
-                className={styles.quickBtn}
-              >
-                Duplicate First Page
-              </button>
-              <button
-                onClick={() => setPagesToDuplicate('last')}
-                className={styles.quickBtn}
-              >
-                Duplicate Last Page
-              </button>
-              <button
-                onClick={() => setPagesToDuplicate('1,2')}
-                className={styles.quickBtn}
-              >
-                Duplicate First Two
-              </button>
+          {totalPages && (
+            <div className={styles.quickActions}>
+              <h4>Quick Actions</h4>
+              <div className={styles.actionButtons}>
+                <button
+                  onClick={() => handleQuickAction('first')}
+                  className={styles.quickBtn}
+                >
+                  Duplicate First Page
+                </button>
+                <button
+                  onClick={() => handleQuickAction('last')}
+                  className={styles.quickBtn}
+                >
+                  Duplicate Last Page
+                </button>
+                <button
+                  onClick={() => handleQuickAction('first-two')}
+                  className={styles.quickBtn}
+                >
+                  Duplicate First Two
+                </button>
+                <button
+                  onClick={() => handleQuickAction('all')}
+                  className={styles.quickBtn}
+                >
+                  Duplicate All Pages
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 

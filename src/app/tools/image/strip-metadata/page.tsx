@@ -1,374 +1,308 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import ToolInfo from '@/components/ToolInfo';
-import styles from './stripmetadata.module.css';
+import { useState, useRef } from "react";
+import styles from "./stripmetadata.module.css";
+import ToolInfo from "@/components/ToolInfo";
+
+type ImageItem = {
+  id: string;
+  file: File;
+  preview: string;
+  originalSize: number;
+  strippedSize: number | null;
+  strippedBlob: Blob | null;
+  status: "pending" | "processing" | "done" | "error";
+};
 
 export default function StripImageMetadata() {
-  const [files, setFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
-  const [metadata, setMetadata] = useState<any[]>([]);
-  const [processing, setProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState('');
+  const [images, setImages] = useState<ImageItem[]>([]);
+  const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(event.target.files || []);
-    if (selectedFiles.length === 0) return;
+  const handleFiles = async (files: FileList | null) => {
+    if (!files) return;
 
-    // Filter for image files only
-    const imageFiles = selectedFiles.filter(file =>
-      file.type.startsWith('image/')
-    );
+    const newImages: ImageItem[] = [];
 
-    if (imageFiles.length !== selectedFiles.length) {
-      setError('Some files were skipped because they are not images');
-    }
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) continue;
 
-    setFiles(imageFiles);
-    setError('');
-
-    // Create previews and extract metadata
-    const newPreviews: string[] = [];
-    const newMetadata: any[] = [];
-
-    imageFiles.forEach((file, index) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        newPreviews.push(e.target?.result as string);
-
-        // Extract metadata (simplified - in real implementation would use exif-js or similar)
-        extractMetadata(file).then(meta => {
-          newMetadata[index] = meta;
-          if (newMetadata.filter(m => m !== undefined).length === imageFiles.length) {
-            setMetadata(newMetadata);
-          }
-        });
-
-        if (newPreviews.length === imageFiles.length) {
-          setPreviews(newPreviews);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const extractMetadata = async (file: File) => {
-    // This is a simplified metadata extraction
-    // In a real implementation, you'd use a library like exif-js
-    const metadata: any = {
-      filename: file.name,
-      size: file.size,
-      type: file.type,
-      lastModified: new Date(file.lastModified).toLocaleString(),
-      hasMetadata: false,
-      metadataFields: []
-    };
-
-    // Simulate metadata detection
-    // Real implementation would parse EXIF, IPTC, XMP data
-    if (file.type.includes('jpeg') || file.type.includes('jpg')) {
-      metadata.hasMetadata = Math.random() > 0.3; // Simulate some images having metadata
-      if (metadata.hasMetadata) {
-        metadata.metadataFields = [
-          'EXIF: Make/Model',
-          'EXIF: DateTime',
-          'EXIF: GPS Coordinates',
-          'EXIF: Camera Settings',
-          'IPTC: Copyright',
-          'IPTC: Keywords'
-        ];
-      }
-    }
-
-    return metadata;
-  };
-
-  const stripMetadata = (file: File): Promise<Blob> => {
-    return new Promise((resolve, reject) => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        reject(new Error('Canvas not supported'));
-        return;
-      }
-
+      const preview = URL.createObjectURL(file);
       const img = new Image();
-      img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img, 0, 0);
+      img.src = preview;
 
-        // Drawing to canvas automatically strips metadata
+      await new Promise((resolve) => {
+        img.onload = () => {
+          newImages.push({
+            id: Math.random().toString(36),
+            file,
+            preview,
+            originalSize: file.size,
+            strippedSize: null,
+            strippedBlob: null,
+            status: "pending",
+          });
+          resolve(null);
+        };
+        img.onerror = () => {
+          resolve(null);
+        };
+      });
+    }
+
+    setImages((prev) => [...prev, ...newImages]);
+  };
+
+  const stripMetadata = async (img: ImageItem): Promise<ImageItem> => {
+    return new Promise((resolve) => {
+      const image = new Image();
+      image.src = img.preview;
+
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve({ ...img, status: "error" });
+          return;
+        }
+
+        ctx.drawImage(image, 0, 0);
+
         canvas.toBlob(
           (blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              reject(new Error('Failed to strip metadata'));
+            if (!blob) {
+              resolve({ ...img, status: "error" });
+              return;
             }
+
+            resolve({
+              ...img,
+              strippedBlob: blob,
+              strippedSize: blob.size,
+              status: "done",
+            });
           },
-          file.type,
+          img.file.type,
           0.95
         );
       };
-      img.onerror = () => reject(new Error('Image loading failed'));
-      img.src = URL.createObjectURL(file);
+
+      image.onerror = () => {
+        resolve({ ...img, status: "error" });
+      };
     });
   };
 
-  const downloadFile = (blob: Blob, filename: string) => {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const stripAll = async () => {
+    const pending = images.filter((img) => img.status === "pending");
+
+    for (const img of pending) {
+      setImages((prev) =>
+        prev.map((i) => (i.id === img.id ? { ...i, status: "processing" } : i))
+      );
+
+      const stripped = await stripMetadata(img);
+
+      setImages((prev) =>
+        prev.map((i) => (i.id === stripped.id ? stripped : i))
+      );
+    }
   };
 
-  const stripAllMetadata = async () => {
-    if (files.length === 0) {
-      setError('Please select images to process');
-      return;
-    }
+  const downloadImage = (img: ImageItem) => {
+    if (!img.strippedBlob) return;
 
-    setProcessing(true);
-    setProgress(0);
-    setError('');
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(img.strippedBlob);
+    const nameWithoutExt = img.file.name.split(".")[0];
+    const ext = img.file.name.substring(img.file.name.lastIndexOf("."));
+    link.download = `${nameWithoutExt}-clean${ext}`;
+    link.click();
+  };
 
-    try {
-      const strippedFiles: Blob[] = [];
-
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const stripped = await stripMetadata(file);
-        strippedFiles.push(stripped);
-        setProgress(((i + 1) / files.length) * 100);
+  const downloadAll = () => {
+    images.forEach((img, index) => {
+      if (img.status === "done") {
+        setTimeout(() => downloadImage(img), index * 100);
       }
+    });
+  };
 
-      // Download all stripped images
-      for (let i = 0; i < strippedFiles.length; i++) {
-        const originalName = files[i].name;
-        const nameWithoutExt = originalName.substring(0, originalName.lastIndexOf('.'));
-        const extension = originalName.substring(originalName.lastIndexOf('.'));
-        const newFilename = `${nameWithoutExt}_clean${extension}`;
-        downloadFile(strippedFiles[i], newFilename);
-      }
-
-      setProgress(100);
-    } catch (err) {
-      setError('Failed to strip metadata');
-    } finally {
-      setProcessing(false);
-    }
+  const removeImage = (id: string) => {
+    setImages((prev) => prev.filter((img) => img.id !== id));
   };
 
   const clearAll = () => {
-    setFiles([]);
-    setPreviews([]);
-    setMetadata([]);
-    setProgress(0);
-    setError('');
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+    images.forEach((img) => URL.revokeObjectURL(img.preview));
+    setImages([]);
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
     }
   };
 
-  const removeFile = (index: number) => {
-    const newFiles = files.filter((_, i) => i !== index);
-    const newPreviews = previews.filter((_, i) => i !== index);
-    const newMetadata = metadata.filter((_, i) => i !== index);
-    setFiles(newFiles);
-    setPreviews(newPreviews);
-    setMetadata(newMetadata);
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    handleFiles(e.dataTransfer.files);
   };
 
-  const getMetadataSummary = () => {
-    const totalFiles = metadata.length;
-    const filesWithMetadata = metadata.filter(m => m?.hasMetadata).length;
-    const totalMetadataFields = metadata.reduce((sum, m) => sum + (m?.metadataFields?.length || 0), 0);
-
-    return { totalFiles, filesWithMetadata, totalMetadataFields };
+  const formatSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
-  const summary = getMetadataSummary();
+  const totalOriginal = images.reduce((sum, img) => sum + img.originalSize, 0);
+  const totalStripped = images.reduce((sum, img) => sum + (img.strippedSize || 0), 0);
+  const totalSaved = totalOriginal - totalStripped;
+  const percentSaved = totalOriginal > 0 ? ((totalSaved / totalOriginal) * 100).toFixed(1) : "0";
 
   return (
     <main className={styles.container}>
-      <h1>Strip Image Metadata</h1>
-      <p>Remove EXIF, IPTC, and other metadata from images for privacy</p>
+      <section className={styles.header}>
+        <h1 className={styles.pageTitle}>
+          <span className={styles.icon}>🛡️</span>
+          <span className={styles.textGradient}>Strip Metadata</span>
+        </h1>
+        <p className={styles.subtitle}>Remove EXIF, GPS, and embedded data from images for privacy.</p>
+      </section>
 
-      <div className={styles.stripper}>
-        <div className={styles.controls}>
-          <div className={styles.fileInput}>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileSelect}
-              className={styles.hiddenInput}
-              ref={fileInputRef}
-              id="strip-metadata-files"
-            />
-            <label htmlFor="strip-metadata-files" className={styles.fileLabel}>
-              {files.length > 0 ? `${files.length} files selected` : 'Choose Images'}
-            </label>
-          </div>
-
-          {files.length > 0 && (
-            <div className={styles.fileInfo}>
-              <p><strong>Files:</strong> {files.length} images selected</p>
-              <p><strong>Total Size:</strong> {(files.reduce((sum, file) => sum + file.size, 0) / 1024 / 1024).toFixed(2)} MB</p>
-            </div>
-          )}
-
-          <div className={styles.metadataSummary}>
-            <h3>Metadata Analysis</h3>
-            <div className={styles.summaryStats}>
-              <div className={styles.stat}>
-                <span className={styles.statNumber}>{summary.filesWithMetadata}</span>
-                <span className={styles.statLabel}>Files with metadata</span>
-              </div>
-              <div className={styles.stat}>
-                <span className={styles.statNumber}>{summary.totalMetadataFields}</span>
-                <span className={styles.statLabel}>Metadata fields found</span>
-              </div>
-              <div className={styles.stat}>
-                <span className={styles.statNumber}>{summary.totalFiles - summary.filesWithMetadata}</span>
-                <span className={styles.statLabel}>Clean files</span>
-              </div>
-            </div>
-
-            <div className={styles.metadataTypes}>
-              <h4>Common Metadata Types:</h4>
-              <div className={styles.metadataList}>
-                <span className={styles.metadataTag}>EXIF</span>
-                <span className={styles.metadataTag}>GPS</span>
-                <span className={styles.metadataTag}>IPTC</span>
-                <span className={styles.metadataTag}>XMP</span>
-                <span className={styles.metadataTag}>Camera Info</span>
-                <span className={styles.metadataTag}>Timestamps</span>
-              </div>
-            </div>
-
-            <div className={styles.privacyNote}>
-              <h4>🔒 Privacy Protection</h4>
-              <p>Stripping metadata removes:</p>
-              <ul>
-                <li>Camera make/model and settings</li>
-                <li>GPS location coordinates</li>
-                <li>Timestamps and edit history</li>
-                <li>Copyright and ownership info</li>
-                <li>Software used to create/edit</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className={styles.actions}>
-            <button
-              onClick={stripAllMetadata}
-              disabled={files.length === 0 || processing}
-              className={styles.stripBtn}
-            >
-              {processing ? `Processing... ${Math.round(progress)}%` : 'Strip Metadata'}
-            </button>
-            <button
-              onClick={clearAll}
-              disabled={processing}
-              className={styles.clearBtn}
-            >
-              Clear All
-            </button>
-          </div>
-
-          {error && <div className={styles.error}>{error}</div>}
+      <section
+        className={`${styles.dropzone} ${dragActive ? styles.dragActive : ""}`}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) => handleFiles(e.target.files)}
+          style={{ display: "none" }}
+        />
+        <div className={styles.dropzoneContent}>
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+          </svg>
+          <h3>Drop images here or click to browse</h3>
+          <p>Support: JPG, PNG, WebP, GIF • Multiple files allowed</p>
         </div>
+      </section>
 
-        <div className={styles.previewSection}>
-          <h3>Selected Images ({files.length})</h3>
+      {images.length > 0 && (
+        <>
+          <section className={styles.stats}>
+            <div className={styles.stat}>
+              <span className={styles.statLabel}>Total Images</span>
+              <span className={styles.statValue}>{images.length}</span>
+            </div>
+            <div className={styles.stat}>
+              <span className={styles.statLabel}>Ready</span>
+              <span className={styles.statValue}>{images.filter(i => i.status === "pending").length}</span>
+            </div>
+            <div className={styles.stat}>
+              <span className={styles.statLabel}>Cleaned</span>
+              <span className={styles.statValue} style={{color: "#dc2626"}}>{images.filter(i => i.status === "done").length}</span>
+            </div>
+            {totalStripped > 0 && (
+              <div className={styles.stat}>
+                <span className={styles.statLabel}>Space Saved</span>
+                <span className={styles.statValue} style={{color: "#22c55e"}}>
+                  {formatSize(totalSaved)} ({percentSaved}%)
+                </span>
+              </div>
+            )}
+          </section>
 
-          {previews.length > 0 ? (
-            <div className={styles.imageGrid}>
-              {previews.map((preview, index) => (
-                <div key={index} className={styles.imageItem}>
-                  <div className={styles.imageWrapper}>
-                    <img
-                      src={preview}
-                      alt={`Preview ${index + 1}`}
-                      className={styles.previewImage}
-                    />
-                    <button
-                      onClick={() => removeFile(index)}
-                      className={styles.removeBtn}
-                      title="Remove image"
-                    >
-                      ✕
-                    </button>
-                    {metadata[index]?.hasMetadata && (
-                      <div className={styles.metadataIndicator}>
-                        <span className={styles.metadataBadge}>Has Metadata</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className={styles.imageInfo}>
-                    <p className={styles.fileName}>{files[index]?.name}</p>
-                    <p className={styles.fileSize}>
-                      {(files[index]?.size / 1024).toFixed(1)} KB
-                    </p>
-                    <div className={styles.metadataStatus}>
-                      {metadata[index]?.hasMetadata ? (
-                        <span className={styles.hasMetadata}>
-                          ⚠️ {metadata[index]?.metadataFields?.length || 0} metadata fields
-                        </span>
-                      ) : (
-                        <span className={styles.cleanFile}>
-                          ✅ No metadata detected
-                        </span>
-                      )}
-                    </div>
-                    <p className={styles.outputName}>
-                      {files[index]?.name.replace(/\.[^/.]+$/, '')}_clean{files[index]?.name.substring(files[index].name.lastIndexOf('.'))}
-                    </p>
+          <section className={styles.actions}>
+            <button onClick={stripAll} className={styles.btnPrimary} disabled={images.every(i => i.status !== "pending")}>
+              🛡️ Strip All ({images.filter(i => i.status === "pending").length})
+            </button>
+            <button onClick={downloadAll} className={styles.btnSecondary} disabled={images.every(i => i.status !== "done")}>
+              ⬇️ Download All ({images.filter(i => i.status === "done").length})
+            </button>
+            <button onClick={clearAll} className={styles.btnDanger}>
+              🗑️ Clear All
+            </button>
+          </section>
+
+          <section className={styles.grid}>
+            {images.map((img) => (
+              <div key={img.id} className={styles.card}>
+                <div className={styles.cardImage}>
+                  <img src={img.preview} alt={img.file.name} />
+                  <div className={styles.cardStatus}>
+                    {img.status === "pending" && <span className={styles.badge}>Pending</span>}
+                    {img.status === "processing" && <span className={`${styles.badge} ${styles.badgeProcessing}`}>Processing...</span>}
+                    {img.status === "done" && <span className={`${styles.badge} ${styles.badgeSuccess}`}>✓ Clean</span>}
+                    {img.status === "error" && <span className={`${styles.badge} ${styles.badgeError}`}>Error</span>}
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className={styles.noImages}>
-              <div className={styles.placeholderIcon}>🛡️</div>
-              <p>Select images to analyze and strip metadata</p>
-              <p className={styles.hint}>Check for EXIF, GPS, and other embedded data</p>
-            </div>
-          )}
-
-          {processing && (
-            <div className={styles.progressContainer}>
-              <div className={styles.progressBar}>
-                <div
-                  className={styles.progressFill}
-                  style={{ width: `${progress}%` }}
-                ></div>
+                <div className={styles.cardBody}>
+                  <h4 className={styles.cardTitle}>{img.file.name}</h4>
+                  <div className={styles.cardInfo}>
+                    <span style={{fontSize: "0.75rem", color: "#6b7280"}}>
+                      {formatSize(img.originalSize)}
+                    </span>
+                    {img.strippedBlob && (
+                      <>
+                        <span>→</span>
+                        <span style={{fontSize: "0.75rem", color: "#22c55e", fontWeight: 600}}>
+                          {formatSize(img.strippedSize!)}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  {img.strippedSize && (
+                    <div className={styles.savedBadge}>
+                      Saved: {formatSize(img.originalSize - img.strippedSize)}
+                    </div>
+                  )}
+                  <div className={styles.cardActions}>
+                    {img.status === "done" && (
+                      <button onClick={() => downloadImage(img)} className={styles.btnSmall}>
+                        ⬇️ Download
+                      </button>
+                    )}
+                    <button onClick={() => removeImage(img.id)} className={styles.btnSmallDanger}>
+                      Remove
+                    </button>
+                  </div>
+                </div>
               </div>
-              <p className={styles.progressText}>
-                Stripping metadata... {Math.round(progress)}%
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
+            ))}
+          </section>
+        </>
+      )}
 
       <ToolInfo
-        howItWorks="Select multiple images<br>Tool analyzes embedded metadata<br>Click strip to remove all metadata<br>Download clean versions automatically"
+        howItWorks="1. Drag & drop or select images<br>2. Tool removes all embedded metadata<br>3. Click 'Strip All' to process<br>4. Download cleaned images individually or all at once"
         faqs={[
-          { title: "What metadata is removed?", content: "EXIF (camera info, GPS), IPTC (copyright, keywords), XMP (extended metadata), and other embedded data." },
-          { title: "Does it affect image quality?", content: "No, only metadata is removed. Image pixels and quality remain unchanged." },
-          { title: "Why strip metadata?", content: "Protects privacy by removing location data, camera info, and personal information embedded in photos." },
-          { title: "Can metadata be recovered?", content: "Once stripped and saved, the metadata cannot be recovered from the processed image." }
+          { title: "What metadata gets removed?", content: "EXIF data (camera settings, GPS coordinates), IPTC data (keywords, copyright), XMP data, and other embedded information." },
+          { title: "Does this affect image quality?", content: "No, only metadata is removed. The image pixels and visual quality remain exactly the same." },
+          { title: "Why is this important?", content: "Protects your privacy by removing location data, camera info, timestamps, and personal information before sharing photos." },
+          { title: "Can I recover stripped metadata?", content: "No, once metadata is stripped and saved, it cannot be recovered from the processed image." }
         ]}
-        tips={["Always strip metadata before sharing<br>Check social media privacy settings<br>Be aware of cloud storage metadata<br>Consider watermarking instead of metadata"]}
+        tips={[
+          "Always strip metadata before sharing photos on social media",
+          "Especially important for photos containing location data or sensitive information",
+          "Batch process multiple images at once to save time",
+          "Downloaded images have '-clean' suffix for easy identification"
+        ]}
       />
     </main>
   );

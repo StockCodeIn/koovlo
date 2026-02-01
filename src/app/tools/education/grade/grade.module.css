@@ -13,6 +13,83 @@
   margin-top: 2rem;
 }
 
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #343a40;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  font-size: 2rem;
+}
+
+.subtitle {
+  color: #6c757d;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.dataInfo {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e7f3ff 0%, #f0e8ff 100%);
+  border-left: 4px solid #667eea;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+}
+
+.infoItem {
+  color: #343a40;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.infoSeparator {
+  color: #adb5bd;
+}
+
+.presetBtns {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.presetBtn {
+  padding: 10px 16px;
+  background: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+  color: #495057;
+}
+
+.presetBtn:hover {
+  background: #e9ecef;
+  border-color: #007bff;
+  transform: translateY(-1px);
+}
+
 .inputSection {
   margin-bottom: 2rem;
 }
@@ -218,6 +295,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .resultsHeader h3 {
@@ -226,8 +305,14 @@
   font-size: 1.2rem;
 }
 
+.headerActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.saveHistoryBtn,
 .copyBtn {
-  padding: 6px 12px;
+  padding: 8px 12px;
   background: #28a745;
   color: white;
   border: none;
@@ -235,8 +320,10 @@
   cursor: pointer;
   font-size: 12px;
   transition: background-color 0.2s;
+  font-weight: 500;
 }
 
+.saveHistoryBtn:hover,
 .copyBtn:hover {
   background: #218838;
 }
@@ -345,6 +432,94 @@
   color: #007bff;
 }
 
+.historySection {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.historySection h3 {
+  margin: 0 0 1rem 0;
+  color: #343a40;
+  font-size: 1.1rem;
+}
+
+.historyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.historyCard {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.historyCard:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.historyDate {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.historyName {
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.historyStats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.historyPercentage {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.historyGrade {
+  background: #e7f3ff;
+  color: #007bff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.historyDeleteBtn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .container {
@@ -353,6 +528,39 @@
 
   .tool {
     padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .icon {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .dataInfo {
+    padding: 0.75rem 0.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .infoSeparator {
+    display: none;
+  }
+
+  .presetBtns {
+    gap: 0.3rem;
+  }
+
+  .presetBtn {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 0.85rem;
   }
 
   .inputHeader {
@@ -373,10 +581,24 @@
 
   .subjectFields {
     width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .subjectName {
+    width: 100%;
+  }
+
+  .marksInput {
     flex: 1;
+  }
+
+  .divider {
+    display: none;
+  }
+
+  .weightInput {
+    width: 100%;
   }
 
   .scaleOptions {
@@ -388,6 +610,17 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+  }
+
+  .headerActions {
+    width: 100%;
+    gap: 0.3rem;
+  }
+
+  .saveHistoryBtn,
+  .copyBtn {
+    flex: 1;
+    min-width: 0;
   }
 
   .resultsGrid {
@@ -411,10 +644,23 @@
   .clearBtn {
     width: 100%;
   }
+
+  .historyGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 480px) {
   .resultsGrid {
     grid-template-columns: 1fr;
+  }
+
+  .historyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .presetBtn {
+    font-size: 0.75rem;
+    padding: 8px 8px;
   }
 }

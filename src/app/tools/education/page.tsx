@@ -22,30 +22,17 @@ export default function EducationToolsPage() {
 
       <div className={styles.grid}>
         <ToolCard title="Percentage Calculator" desc="Calculate exam percentage" link="/tools/education/percentage" icon="📊" />
-        <ToolCard title="CGPA Calculator" desc="Calculate CGPA" link="/tools/education/cgpa" icon="📘" />
-        <ToolCard title="GPA Calculator" desc="Calculate GPA" link="/tools/education/gpa" icon="📚" />
-        <ToolCard title="Marks to Percentage" desc="Convert marks to percentage" link="/tools/education/marks-percentage" icon="🔄" />
-        <ToolCard title="Grade Calculator" desc="Calculate grades" link="/tools/education/grade" icon="🎓" />
-        <ToolCard title="Attendance Calculator" desc="Calculate attendance percentage" link="/tools/education/attendance" icon="📅" />
-        <ToolCard title="Rank Calculator" desc="Calculate rank" link="/tools/education/rank" icon="🏆" />
-        <ToolCard title="Word Counter" desc="Count words in text" link="/tools/education/word-counter" icon="📝" />
-        <ToolCard title="Reading Time Calculator" desc="Estimate reading time" link="/tools/education/reading-time" icon="⏱️" />
-        <ToolCard title="Text Summarizer" desc="Summarize text" link="/tools/education/text-summarizer" icon="📄" />
-        <ToolCard title="Flashcard Maker" desc="Create flashcards" link="/tools/education/flashcard" icon="🃏" />
-        <ToolCard title="Quiz Generator" desc="Generate quizzes" link="/tools/education/quiz-generator" icon="❓" />
-        <ToolCard title="Notes Organizer" desc="Organize notes" link="/tools/education/notes-organizer" icon="📓" />
-        <ToolCard title="Scientific Calculator" desc="Advanced calculator" link="/tools/education/scientific-calc" icon="🧮" />
-        <ToolCard title="Unit Converter" desc="Convert units" link="/tools/education/unit-converter" icon="🔄" />
-        <ToolCard title="Fraction Calculator" desc="Calculate fractions" link="/tools/education/fraction-calc" icon="➗" />
-        <ToolCard title="Average Calculator" desc="Calculate averages" link="/tools/education/average" icon="📊" />
-        <ToolCard title="Speed Distance Time" desc="Calculate speed, distance, time" link="/tools/education/speed-distance-time" icon="🏃" />
-        <ToolCard title="Interest Calculator" desc="Calculate simple/compound interest" link="/tools/education/interest" icon="💰" />
-        <ToolCard title="Question Paper Timer" desc="Timer for exams" link="/tools/education/timer" icon="⏰" />
-        <ToolCard title="Answer Sheet Generator" desc="Generate answer sheets" link="/tools/education/answer-sheet" icon="📝" />
-        <ToolCard title="OMR Sheet Generator" desc="Generate OMR sheets" link="/tools/education/omr-sheet" icon="📋" />
-        <ToolCard title="Revision Planner" desc="Plan revisions" link="/tools/education/revision-planner" icon="📅" />
-        <ToolCard title="Checklist" desc="Important topics checklist" link="/tools/education/checklist" icon="✅" />
-    </div>
+        <ToolCard title="CGPA Calculator" desc="Calculate overall CGPA across all semesters with credits & percentage" link="/tools/education/cgpa" icon="📘" />
+        <ToolCard title="GPA Calculator" desc="Calculate current semester GPA and predict required grades for your target" link="/tools/education/gpa" icon="📚" />
+        <ToolCard title="Grade Calculator" desc="Calculate weighted grades" link="/tools/education/grade" icon="🎓" />
+        <ToolCard title="Attendance Calculator" desc="Track and calculate attendance" link="/tools/education/attendance" icon="📅" />
+        <ToolCard title="Rank Calculator" desc="Calculate class rank & percentile" link="/tools/education/rank" icon="🏆" />
+        <ToolCard title="Text Summarizer" desc="Summarize long text instantly" link="/tools/education/text-summarizer" icon="📄" />
+        <ToolCard title="Flashcard Maker" desc="Create study flashcards" link="/tools/education/flashcard" icon="🃏" />
+        <ToolCard title="Quiz Generator" desc="Generate practice quizzes" link="/tools/education/quiz-generator" icon="❓" />
+        <ToolCard title="Notes Organizer" desc="Professional note-taking with categories, tags, pinning, and advanced organization" link="/tools/education/notes-organizer" icon="📓" />
+        <ToolCard title="Revision Planner" desc="Plan your exam revision" link="/tools/education/revision-planner" icon="📅" />
+      </div>
     </main >
   );
 }

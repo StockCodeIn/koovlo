@@ -1,0 +1,338 @@
+/* src/app/tools/pdf/extract-pages/split.module.css */
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 60px 20px 80px;
+  text-align: center;
+}
+
+.box {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 40px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px; /* Emoji aur text ke beech space */
+}
+
+.icon {
+  /* Emoji ka asli color dikhane ke liye ispar koi gradient nahi lagana */
+  background: none;
+  -webkit-text-fill-color: initial; 
+}
+
+.textGradient {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.box p {
+  color: var(--brand-muted);
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
+.dropZone {
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 30px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.dropZone.dragOver {
+  border-color: var(--brand-primary);
+  background: rgba(0, 123, 255, 0.05);
+}
+
+.fileInput {
+  display: inline-block;
+  background: #fafafa;
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.fileInput:hover {
+  border-color: var(--brand-primary);
+}
+
+.fileInput input {
+  display: none;
+}
+
+.fileInput span {
+  font-weight: 500;
+  color: var(--brand-text);
+}
+
+.dropText {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.fileInfo {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  text-align: left;
+}
+
+.fileInfo p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+}
+
+.clearBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+.clearBtn:hover {
+  background: #c82333;
+}
+
+.inputGroup {
+  margin-top: 20px;
+  text-align: left;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.inputGroup label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--brand-text);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.inputGroup input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 0.95rem;
+  transition: border-color 0.3s ease;
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: var(--brand-primary);
+}
+
+.inputHelp {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.inputHelp p {
+  margin: 0 0 8px 0;
+  font-weight: 500;
+  color: var(--brand-text);
+}
+
+.inputHelp ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.inputHelp li {
+  margin: 4px 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.inputHelp code {
+  background: #f8f9fa;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+  color: #495057;
+}
+
+.preview {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.preview h3 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  color: var(--brand-text);
+}
+
+.pageNumbers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pageNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  background: var(--brand-primary);
+  color: white;
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.morePages {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  height: 35px;
+  background: #6c757d;
+  color: white;
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.progressContainer {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  transition: width 0.3s ease;
+}
+
+.button {
+  margin-top: 24px;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  color: #fff;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.message {
+  margin-top: 18px;
+  font-size: 0.95rem;
+  color: var(--brand-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 40px 16px 60px;
+  }
+
+  .box {
+    padding: 30px 16px;
+  }
+
+  .pageTitle {
+    font-size: 1.8rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dropZone {
+    padding: 20px 16px;
+  }
+
+  .fileInput {
+    padding: 16px;
+  }
+
+  .inputGroup {
+    max-width: 100%;
+  }
+
+  .pageNumbers {
+    justify-content: center;
+  }
+
+  .button {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .fileInfo {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .box p {
+    font-size: 0.9rem;
+  }
+
+  .fileInput span {
+    font-size: 0.9rem;
+  }
+
+  .dropText {
+    font-size: 0.8rem;
+  }
+
+  .inputHelp ul {
+    padding-left: 16px;
+  }
+
+  .inputHelp li {
+    font-size: 0.8rem;
+  }
+}

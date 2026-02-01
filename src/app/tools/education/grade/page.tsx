@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './grade.module.css';
 
 interface Subject {
@@ -11,11 +11,23 @@ interface Subject {
   weight: number;
 }
 
+interface ExamRecord {
+  id: string;
+  examName: string;
+  date: string;
+  percentage: number;
+  letterGrade: string;
+  gpa: number;
+  subjects: Subject[];
+}
+
 export default function GradePage() {
   const [subjects, setSubjects] = useState<Subject[]>([
     { id: 1, name: 'Subject 1', marks: 0, maxMarks: 100, weight: 1 },
   ]);
   const [gradingScale, setGradingScale] = useState<'percentage' | 'letter' | 'gpa'>('percentage');
+  const [examHistory, setExamHistory] = useState<ExamRecord[]>([]);
+  const [lastSaved, setLastSaved] = useState<string>('');
   const [results, setResults] = useState({
     totalMarks: 0,
     totalMaxMarks: 0,
@@ -24,6 +36,24 @@ export default function GradePage() {
     letterGrade: '',
     gpa: 0,
   });
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('grade-calculator-subjects');
+    const savedHistory = localStorage.getItem('grade-calculator-history');
+    if (saved) setSubjects(JSON.parse(saved));
+    if (savedHistory) setExamHistory(JSON.parse(savedHistory));
+  }, []);
+
+  // Save to localStorage on change
+  useEffect(() => {
+    localStorage.setItem('grade-calculator-subjects', JSON.stringify(subjects));
+    setLastSaved(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+  }, [subjects]);
+
+  useEffect(() => {
+    localStorage.setItem('grade-calculator-history', JSON.stringify(examHistory));
+  }, [examHistory]);
 
   const addSubject = () => {
     const newId = Math.max(...subjects.map(s => s.id)) + 1;
@@ -123,6 +153,48 @@ export default function GradePage() {
     ]);
   };
 
+  const loadPreset = (type: 'science' | 'commerce' | 'arts') => {
+    const presets = {
+      science: [
+        { id: 1, name: 'Physics', marks: 0, maxMarks: 100, weight: 1 },
+        { id: 2, name: 'Chemistry', marks: 0, maxMarks: 100, weight: 1 },
+        { id: 3, name: 'Mathematics', marks: 0, maxMarks: 100, weight: 1 },
+        { id: 4, name: 'English', marks: 0, maxMarks: 100, weight: 1 },
+      ],
+      commerce: [
+        { id: 1, name: 'Accounting', marks: 0, maxMarks: 100, weight: 1 },
+        { id: 2, name: 'Economics', marks: 0, maxMarks: 100, weight: 1 },
+        { id: 3, name: 'Business Studies', marks: 0, maxMarks: 100, weight: 1 },
+        { id: 4, name: 'English', marks: 0, maxMarks: 100, weight: 1 },
+      ],
+      arts: [
+        { id: 1, name: 'History', marks: 0, maxMarks: 100, weight: 1 },
+        { id: 2, name: 'Geography', marks: 0, maxMarks: 100, weight: 1 },
+        { id: 3, name: 'Political Science', marks: 0, maxMarks: 100, weight: 1 },
+        { id: 4, name: 'English', marks: 0, maxMarks: 100, weight: 1 },
+      ],
+    };
+    setSubjects(presets[type]);
+  };
+
+  const saveToHistory = (examName: string) => {
+    const newRecord: ExamRecord = {
+      id: Date.now().toString(),
+      examName,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      percentage: results.weightedPercentage,
+      letterGrade: results.letterGrade,
+      gpa: results.gpa,
+      subjects: JSON.parse(JSON.stringify(subjects)),
+    };
+    setExamHistory(prev => [newRecord, ...prev].slice(0, 10));
+    alert(`✅ Exam "${examName}" saved to history!`);
+  };
+
+  const deleteFromHistory = (id: string) => {
+    setExamHistory(prev => prev.filter(record => record.id !== id));
+  };
+
   const copyResults = async () => {
     const resultsText = `Grade Calculation Results:
 
@@ -133,7 +205,7 @@ Letter Grade: ${results.letterGrade}
 GPA: ${results.gpa.toFixed(2)}
 
 Subject Details:
-${subjects.map(s => `${s.name}: ${s.marks}/${s.maxMarks} (${((s.marks/s.maxMarks)*100).toFixed(1)}%)`).join('\n')}`;
+${subjects.map(s => `${s.name}: ${s.marks}/${s.maxMarks} (${((s.marks / s.maxMarks) * 100).toFixed(1)}%)`).join('\n')}`;
 
     try {
       await navigator.clipboard.writeText(resultsText);
@@ -143,9 +215,48 @@ ${subjects.map(s => `${s.name}: ${s.marks}/${s.maxMarks} (${((s.marks/s.maxMarks
     }
   };
 
+  const handleSaveExam = () => {
+    const examName = prompt('Enter exam name (e.g., Midterm, Final, Monthly Test):');
+    if (examName) {
+      saveToHistory(examName);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.tool}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>
+            <span className={styles.icon}>📊</span>
+            Grade Calculator
+          </h1>
+          <p className={styles.subtitle}>
+            Calculate your grades and track exam performance over time
+          </p>
+          <div className={styles.dataInfo}>
+            <span className={styles.infoItem}>
+              💾 <strong>Auto-Save:</strong> Every calculation is automatically saved
+            </span>
+            <span className={styles.infoSeparator}>•</span>
+            <span className={styles.infoItem}>
+              {lastSaved && <><strong>Last saved:</strong> {lastSaved}</>
+              }
+            </span>
+          </div>
+        </div>
+
+        <div className={styles.presetBtns}>
+          <button onClick={() => loadPreset('science')} className={styles.presetBtn}>
+            🔬 Science
+          </button>
+          <button onClick={() => loadPreset('commerce')} className={styles.presetBtn}>
+            💼 Commerce
+          </button>
+          <button onClick={() => loadPreset('arts')} className={styles.presetBtn}>
+            📚 Arts
+          </button>
+        </div>
+
         <div className={styles.inputSection}>
           <div className={styles.inputHeader}>
             <h3>Subject Marks</h3>
@@ -256,9 +367,14 @@ ${subjects.map(s => `${s.name}: ${s.marks}/${s.maxMarks} (${((s.marks/s.maxMarks
           <div className={styles.resultsSection}>
             <div className={styles.resultsHeader}>
               <h3>Grade Results</h3>
-              <button onClick={copyResults} className={styles.copyBtn}>
-                Copy Results
-              </button>
+              <div className={styles.headerActions}>
+                <button onClick={handleSaveExam} className={styles.saveHistoryBtn}>
+                  📝 Save to History
+                </button>
+                <button onClick={copyResults} className={styles.copyBtn}>
+                  Copy Results
+                </button>
+              </div>
             </div>
 
             <div className={styles.resultsGrid}>
@@ -315,16 +431,42 @@ ${subjects.map(s => `${s.name}: ${s.marks}/${s.maxMarks} (${((s.marks/s.maxMarks
           </div>
         )}
 
+        {examHistory.length > 0 && (
+          <div className={styles.historySection}>
+            <h3>📋 Exam History</h3>
+            <div className={styles.historyGrid}>
+              {examHistory.map(record => (
+                <div key={record.id} className={styles.historyCard}>
+                  <div className={styles.historyDate}>{record.date}</div>
+                  <div className={styles.historyName}>{record.examName}</div>
+                  <div className={styles.historyStats}>
+                    <span className={styles.historyPercentage}>{record.percentage.toFixed(1)}%</span>
+                    <span className={styles.historyGrade}>{record.letterGrade}</span>
+                  </div>
+                  <button
+                    onClick={() => deleteFromHistory(record.id)}
+                    className={styles.historyDeleteBtn}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className={styles.infoSection}>
-          <h4>About Grade Calculator</h4>
-          <p>This tool helps you calculate grades with support for:</p>
+          <h4>📖 How to Use Grade Calculator</h4>
+          <p><strong>Step 1:</strong> Select your stream (Science/Commerce/Arts) or add subjects manually</p>
+          <p><strong>Step 2:</strong> Enter marks for each subject</p>
+          <p><strong>Step 3:</strong> Click "Calculate Grades" button</p>
+          <p><strong>Step 4:</strong> Click "Save to History" to track your exam scores</p>
           <ul>
-            <li><strong>Simple Average:</strong> Equal weight for all subjects</li>
-            <li><strong>Weighted Average:</strong> Different importance for each subject</li>
-            <li><strong>Letter Grades:</strong> Standard A+ to F grading scale</li>
-            <li><strong>GPA:</strong> Grade Point Average on a 4.0 scale</li>
+            <li>📊 Simple and weighted averages calculated automatically</li>
+            <li>📝 Exam history saved automatically - track up to 10 exams</li>
+            <li>💾 Data stored securely on your device</li>
+            <li>📋 Letter grades and GPA calculated instantly</li>
           </ul>
-          <p>Perfect for students tracking their academic performance!</p>
         </div>
       </div>
     </div>

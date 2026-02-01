@@ -1,17 +1,20 @@
 .container {
-  display: flex;
-  justify-content: center;
-  padding: 60px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .box {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
-  padding: 40px 24px;
-  width: 100%;
-  max-width: 800px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .pageTitle {
@@ -21,90 +24,312 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+  margin-bottom: 0.5rem;
+}
+
+.icon {
+  font-size: 2.5rem;
 }
 
 .textGradient {
-  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  background: linear-gradient(90deg, #007bff, #28a745);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.fileInput {
-  display: inline-block;
-  background: gray;
-  border: 2px dashed #ddd;
-  margin-right: 10px;
-  border-radius: 12px;
-  padding: 30px;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
+.description {
+  color: #6c757d;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
 }
 
-.fileInput:hover {
-  border-color: var(--brand-primary);
+.dropZone {
+  margin-bottom: 1.5rem;
+}
+
+.fileInput {
+  display: block;
+  padding: 1rem;
+  border: 2px dashed #007bff;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  position: relative;
+}
+
+.fileInput:hover:not(:disabled) {
+  border-color: #0056b3;
+  background: #f0f8ff;
+}
+
+.dropZone.dragOver .fileInput {
+  border-color: #28a745;
+  background: #f0f9ff;
+  transform: scale(1.02);
 }
 
 .fileInput input {
-  display: none;
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
 }
 
-.fileInput span {
-  font-weight: 500;
-  color: var(--brand-text);
+.dropText {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.9rem;
+  color: #6c757d;
 }
 
-.settings {
-  margin-top: 24px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 12px;
+.fileInfo {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 1.5rem;
   text-align: left;
 }
 
-.settings label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: 6px;
-  font-size: 14px;
+.fileInfo p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #495057;
 }
 
-.settings input,
-.settings select {
+.clearBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.clearBtn:hover {
+  background: #c82333;
+}
+
+.progressContainer {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 1.5rem;
+}
+
+.progressBar {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #007bff, #28a745);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progressContainer p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.settings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  box-sizing: border-box;
+}
+
+.settingGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settingGroup label {
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.9rem;
+}
+
+.selectInput, .numberInput, .colorInput {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+
+.selectInput:focus, .numberInput:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.colorInput {
+  cursor: pointer;
+  height: 40px;
 }
 
 .button {
-  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
-  color: #fff;
+  background: linear-gradient(90deg, #007bff, #28a745);
+  color: white;
   border: none;
   border-radius: 8px;
-  padding: 12px 24px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 24px;
-  transition: transform 0.2s;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 300px;
 }
 
-.button:hover {
-  transform: scale(1.05);
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .message {
-  margin-top: 14px;
-  color: #333;
+  padding: 1rem;
+  border-radius: 8px;
   font-weight: 500;
+  margin: 0;
 }
 
-@media (max-width: 600px) {
+.message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.message.info {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    overflow-x: hidden;
+  }
+
   .box {
-    padding: 24px 16px;
+    padding: 1.5rem;
+    margin: 0;
   }
 
   .pageTitle {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .icon {
+    font-size: 2rem;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .settings {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .fileInput {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .button {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.95rem;
+    max-width: none;
+  }
+
+  .fileInfo {
+    padding: 0.75rem;
+  }
+
+  .progressContainer {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .box {
+    padding: 1rem;
+    border-radius: 8px;
+  }
+
+  .settings {
+    padding: 0.75rem;
+    gap: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .button {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .fileInput {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .description {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
   }
 }

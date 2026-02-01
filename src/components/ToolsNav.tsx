@@ -9,7 +9,6 @@ const categories = [
   { name: "Education", path: "/tools/education", emoji: "🎓" },
   { name: "Document", path: "/tools/document", emoji: "📋" },
   { name: "Text/Web", path: "/tools/text-web", emoji: "📝" },
-  { name: "File", path: "/tools/file", emoji: "📁" },
   { name: "All", path: "/tools", emoji: "✨" },
 ];
 

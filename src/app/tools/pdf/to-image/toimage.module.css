@@ -1,32 +1,17 @@
-.container {
-  max-width: 800px;
-  margin: auto;
-  padding: 60px 20px 80px;
-  text-align: center;
-}
-
-.box {
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 16px;
-  padding: 40px 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-}
-
 .pageTitle {
   font-size: 2rem;
   font-weight: 700;
-  text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px; /* Emoji aur text ke beech space */
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .icon {
   /* Emoji ka asli color dikhane ke liye ispar koi gradient nahi lagana */
   background: none;
-  -webkit-text-fill-color: initial; 
+  -webkit-text-fill-color: initial;
 }
 
 .textGradient {
@@ -36,98 +21,331 @@
   -webkit-text-fill-color: transparent;
 }
 
-.box p {
+.description {
+  text-align: center;
   color: var(--brand-muted);
   font-size: 1rem;
   margin-bottom: 30px;
 }
 
-.fileInput {
-  display: inline-block;
-  background: gray;
-  margin-right: 10px;
+.converter {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin: 2rem 0;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.inputSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dropZone {
   border: 2px dashed #ddd;
   border-radius: 12px;
   padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.dropZone.dragOver {
+  border-color: var(--brand-primary);
+  background: rgba(0, 123, 255, 0.05);
+}
+
+.fileInput {
+  position: relative;
+}
+
+.hiddenInput {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+}
+
+.fileLabel {
+  display: block;
+  padding: 1rem;
+  border: 2px dashed #007bff;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  position: relative;
+  z-index: 1;
+}
+
+.fileLabel:hover {
+  border-color: #0056b3;
+  background: #f0f8ff;
+}
+
+.dropText {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.fileInfo {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.fileInfo p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.clearBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+.clearBtn:hover {
+  background: #c82333;
+}
+
+.progressContainer {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  transition: width 0.3s ease;
+}
+
+.optionsSection {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.qualitySelect {
+  margin-bottom: 1.5rem;
+}
+
+.qualitySelect label {
+  display: block;
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: white;
   cursor: pointer;
   transition: border-color 0.3s ease;
 }
 
-.fileInput:hover {
-  border-color: var(--brand-primary);
+.select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
-.fileInput input {
-  display: none;
-}
-
-.fileInput span {
-  font-weight: 500;
-  color: var(--brand-text);
-}
-
-.button {
-  margin-top: 24px;
-  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
-  color: #fff;
-  border: none;
-  padding: 12px 26px;
-  border-radius: 10px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: transform 0.25s ease;
-}
-
-.button:disabled {
-  opacity: 0.6;
+.select:disabled {
+  background: #f8f9fa;
   cursor: not-allowed;
 }
 
-.button:hover:not(:disabled) {
-  transform: scale(1.05);
+.convertBtn {
+  padding: 1rem 2rem;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 250px;
+  margin: 0 auto;
+  display: block;
+}
+
+.convertBtn:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.convertBtn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .message {
-  margin-top: 18px;
-  font-size: 0.95rem;
-  color: var(--brand-primary);
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  .box {
-    padding: 30px 16px;
-  }
-
-  .box h1 {
-    font-size: 1.6rem;
-  }
-
-  .button {
-    width: 100%;
-  }
-}
-.qualitySelect {
-  margin-top: 20px;
-  text-align: left;
-}
-
-.qualitySelect label {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
   font-weight: 500;
-  margin-right: 8px;
-  color: var(--color-text, #333);
+  text-align: center;
 }
 
-.qualitySelect select {
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  background: #fff;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
 }
 
-.qualitySelect select:hover {
-  border-color: var(--color-accent, #0070f3);
+.message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--brand-muted);
+  font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .pageTitle {
+    font-size: 1.8rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .converter {
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .dropZone {
+    padding: 16px;
+  }
+
+  .fileLabel {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .dropText {
+    font-size: 0.8rem;
+  }
+
+  .fileInfo {
+    padding: 0.75rem;
+  }
+
+  .fileInfo p {
+    font-size: 0.8rem;
+  }
+
+  .optionsSection {
+    padding: 1rem;
+  }
+
+  .convertBtn {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .progressContainer {
+    margin: 0.5rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.8rem;
+  }
+
+  .converter {
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+  }
+
+  .dropZone {
+    padding: 12px;
+  }
+
+  .fileLabel {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .dropText {
+    font-size: 0.7rem;
+  }
+
+  .fileInfo {
+    text-align: center;
+    padding: 0.5rem;
+  }
+
+  .fileInfo p {
+    font-size: 0.8rem;
+  }
+
+  .optionsSection {
+    padding: 0.75rem;
+  }
+
+  .convertBtn {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
 }

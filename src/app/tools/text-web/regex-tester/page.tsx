@@ -2,6 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import styles from './regextester.module.css';
+import ToolInfo from '@/components/ToolInfo';
+
+interface HistoryItem {
+  id: string;
+  pattern: string;
+  flags: string;
+  testText: string;
+  matchCount: number;
+  timestamp: number;
+}
 
 export default function RegexTesterPage() {
   const [regex, setRegex] = useState('');
@@ -15,6 +25,19 @@ export default function RegexTesterPage() {
   const [matches, setMatches] = useState<any[]>([]);
   const [error, setError] = useState('');
   const [highlightedText, setHighlightedText] = useState('');
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('regex-tester-data');
+    if (saved) {
+      const { history: savedHistory } = JSON.parse(saved);
+      setHistory(savedHistory || []);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('regex-tester-data', JSON.stringify({ history }));
+  }, [history]);
 
   const testRegex = () => {
     if (!regex) {
@@ -26,9 +49,9 @@ export default function RegexTesterPage() {
 
     try {
       const flagString = (flags.global ? 'g' : '') +
-                        (flags.caseInsensitive ? 'i' : '') +
-                        (flags.multiline ? 'm' : '') +
-                        (flags.dotAll ? 's' : '');
+        (flags.caseInsensitive ? 'i' : '') +
+        (flags.multiline ? 'm' : '') +
+        (flags.dotAll ? 's' : '');
 
       const regexObj = new RegExp(regex, flagString);
       const foundMatches = [];
@@ -51,6 +74,17 @@ export default function RegexTesterPage() {
 
       setMatches(foundMatches);
       setError('');
+
+      // Track in history
+      const newItem: HistoryItem = {
+        id: Date.now().toString(),
+        pattern: regex,
+        flags: flagString || 'none',
+        testText: testText.slice(0, 100),
+        matchCount: foundMatches.length,
+        timestamp: Date.now()
+      };
+      setHistory(prev => [newItem, ...prev].slice(0, 50));
 
       // Create highlighted text
       if (foundMatches.length > 0) {
@@ -130,8 +164,45 @@ Another email: test@test-domain.org`);
     }
   };
 
+  const deleteHistoryItem = (id: string) => {
+    setHistory(prev => prev.filter(item => item.id !== id));
+  };
+
+  const clearHistory = () => {
+    if (confirm('Clear all history?')) {
+      setHistory([]);
+    }
+  };
+
+  const loadFromHistory = (item: HistoryItem) => {
+    setRegex(item.pattern);
+    setTestText(item.testText);
+    setFlags({
+      global: item.flags.includes('g'),
+      caseInsensitive: item.flags.includes('i'),
+      multiline: item.flags.includes('m'),
+      dotAll: item.flags.includes('s')
+    });
+  };
+
+  const getAnalytics = () => {
+    const totalTests = history.length;
+    const totalMatches = history.reduce((sum, item) => sum + item.matchCount, 0);
+    const avgMatches = totalTests > 0 ? Math.round((totalMatches / totalTests) * 10) / 10 : 0;
+    const uniquePatterns = new Set(history.map(h => h.pattern)).size;
+    return { totalTests, totalMatches, avgMatches, uniquePatterns };
+  };
+
+  const analytics = getAnalytics();
+
   return (
     <div className={styles.container}>
+      <h1 className={styles.pageTitle}>
+        <span className={styles.icon}>🔍</span>
+        <span className={styles.textGradient}>Regex Tester</span>
+      </h1>
+      <p className={styles.subtitle}>Test and visualize regular expressions with real-time matching and analytics.</p>
+
       <div className={styles.tool}>
         <div className={styles.regexSection}>
           <div className={styles.regexHeader}>
@@ -280,6 +351,99 @@ Another email: test@test-domain.org`);
           </div>
         </div>
       </div>
+
+      {history.length > 0 && (
+        <div className={styles.smartDashboard}>
+          <h3>📊 Analytics</h3>
+          <div className={styles.analyticsGrid}>
+            <div className={styles.statCard}>
+              <span className={styles.statValue}>{analytics.totalTests}</span>
+              <span className={styles.statLabel}>Total Tests</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statValue}>{analytics.uniquePatterns}</span>
+              <span className={styles.statLabel}>Unique Patterns</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statValue}>{analytics.totalMatches}</span>
+              <span className={styles.statLabel}>Total Matches</span>
+            </div>
+            <div className={styles.statCard}>
+              <span className={styles.statValue}>{analytics.avgMatches}</span>
+              <span className={styles.statLabel}>Avg Matches/Test</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {history.length > 0 && (
+        <div className={styles.historySection}>
+          <div className={styles.historyHeader}>
+            <h3>📜 Test History</h3>
+            <button onClick={clearHistory} className={styles.clearBtn}>
+              🗑️ Clear History
+            </button>
+          </div>
+          <div className={styles.historyList}>
+            {history.map((item) => (
+              <div key={item.id} className={styles.historyItem}>
+                <div className={styles.historyText}>
+                  <div className={styles.historyMeta}>
+                    <span className={styles.historyPattern}>
+                      Pattern: <code>{item.pattern}</code>
+                    </span>
+                    <span className={styles.historyFlags}>
+                      Flags: {item.flags}
+                    </span>
+                    <span className={styles.historyMatches}>
+                      Matches: {item.matchCount}
+                    </span>
+                    <span className={styles.historyTime}>
+                      {new Date(item.timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
+                  <div className={styles.historyContent}>
+                    Text: {item.testText.slice(0, 60)}{item.testText.length > 60 ? '...' : ''}
+                  </div>
+                </div>
+                <div className={styles.historyActions}>
+                  <button
+                    onClick={() => loadFromHistory(item)}
+                    className={styles.historyBtn}
+                    title="Load this test"
+                  >
+                    🔄
+                  </button>
+                  <button
+                    onClick={() => deleteHistoryItem(item.id)}
+                    className={styles.historyBtn}
+                    title="Delete"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <ToolInfo
+        howItWorks="1. Enter a regex pattern (e.g., \\b\\w+@\\w+\\.\\w+\\b for emails)<br>2. Paste text to test<br>3. Select flags (Global, Case Insensitive, Multiline, Dot All)<br>4. See highlighted matches in real-time<br>5. View match details with groups<br>6. Copy patterns or matches<br>7. Track history and analytics"
+        faqs={[
+          { title: "What is a regex?", content: "Regular Expression is a pattern for matching text. Used for validation, searching, and text replacement." },
+          { title: "What do flags do?", content: "Global (g): Find all matches. Case Insensitive (i): Ignore case. Multiline (m): ^ and $ match line boundaries. Dot All (s): . matches newlines." },
+          { title: "How to use groups?", content: "Use parentheses to create groups: (\\w+)@(\\w+). Groups are captured and shown as $1, $2, etc." },
+          { title: "Common patterns?", content: "Email: \\b[\\w.-]+@[\\w.-]+\\.\\w+\\b | Phone: \\d{3}-?\\d{3}-?\\d{4} | URL: https?://[\\S]+" }
+        ]}
+        tips={[
+          "Use raw patterns - backslashes should be escaped (\\\\d not \\d)",
+          "Test simple patterns first, then add complexity",
+          "Use capturing groups () to extract specific parts",
+          "Global flag finds all matches; without it, stops at first match",
+          "Practice with online regex tools to understand patterns better"
+        ]}
+      />
     </div>
   );
 }

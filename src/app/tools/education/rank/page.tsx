@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./rank.module.css";
 import ToolInfo from "@/components/ToolInfo";
 
@@ -14,21 +14,53 @@ interface RankedStudent extends Student {
   rank: number;
 }
 
+interface Assessment {
+  id: string;
+  name: string;
+  date: string;
+  rankings: RankedStudent[];
+  statistics: {
+    highest: number;
+    lowest: number;
+    average: number;
+    median: number;
+    totalStudents: number;
+    stdDev: number;
+  };
+}
+
+interface StudentPerformance {
+  studentId: number;
+  name: string;
+  scores: number[];
+  avgScore: number;
+  improvement: number;
+  consistency: number;
+}
+
 export default function RankCalculator() {
   const [students, setStudents] = useState<Student[]>([
     { id: 1, name: "Student 1", score: 0 },
     { id: 2, name: "Student 2", score: 0 }
   ]);
-  const [results, setResults] = useState<{
-    rankings: RankedStudent[];
-    statistics: {
-      highest: number;
-      lowest: number;
-      average: number;
-      median: number;
-      totalStudents: number;
-    };
-  } | null>(null);
+  const [assessmentName, setAssessmentName] = useState("Assessment 1");
+  const [assessments, setAssessments] = useState<Assessment[]>([]);
+  const [results, setResults] = useState<Assessment | null>(null);
+  const [lastSaved, setLastSaved] = useState<string>("");
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("rank-calculator-assessments");
+    if (saved) {
+      try {
+        setAssessments(JSON.parse(saved));
+      } catch (e) {
+        console.error("Error loading assessments:", e);
+      }
+    }
+  }, []);
 
   const addStudent = () => {
     const newId = Math.max(...students.map(s => s.id)) + 1;
@@ -79,16 +111,30 @@ export default function RankCalculator() {
       ? (sortedScores[sortedScores.length / 2 - 1] + sortedScores[sortedScores.length / 2]) / 2
       : sortedScores[Math.floor(sortedScores.length / 2)];
 
-    setResults({
+    // Calculate standard deviation
+    const variance = scores.reduce((sum, score) => sum + Math.pow(score - average, 2), 0) / scores.length;
+    const stdDev = Math.sqrt(variance);
+
+    const newAssessment: Assessment = {
+      id: Date.now().toString(),
+      name: assessmentName,
+      date: new Date().toLocaleDateString(),
       rankings: rankedStudents,
       statistics: {
         highest,
         lowest,
         average,
         median,
-        totalStudents: students.length
+        totalStudents: students.length,
+        stdDev
       }
-    });
+    };
+
+    const updatedAssessments = [newAssessment, ...assessments];
+    setAssessments(updatedAssessments);
+    setResults(newAssessment);
+    setLastSaved(new Date().toLocaleTimeString());
+    localStorage.setItem("rank-calculator-assessments", JSON.stringify(updatedAssessments));
   };
 
   const clearAll = () => {
@@ -97,6 +143,61 @@ export default function RankCalculator() {
       { id: 2, name: "Student 2", score: 0 }
     ]);
     setResults(null);
+    setAssessmentName("Assessment 1");
+  };
+
+  const getStudentPerformance = (): StudentPerformance[] => {
+    const performanceMap = new Map<number, StudentPerformance>();
+
+    assessments.forEach(assessment => {
+      assessment.rankings.forEach(ranked => {
+        if (!performanceMap.has(ranked.id)) {
+          performanceMap.set(ranked.id, {
+            studentId: ranked.id,
+            name: ranked.name,
+            scores: [],
+            avgScore: 0,
+            improvement: 0,
+            consistency: 0
+          });
+        }
+        performanceMap.get(ranked.id)!.scores.push(ranked.score);
+      });
+    });
+
+    const performance = Array.from(performanceMap.values());
+    performance.forEach(p => {
+      p.avgScore = p.scores.reduce((a, b) => a + b, 0) / p.scores.length;
+      p.improvement = p.scores[0] - (p.scores[p.scores.length - 1] ?? 0);
+      
+      const variance = p.scores.reduce((sum, score) => sum + Math.pow(score - p.avgScore, 2), 0) / p.scores.length;
+      p.consistency = 100 - Math.min(Math.sqrt(variance), 100);
+    });
+
+    return performance.sort((a, b) => b.avgScore - a.avgScore);
+  };
+
+  const exportData = () => {
+    const data = {
+      assessments,
+      exportedAt: new Date().toISOString()
+    };
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `rank-data-${new Date().getTime()}.json`;
+    a.click();
+  };
+
+  const deleteAssessment = (id: string) => {
+    const updated = assessments.filter(a => a.id !== id);
+    setAssessments(updated);
+    localStorage.setItem("rank-calculator-assessments", JSON.stringify(updated));
+    if (results?.id === id) {
+      setResults(null);
+    }
   };
 
   const getPercentile = (rank: number, total: number): number => {
@@ -117,13 +218,82 @@ export default function RankCalculator() {
   return (
     <main className={styles.container}>
       <section className={styles.tool}>
-        <h1 className={styles.title}>
-          <span className={styles.icon}>🏆</span>
-          Rank Calculator
-        </h1>
-        <p>Calculate student rankings, percentiles, and class statistics.</p>
+        <div className={styles.header}>
+          <h1 className={styles.title}>
+            🏆 Rank Calculator
+          </h1>
+          <p className={styles.subtitle}>
+            Track student rankings across multiple assessments with intelligent analytics
+          </p>
+          <div className={styles.dataInfo}>
+            <span className={styles.infoItem}>
+              💾 <strong>Auto-Save:</strong> All assessments are saved
+            </span>
+            <span className={styles.infoSeparator}>•</span>
+            <span className={styles.infoItem}>
+              {lastSaved && <><strong>Last saved:</strong> {lastSaved}</>}
+            </span>
+          </div>
+        </div>
+
+        {/* Smart Analytics Dashboard */}
+        {assessments.length > 0 && (
+          <div className={styles.smartDashboard}>
+            <div className={styles.dashboardSection}>
+              <h3>📊 Performance Insights</h3>
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <span className={styles.statNumber}>{assessments.length}</span>
+                  <span className={styles.statName}>Total Assessments</span>
+                </div>
+                <div className={styles.statCard}>
+                  <span className={styles.statNumber}>{new Set(assessments.flatMap(a => a.rankings.map(r => r.id))).size}</span>
+                  <span className={styles.statName}>Total Students</span>
+                </div>
+                <div className={styles.statCard}>
+                  <span className={styles.statNumber}>{results ? results.statistics.average.toFixed(1) : "-"}</span>
+                  <span className={styles.statName}>Class Average</span>
+                </div>
+                <div className={styles.statCard}>
+                  <span className={styles.statNumber}>{results ? results.statistics.stdDev.toFixed(1) : "-"}</span>
+                  <span className={styles.statName}>Std Deviation</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Student Performance Trends */}
+            {getStudentPerformance().length > 0 && (
+              <div className={styles.dashboardSection}>
+                <h3>⭐ Top Performers</h3>
+                <div className={styles.topPerformers}>
+                  {getStudentPerformance().slice(0, 3).map((perf, idx) => (
+                    <div key={perf.studentId} className={styles.performerCard}>
+                      <div className={styles.performerRank}>{idx + 1}</div>
+                      <div className={styles.performerInfo}>
+                        <div className={styles.performerName}>{perf.name}</div>
+                        <div className={styles.performerStats}>
+                          Avg: {perf.avgScore.toFixed(1)} | Consistency: {perf.consistency.toFixed(0)}%
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className={styles.inputSection}>
+          <div className={styles.assessmentInput}>
+            <input
+              type="text"
+              value={assessmentName}
+              onChange={(e) => setAssessmentName(e.target.value)}
+              placeholder="Assessment name..."
+              className={styles.assessmentNameInput}
+            />
+          </div>
+
           <div className={styles.studentsList}>
             {students.map((student, index) => (
               <div key={student.id} className={styles.studentRow}>
@@ -163,6 +333,15 @@ export default function RankCalculator() {
             <button onClick={calculateRankings} className={styles.calculateBtn}>
               Calculate Rankings
             </button>
+            <button onClick={() => setShowAnalytics(!showAnalytics)} className={styles.analyticsBtn}>
+              📈 Analytics
+            </button>
+            <button onClick={() => setShowHistory(!showHistory)} className={styles.historyBtn}>
+              📋 History
+            </button>
+            <button onClick={exportData} className={styles.exportBtn}>
+              📥 Export
+            </button>
             <button onClick={clearAll} className={styles.clearBtn}>
               Clear All
             </button>
@@ -171,7 +350,12 @@ export default function RankCalculator() {
 
         {results && (
           <div className={styles.resultsSection}>
-            <h3>Class Rankings</h3>
+            <div className={styles.resultsHeader}>
+              <h3>{results.name} - {results.date}</h3>
+              <button onClick={() => deleteAssessment(results.id)} className={styles.deleteBtn}>
+                Delete Assessment
+              </button>
+            </div>
             <div className={styles.rankingsTable}>
               <div className={styles.tableHeader}>
                 <span>Rank</span>
@@ -215,10 +399,79 @@ export default function RankCalculator() {
                   <div className={styles.statValue}>{results.statistics.median.toFixed(1)}</div>
                 </div>
                 <div className={styles.statCard}>
+                  <div className={styles.statLabel}>Std Deviation</div>
+                  <div className={styles.statValue}>{results.statistics.stdDev.toFixed(2)}</div>
+                </div>
+                <div className={styles.statCard}>
                   <div className={styles.statLabel}>Total Students</div>
                   <div className={styles.statValue}>{results.statistics.totalStudents}</div>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Assessment History */}
+        {showHistory && assessments.length > 0 && (
+          <div className={styles.historySection}>
+            <h3>📋 Assessment History</h3>
+            <div className={styles.assessmentsList}>
+              {assessments.map((assessment) => (
+                <div key={assessment.id} className={styles.assessmentCard}>
+                  <div className={styles.assessmentHeader}>
+                    <div>
+                      <h4>{assessment.name}</h4>
+                      <p>{assessment.date}</p>
+                    </div>
+                    <div className={styles.assessmentMeta}>
+                      <span>{assessment.statistics.totalStudents} students</span>
+                      <span>Avg: {assessment.statistics.average.toFixed(1)}</span>
+                      <button
+                        onClick={() => {
+                          setResults(assessment);
+                          setShowHistory(false);
+                        }}
+                        className={styles.viewBtn}
+                      >
+                        View
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Student Performance Analytics */}
+        {showAnalytics && getStudentPerformance().length > 0 && (
+          <div className={styles.analyticsSection}>
+            <h3>📊 Student Performance Analytics</h3>
+            <div className={styles.performanceTable}>
+              <div className={styles.tableHeader}>
+                <span>Student</span>
+                <span>Avg Score</span>
+                <span>Consistency</span>
+                <span>Trend</span>
+              </div>
+              {getStudentPerformance().map((perf) => (
+                <div key={perf.studentId} className={styles.tableRow}>
+                  <span className={styles.name}>{perf.name}</span>
+                  <span className={styles.score}>{perf.avgScore.toFixed(1)}</span>
+                  <span className={styles.consistency}>
+                    <div className={styles.consistencyBar}>
+                      <div
+                        className={styles.consistencyFill}
+                        style={{ width: `${perf.consistency}%` }}
+                      />
+                    </div>
+                    {perf.consistency.toFixed(0)}%
+                  </span>
+                  <span className={styles.trend}>
+                    {perf.improvement > 0 ? `📈 +${perf.improvement.toFixed(1)}` : perf.improvement < 0 ? `📉 ${perf.improvement.toFixed(1)}` : "→ No change"}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         )}

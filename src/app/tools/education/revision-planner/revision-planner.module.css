@@ -3,6 +3,7 @@
   margin: 0 auto;
   padding: 2rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
 }
 
 .tool {
@@ -13,19 +14,153 @@
   margin-top: 2rem;
 }
 
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
 .title {
   font-size: 2rem;
   font-weight: bold;
   color: #343a40;
   margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #6c757d;
+  margin: 0.5rem 0 0 0;
+  font-size: 1rem;
+}
+
+.dataInfo {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e7f3ff 0%, #f0e8ff 100%);
+  border-left: 4px solid #667eea;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
 }
 
-.icon {
-  font-size: 2rem;
+.infoItem {
+  color: #343a40;
+  display: flex;
+  align-items: center;
+}
+
+.infoSeparator {
+  color: #bbb;
+}
+
+/* Smart Dashboard */
+.smartDashboard {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.dashboardSection {
+  margin-bottom: 1.5rem;
+}
+
+.dashboardSection:last-child {
+  margin-bottom: 0;
+}
+
+.dashboardSection h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  opacity: 0.95;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.statNumber {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.statName {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+/* Subject Performance */
+.performanceList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.performanceItem {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.performanceName {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.performanceBar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.performanceFill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  transition: width 0.3s ease;
+}
+
+.performanceStats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+/* Smart Insights */
+.insightCard {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.insightPositive {
+  color: #c8e6c9;
+}
+
+.insightWarning {
+  color: #ffccbc;
 }
 
 .planner {
@@ -208,11 +343,13 @@
 .controls {
   display: flex;
   justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .generateBtn {
   padding: 12px 24px;
-  background: #007bff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -222,14 +359,49 @@
   font-size: 1rem;
 }
 
-.generateBtn:hover:not(:disabled) {
-  background: #0056b3;
-  transform: translateY(-1px);
+.generateBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
-.generateBtn:disabled {
-  background: #6c757d;
-  cursor: not-allowed;
+.generateBtn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.analyticsBtn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.analyticsBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+}
+
+.historyBtn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.historyBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
 }
 
 .planHeader {
@@ -331,11 +503,17 @@
   }
 
   .tool {
-    padding: 1.5rem;
+    padding: 1rem;
   }
 
   .title {
     font-size: 1.5rem;
+  }
+
+  .setupSection,
+  .subjectsSection,
+  .planSection {
+    padding: 1rem;
   }
 
   .setupGrid {
@@ -378,12 +556,44 @@
   .sessionActions {
     align-self: flex-end;
   }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .generateBtn,
+  .analyticsBtn,
+  .historyBtn {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .tool {
+    padding: 0.75rem;
+  }
+
+  .inputRow {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
   .inputRow input,
   .inputRow select {
     font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .addBtn {
+    width: 100%;
   }
 
   .topics {
@@ -393,4 +603,146 @@
   .topic {
     align-self: flex-start;
   }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .dataInfo {
+    flex-direction: column;
+    text-align: center;
+    padding: 0.75rem;
+  }
+
+  .infoSeparator {
+    display: none;
+  }
+
+  .setupSection,
+  .subjectsSection,
+  .planSection {
+    padding: 0.75rem;
+  }
+}
+
+/* Analytics Section */
+.analyticsSection {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 2px solid #f0e8ff;
+  margin-bottom: 2rem;
+}
+
+.analyticsSection h3 {
+  margin: 0 0 1.5rem 0;
+  color: #343a40;
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.analyticsCard {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.analyticsCard h4 {
+  margin: 0 0 1rem 0;
+  color: #333;
+}
+
+.analyticsMetric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.metricValue {
+  font-weight: 600;
+  color: #667eea;
+}
+
+/* History Section */
+.historySection {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.historySection h3 {
+  margin: 0 0 1.5rem 0;
+  color: #343a40;
+}
+
+.plansList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.planCard {
+  background: white;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.planCard:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.planHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.planHeader h4 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.planHeader p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.planMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: right;
+  font-size: 0.85rem;
+}
+
+.deleteBtn {
+  padding: 0.4rem 1rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
 }

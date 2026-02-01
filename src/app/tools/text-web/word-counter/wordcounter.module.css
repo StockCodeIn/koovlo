@@ -3,6 +3,7 @@
   margin: auto;
   padding: 60px 20px 80px;
   text-align: center;
+  overflow-x: hidden;
 }
 
 .box {
@@ -11,6 +12,12 @@
   border-radius: 16px;
   padding: 40px 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
 .pageTitle {
@@ -21,6 +28,36 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
+}
+
+.subtitle {
+  color: var(--brand-muted);
+  font-size: 1rem;
+  margin: 10px 0 0 0;
+}
+
+.dataInfo {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e7f3ff 0%, #f0e8ff 100%);
+  border-left: 4px solid var(--brand-primary);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
+}
+
+.infoItem {
+  color: #343a40;
+  display: flex;
+  align-items: center;
+}
+
+.infoSeparator {
+  color: #bbb;
 }
 
 .icon {
@@ -50,6 +87,95 @@
   font-family: inherit;
   font-size: 1rem;
   resize: vertical;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Smart Dashboard */
+.smartDashboard {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.dashboardSection h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.05rem;
+  opacity: 0.95;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.statNumber {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.statName {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1rem 0 1.5rem;
+  flex-wrap: wrap;
+}
+
+.primaryBtn,
+.secondaryBtn,
+.analyticsBtn,
+.historyBtn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.primaryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.secondaryBtn {
+  background: #e9ecef;
+  color: #343a40;
+}
+
+.analyticsBtn {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.historyBtn {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
 }
 
 .stats {
@@ -64,6 +190,7 @@
   padding: 20px;
   border-radius: 8px;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .number {
@@ -71,9 +198,153 @@
   font-size: 2rem;
   font-weight: bold;
   color: var(--brand-primary);
+  word-break: break-word;
 }
 
 .stat span:last-child {
   font-size: 0.9rem;
   color: var(--brand-muted);
+}
+
+/* Analytics */
+.analyticsSection {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 2px solid #f0e8ff;
+  margin-top: 1.5rem;
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.analyticsCard {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.analyticsMetric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.metricValue {
+  font-weight: 600;
+  color: #667eea;
+}
+
+/* History */
+.historySection {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+}
+
+.historyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.clearBtn {
+  padding: 0.4rem 0.8rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.historyList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.historyCard {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: left;
+}
+
+.historyCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.historyDate {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.deleteBtn {
+  padding: 0.3rem 0.7rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.historyText {
+  font-size: 0.9rem;
+  color: #495057;
+  margin: 0.5rem 0;
+  word-break: break-word;
+}
+
+.historyStats {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 40px 16px 60px;
+  }
+
+  .box {
+    padding: 24px 16px;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dataInfo {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .infoSeparator {
+    display: none;
+  }
 }

@@ -31,7 +31,29 @@ interface QuizAttempt {
   totalPoints: number;
   timeSpent: number; // in seconds
   completedAt: string;
+  questionPerformance?: Record<string, { correct: boolean; timeTaken?: number }>;
 }
+
+interface QuizPreset {
+  name: string;
+  description: string;
+  category: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  questionCount: number;
+}
+
+interface QuestionBank {
+  id: string;
+  topic: string;
+  questions: QuizQuestion[];
+}
+
+const quizPresets: QuizPreset[] = [
+  { name: 'General Knowledge 101', description: 'Basic GK questions', category: 'General Knowledge', difficulty: 'easy', questionCount: 10 },
+  { name: 'Science Basics', description: 'Fundamental science concepts', category: 'Science', difficulty: 'easy', questionCount: 15 },
+  { name: 'Math Aptitude', description: 'Mathematical problem-solving', category: 'Mathematics', difficulty: 'medium', questionCount: 20 },
+  { name: 'History Deep Dive', description: 'Advanced history knowledge', category: 'History', difficulty: 'hard', questionCount: 25 },
+];
 
 const categories = [
   'General Knowledge',
@@ -57,6 +79,12 @@ export default function QuizGeneratorTool() {
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [attempts, setAttempts] = useState<QuizAttempt[]>([]);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [weakAreas, setWeakAreas] = useState<Map<string, number>>(new Map());
+  const [questionBank, setQuestionBank] = useState<QuestionBank[]>([]);
+  const [lastSaved, setLastSaved] = useState('');
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [showPresets, setShowPresets] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('quizzes');
@@ -65,12 +93,15 @@ export default function QuizGeneratorTool() {
       setQuizzes(JSON.parse(saved));
     }
     if (savedAttempts) {
-      setAttempts(JSON.parse(savedAttempts));
+      const parsedAttempts = JSON.parse(savedAttempts);
+      setAttempts(parsedAttempts);
+      analyzeWeakAreas(parsedAttempts);
     }
   }, []);
 
   useEffect(() => {
     localStorage.setItem('quizzes', JSON.stringify(quizzes));
+    setLastSaved(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
   }, [quizzes]);
 
   useEffect(() => {
@@ -113,6 +144,61 @@ export default function QuizGeneratorTool() {
     setQuizzes(prev => [...prev, newQuiz]);
     setCurrentQuiz(newQuiz);
     setIsCreating(true);
+  };
+
+  const createFromPreset = (preset: QuizPreset) => {
+    const newQuiz: Quiz = {
+      id: Date.now().toString(),
+      title: preset.name,
+      description: preset.description,
+      questions: [],
+      passingScore: 70,
+      createdAt: new Date().toISOString(),
+      category: preset.category,
+    };
+
+    setQuizzes(prev => [...prev, newQuiz]);
+    setCurrentQuiz(newQuiz);
+    setIsCreating(true);
+    setShowPresets(false);
+  };
+
+  const analyzeWeakAreas = (quizAttempts: QuizAttempt[]) => {
+    const weakMap = new Map<string, number>();
+    
+    quizAttempts.forEach(attempt => {
+      const quiz = quizzes.find(q => q.id === attempt.quizId);
+      if (quiz) {
+        quiz.questions.forEach(question => {
+          const userAnswer = attempt.answers[question.id];
+          let isCorrect = false;
+
+          if (question.type === 'multiple-choice' || question.type === 'true-false') {
+            isCorrect = userAnswer === question.correctAnswer;
+          } else {
+            isCorrect = String(userAnswer).toLowerCase().trim() === String(question.correctAnswer).toLowerCase().trim();
+          }
+
+          if (!isCorrect) {
+            const topicKey = `${quiz.category}-${question.question.substring(0, 30)}`;
+            weakMap.set(topicKey, (weakMap.get(topicKey) || 0) + 1);
+          }
+        });
+      }
+    });
+
+    setWeakAreas(weakMap);
+  };
+
+  const getPerformanceStats = () => {
+    if (attempts.length === 0) return { avgScore: 0, totalAttempts: 0, bestScore: 0, passingRate: 0 };
+
+    const scores = attempts.map(a => (a.score / a.totalPoints) * 100);
+    const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const bestScore = Math.max(...scores);
+    const passingRate = Math.round((scores.filter(s => s >= 70).length / scores.length) * 100);
+
+    return { avgScore: Math.round(avgScore), totalAttempts: attempts.length, bestScore: Math.round(bestScore), passingRate };
   };
 
   const saveQuiz = (quiz: Quiz) => {
@@ -236,6 +322,28 @@ export default function QuizGeneratorTool() {
     const timeSpent = quizStartTime ? Math.floor((endTime - quizStartTime) / 1000) : 0;
     const { score, totalPoints, percentage } = calculateScore();
 
+    // Calculate question-level performance
+    const questionPerformance: Record<string, { correct: boolean; timeTaken?: number }> = {};
+    currentQuiz.questions.forEach(question => {
+      const userAnswer = answers[question.id];
+      let isCorrect = false;
+
+      if (question.type === 'multiple-choice' || question.type === 'true-false') {
+        isCorrect = userAnswer === question.correctAnswer;
+      } else {
+        isCorrect = String(userAnswer).toLowerCase().trim() === String(question.correctAnswer).toLowerCase().trim();
+      }
+
+      questionPerformance[question.id] = { correct: isCorrect };
+    });
+
+    // Update streak
+    if (percentage >= currentQuiz.passingScore) {
+      setCurrentStreak(prev => prev + 1);
+    } else {
+      setCurrentStreak(0);
+    }
+
     const attempt: QuizAttempt = {
       quizId: currentQuiz.id,
       answers,
@@ -243,9 +351,11 @@ export default function QuizGeneratorTool() {
       totalPoints,
       timeSpent,
       completedAt: new Date().toISOString(),
+      questionPerformance,
     };
 
     setAttempts(prev => [...prev, attempt]);
+    analyzeWeakAreas([...attempts, attempt]);
     setShowResults(true);
     setIsTakingQuiz(false);
   };
@@ -258,6 +368,10 @@ export default function QuizGeneratorTool() {
     setQuizStartTime(null);
     setTimeRemaining(null);
     setCurrentQuiz(null);
+  };
+
+  const toggleAnalytics = () => {
+    setShowAnalytics(!showAnalytics);
   };
 
   const exportQuiz = (quiz: Quiz) => {
@@ -316,20 +430,73 @@ export default function QuizGeneratorTool() {
             📝 Quiz Generator
           </h1>
           <p className={styles.subtitle}>
-            Create, manage, and take interactive quizzes with multiple question types
+            Create, manage, and take interactive quizzes with intelligent analytics
           </p>
+          <div className={styles.dataInfo}>
+            <span className={styles.infoItem}>
+              💾 <strong>Auto-Save:</strong> All quizzes and attempts are saved
+            </span>
+            <span className={styles.infoSeparator}>•</span>
+            <span className={styles.infoItem}>
+              {lastSaved && <><strong>Last saved:</strong> {lastSaved}</>}
+            </span>
+          </div>
         </div>
 
         {!isTakingQuiz && !showResults && (
           <div className={styles.quizLibrary}>
+            <div className={styles.smartDashboard}>
+              <div className={styles.dashboardSection}>
+                <h3>📊 Your Performance</h3>
+                <div className={styles.statsGrid}>
+                  <div className={styles.statCard}>
+                    <span className={styles.statNumber}>{getPerformanceStats().totalAttempts}</span>
+                    <span className={styles.statName}>Quizzes Taken</span>
+                  </div>
+                  <div className={styles.statCard}>
+                    <span className={styles.statNumber}>{getPerformanceStats().avgScore}%</span>
+                    <span className={styles.statName}>Avg Score</span>
+                  </div>
+                  <div className={styles.statCard}>
+                    <span className={styles.statNumber}>{getPerformanceStats().bestScore}%</span>
+                    <span className={styles.statName}>Best Score</span>
+                  </div>
+                  <div className={styles.statCard}>
+                    <span className={styles.statNumber}>{currentStreak} 🔥</span>
+                    <span className={styles.statName}>Current Streak</span>
+                  </div>
+                </div>
+              </div>
+
+              {weakAreas.size > 0 && (
+                <div className={styles.dashboardSection}>
+                  <h3>⚠️ Areas to Improve</h3>
+                  <div className={styles.weakAreasList}>
+                    {Array.from(weakAreas.entries()).slice(0, 5).map(([area, count]) => (
+                      <div key={area} className={styles.weakArea}>
+                        <span className={styles.areaTopic}>{area.split('-')[1] || area}</span>
+                        <span className={styles.areaCount}>{count} mistakes</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className={styles.libraryHeader}>
               <h2>Quiz Library</h2>
               <div className={styles.libraryActions}>
                 <button onClick={createNewQuiz} className={styles.createBtn}>
-                  Create New Quiz
+                  ✨ Create New
+                </button>
+                <button onClick={() => setShowPresets(!showPresets)} className={styles.presetsBtn}>
+                  🎯 Quick Templates
+                </button>
+                <button onClick={toggleAnalytics} className={styles.analyticsBtn}>
+                  📈 Analytics
                 </button>
                 <label className={styles.importBtn}>
-                  Import Quiz
+                  📥 Import
                   <input
                     type="file"
                     accept=".json"
@@ -339,6 +506,27 @@ export default function QuizGeneratorTool() {
                 </label>
               </div>
             </div>
+
+            {showPresets && (
+              <div className={styles.presetsSection}>
+                <h3>Quick Templates</h3>
+                <div className={styles.presetsGrid}>
+                  {quizPresets.map((preset) => (
+                    <div key={preset.name} className={styles.presetCard}>
+                      <h4 className={styles.presetName}>{preset.name}</h4>
+                      <p className={styles.presetDescription}>{preset.description}</p>
+                      <div className={styles.presetMeta}>
+                        <span className={`${styles.difficulty} ${styles[preset.difficulty]}`}>{preset.difficulty}</span>
+                        <span className={styles.questionCount}>{preset.questionCount} Qs</span>
+                      </div>
+                      <button onClick={() => createFromPreset(preset)} className={styles.usePresetBtn}>
+                        Use Template
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className={styles.quizGrid}>
               {quizzes.map(quiz => {

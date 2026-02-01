@@ -39,7 +39,13 @@ export default function FlashcardTool() {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [newCard, setNewCard] = useState({ front: '', back: '', category: '', difficulty: 'medium' as const });
   const [isAdding, setIsAdding] = useState(false);
+  const [isBulkAdding, setIsBulkAdding] = useState(false);
+  const [bulkInput, setBulkInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [studyTimer, setStudyTimer] = useState(0);
+  const [isStudying, setIsStudying] = useState(false);
+  const [lastSaved, setLastSaved] = useState<string>('');
+  const [autoFlipDelay, setAutoFlipDelay] = useState(0);
 
   useEffect(() => {
     const saved = localStorage.getItem('flashcards');
@@ -54,11 +60,50 @@ export default function FlashcardTool() {
 
   useEffect(() => {
     localStorage.setItem('flashcards', JSON.stringify(cards));
+    setLastSaved(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
   }, [cards]);
 
   useEffect(() => {
     localStorage.setItem('flashcard-categories', JSON.stringify(categories));
   }, [categories]);
+
+  // Study timer
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isStudying) {
+      interval = setInterval(() => {
+        setStudyTimer(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isStudying]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (isAdding || isBulkAdding) return;
+      
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        flipCard();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextCard();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevCard();
+      } else if (e.key === '1' && showAnswer) {
+        e.preventDefault();
+        markIncorrect();
+      } else if (e.key === '2' && showAnswer) {
+        e.preventDefault();
+        markCorrect();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isAdding, isBulkAdding, showAnswer, currentCardIndex]);
 
   const addCard = () => {
     if (!newCard.front.trim() || !newCard.back.trim()) return;
@@ -76,6 +121,68 @@ export default function FlashcardTool() {
     setCards(prev => [...prev, card]);
     setNewCard({ front: '', back: '', category: '', difficulty: 'medium' });
     setIsAdding(false);
+  };
+
+  const bulkAddCards = () => {
+    const lines = bulkInput.split('\n').filter(line => line.trim());
+    const newCards: Flashcard[] = [];
+
+    lines.forEach(line => {
+      const parts = line.split('|').map(p => p.trim());
+      if (parts.length >= 2) {
+        newCards.push({
+          id: Date.now().toString() + Math.random(),
+          front: parts[0],
+          back: parts[1],
+          category: parts[2] || '',
+          difficulty: (parts[3] as any) || 'medium',
+          correctCount: 0,
+          incorrectCount: 0,
+        });
+      }
+    });
+
+    if (newCards.length > 0) {
+      setCards(prev => [...prev, ...newCards]);
+      setBulkInput('');
+      setIsBulkAdding(false);
+    }
+  };
+
+  const loadPreset = (type: 'science' | 'history' | 'math') => {
+    const presets = {
+      science: [
+        { front: 'What is photosynthesis?', back: 'Process by which plants convert light energy into chemical energy', category: '2', difficulty: 'medium' },
+        { front: 'What is DNA?', back: 'Deoxyribonucleic acid - carries genetic information', category: '2', difficulty: 'easy' },
+        { front: 'Newton\'s First Law?', back: 'An object at rest stays at rest unless acted upon by a force', category: '2', difficulty: 'medium' },
+        { front: 'What is H2O?', back: 'Water molecule - 2 hydrogen atoms, 1 oxygen atom', category: '2', difficulty: 'easy' },
+      ],
+      history: [
+        { front: 'When was WW2?', back: '1939-1945', category: '3', difficulty: 'easy' },
+        { front: 'Who was first US President?', back: 'George Washington', category: '3', difficulty: 'easy' },
+        { front: 'Renaissance period?', back: '14th-17th century European cultural movement', category: '3', difficulty: 'medium' },
+        { front: 'French Revolution year?', back: '1789', category: '3', difficulty: 'medium' },
+      ],
+      math: [
+        { front: 'Pythagorean theorem?', back: 'a² + b² = c²', category: '1', difficulty: 'medium' },
+        { front: 'What is π (pi)?', back: '3.14159... ratio of circle circumference to diameter', category: '1', difficulty: 'easy' },
+        { front: 'Quadratic formula?', back: 'x = (-b ± √(b²-4ac)) / 2a', category: '1', difficulty: 'hard' },
+        { front: 'Sum of angles in triangle?', back: '180 degrees', category: '1', difficulty: 'easy' },
+      ]
+    };
+
+    const preset = presets[type];
+    const newCards = preset.map(p => ({
+      id: Date.now().toString() + Math.random(),
+      front: p.front,
+      back: p.back,
+      category: p.category,
+      difficulty: p.difficulty as any,
+      correctCount: 0,
+      incorrectCount: 0,
+    }));
+
+    setCards(prev => [...prev, ...newCards]);
   };
 
   const deleteCard = (id: string) => {
@@ -223,6 +330,24 @@ export default function FlashcardTool() {
     })));
   };
 
+  const startStudySession = () => {
+    setIsStudying(true);
+    setStudyTimer(0);
+    setCurrentCardIndex(0);
+    setShowAnswer(false);
+    setIsFlipped(false);
+  };
+
+  const stopStudySession = () => {
+    setIsStudying(false);
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const exportCards = () => {
     const data = {
       cards,
@@ -270,11 +395,30 @@ export default function FlashcardTool() {
       <div className={styles.tool}>
         <div className={styles.header}>
           <h1 className={styles.title}>
-            🃏 Flashcard Study Tool
+            <span className={styles.icon}>🃏</span>
+            Flashcard Study Tool
           </h1>
           <p className={styles.subtitle}>
-            Master concepts with spaced repetition and interactive flashcards
+            Build once, teach again and again • Data is saved automatically
           </p>
+          <div className={styles.dataInfo}>
+            <span className={styles.infoItem}>
+              💾 <strong>Auto-Save:</strong> Every change is automatically saved on the device
+            </span>
+            <span className={styles.infoSeparator}>•</span>
+            <span className={styles.infoItem}>
+              {lastSaved && <><strong>Last saved:</strong> {lastSaved}</>
+            }
+            </span>
+          </div>
+          <p className={styles.infoText}>
+            💡 <strong>Tip:</strong> Neeche "Download the backup using the "Export" button (on the file). If you ever change your phone or clear the data, you can reload it using "Import".
+          </p>
+          {isStudying && (
+            <div className={styles.timer}>
+              ⏱️ Study Time: <strong>{formatTime(studyTimer)}</strong>
+            </div>
+          )}
         </div>
 
         <div className={styles.stats}>
@@ -336,21 +480,45 @@ export default function FlashcardTool() {
             />
           </div>
 
+          <div className={styles.presetSection}>
+            <button onClick={() => loadPreset('science')} className={styles.presetBtn}>
+              🔬 Science
+            </button>
+            <button onClick={() => loadPreset('history')} className={styles.presetBtn}>
+              📜 History
+            </button>
+            <button onClick={() => loadPreset('math')} className={styles.presetBtn}>
+              📐 Math
+            </button>
+          </div>
+
           <div className={styles.actions}>
             <button onClick={() => setIsAdding(true)} className={styles.addBtn}>
-              Add Card
+              + Add Card
+            </button>
+            <button onClick={() => setIsBulkAdding(true)} className={styles.bulkBtn}>
+              📊 Bulk Import
             </button>
             <button onClick={shuffleCards} className={styles.shuffleBtn}>
-              Shuffle
+              🔀 Shuffle
             </button>
+            {!isStudying ? (
+              <button onClick={startStudySession} className={styles.startBtn}>
+                ▶️ Start Session
+              </button>
+            ) : (
+              <button onClick={stopStudySession} className={styles.stopBtn}>
+                ⏸️ Stop
+              </button>
+            )}
             <button onClick={resetProgress} className={styles.resetBtn}>
-              Reset Progress
+              🔄 Reset
             </button>
             <button onClick={exportCards} className={styles.exportBtn}>
-              Export
+              ↓ Export
             </button>
             <label className={styles.importBtn}>
-              Import
+              ↑ Import
               <input
                 type="file"
                 accept=".json"
@@ -513,6 +681,39 @@ export default function FlashcardTool() {
                 </button>
                 <button onClick={addCard} className={styles.saveBtn}>
                   Add Card
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isBulkAdding && (
+          <div className={styles.modal}>
+            <div className={styles.modalContent}>
+              <h3>📊 Bulk Import Flashcards</h3>
+              <p className={styles.bulkInstructions}>
+                Enter one card per line in this format:<br />
+                <code>Question | Answer | Category | Difficulty</code><br />
+                <small>Category and Difficulty are optional. Example:</small><br />
+                <code>What is DNA? | Genetic material | 2 | medium</code>
+              </p>
+
+              <div className={styles.formGroup}>
+                <textarea
+                  value={bulkInput}
+                  onChange={(e) => setBulkInput(e.target.value)}
+                  placeholder="Question 1 | Answer 1 | 2 | easy\nQuestion 2 | Answer 2 | 1 | hard"
+                  className={styles.bulkTextarea}
+                  rows={10}
+                />
+              </div>
+
+              <div className={styles.modalActions}>
+                <button onClick={() => setIsBulkAdding(false)} className={styles.cancelBtn}>
+                  Cancel
+                </button>
+                <button onClick={bulkAddCards} className={styles.saveBtn}>
+                  Import {bulkInput.split('\n').filter(l => l.trim()).length} Cards
                 </button>
               </div>
             </div>

@@ -30,6 +30,17 @@
   font-size: 1rem;
 }
 
+.proInfo {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e7f3ff 0%, #f0e8ff 100%);
+  border-left: 4px solid #667eea;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #343a40;
+  line-height: 1.5;
+}
+
 .stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -228,6 +239,21 @@
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
+.noteCheckbox {
+  display: none;
+  margin-bottom: 0.5rem;
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.noteCard:hover .noteCheckbox {
+  display: block;
+}
+
 .noteHeader {
   display: flex;
   justify-content: space-between;
@@ -295,6 +321,33 @@
 
 .deleteBtn:hover {
   background: #c82333;
+}
+
+.pinIcon {
+  background: transparent;
+  color: #6c757d;
+  transition: all 0.2s;
+}
+
+.pinIcon.pinned {
+  color: #ff6b35;
+}
+
+.deleteSelectedBtn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  background: #dc3545;
+  color: white;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.deleteSelectedBtn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
 }
 
 .notePreview {
@@ -541,6 +594,137 @@
 .emptyState p {
   margin: 0;
   font-size: 1.1rem;
+}
+
+.categoryManager {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid #dee2e6;
+}
+
+.categoryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.categoryHeader h4 {
+  margin: 0;
+  color: #343a40;
+  font-size: 0.95rem;
+}
+
+.expandBtn {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.expandBtn:hover {
+  background: #0056b3;
+  transform: rotate(45deg);
+}
+
+.categoryForm {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  transition: all 0.2s;
+}
+
+.categoryForm.hidden {
+  display: none;
+}
+
+.categoryInput {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.colorPicker {
+  width: 40px;
+  height: 32px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.addCategoryBtn {
+  padding: 6px 12px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.addCategoryBtn:hover {
+  background: #218838;
+}
+
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.categoryItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #dee2e6;
+  font-size: 0.9rem;
+}
+
+.categoryDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.categoryName {
+  flex: 1;
+  color: #343a40;
+}
+
+.deleteCategoryBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.deleteCategoryBtn:hover {
+  background: #c82333;
 }
 
 /* Responsive design */

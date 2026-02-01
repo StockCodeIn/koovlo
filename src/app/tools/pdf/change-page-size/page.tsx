@@ -1,8 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import ToolInfo from '@/components/ToolInfo';
-import styles from './changepagesize.module.css';
+import { useState, useRef } from "react";
+import { PDFDocument } from "pdf-lib";
+import styles from "./changepagesize.module.css";
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
 
 export default function ChangePageSize() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -11,7 +19,11 @@ export default function ChangePageSize() {
   const [customHeight, setCustomHeight] = useState(842);
   const [unit, setUnit] = useState<'points' | 'mm' | 'inches'>('points');
   const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState('');
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error" | "info">("info");
+  const [progress, setProgress] = useState(0);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const pageSizes = {
     A4: { width: 595, height: 842, desc: '210 × 297 mm' },
@@ -26,11 +38,50 @@ export default function ChangePageSize() {
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
       if (selectedFile.type !== 'application/pdf') {
-        setError('Please select a PDF file');
+        setMessage('❌ Please select a valid PDF file');
+        setMessageType('error');
         return;
       }
       setPdfFile(selectedFile);
-      setError('');
+      setMessage(`✅ File selected: ${selectedFile.name}`);
+      setMessageType('success');
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const selectedFile = files[0];
+      if (selectedFile.type !== 'application/pdf') {
+        setMessage('❌ Please upload a valid PDF file');
+        setMessageType('error');
+        return;
+      }
+      setPdfFile(selectedFile);
+      setMessage(`✅ File selected: ${selectedFile.name}`);
+      setMessageType('success');
+    }
+  };
+
+  const clearFile = () => {
+    setPdfFile(null);
+    setMessage("");
+    setProgress(0);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -54,25 +105,57 @@ export default function ChangePageSize() {
 
   const changePageSize = async () => {
     if (!pdfFile) {
-      setError('Please select a PDF file');
+      setMessage('Please select a PDF file first');
+      setMessageType('error');
       return;
     }
 
     setProcessing(true);
-    setError('');
+    setMessage('Preparing to change page size...');
+    setMessageType('info');
+    setProgress(0);
 
     try {
-      // In a real implementation, this would use pdf-lib
-      // For now, we'll show a placeholder
-      setError('PDF page size changing requires pdf-lib. This feature is under development.');
+      const arrayBuffer = await pdfFile.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pages = pdfDoc.getPages();
 
-      setTimeout(() => {
-        setProcessing(false);
-      }, 2000);
+      const targetSize = getCurrentSize();
 
+      setProgress(25);
+      setMessage(`Processing ${pages.length} page${pages.length > 1 ? 's' : ''}...`);
+
+      // Change page size for each page
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
+        page.setSize(targetSize.width, targetSize.height);
+
+        setProgress(25 + (i / pages.length) * 50);
+        setMessage(`Resizing page ${i + 1} of ${pages.length}...`);
+      }
+
+      setProgress(80);
+      setMessage('Finalizing PDF...');
+
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes as unknown as BlobPart], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${pdfFile.name.replace('.pdf', '')}-resized-${pageSize}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      setProgress(100);
+      setMessage('✅ Page size changed successfully!');
+      setMessageType('success');
     } catch (err) {
-      setError('Failed to change page size');
+      console.error('Page size change error:', err);
+      setMessage('❌ Failed to change page size. Please try again.');
+      setMessageType('error');
+    } finally {
       setProcessing(false);
+      setTimeout(() => setProgress(0), 1000);
     }
   };
 
@@ -80,38 +163,68 @@ export default function ChangePageSize() {
 
   return (
     <main className={styles.container}>
-      <h1>Change PDF Page Size</h1>
-      <p>Resize all pages in your PDF to a different page size</p>
+      <h1 className={styles.pageTitle}>
+        <span className={styles.icon}>📏</span>
+        <span className={styles.textGradient}>Change PDF Page Size</span>
+      </h1>
+      <p className={styles.description}>
+        Resize all pages in your PDF to a different page size — perfect for printing or formatting.
+      </p>
 
       <div className={styles.converter}>
         <div className={styles.inputSection}>
-          <div className={styles.fileInput}>
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={handleFileSelect}
-              className={styles.hiddenInput}
-              id="pdf-file"
-            />
-            <label htmlFor="pdf-file" className={styles.fileLabel}>
-              {pdfFile ? pdfFile.name : 'Choose PDF File'}
+          <div
+            className={`${styles.dropZone} ${isDragOver ? styles.dragOver : ""}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <label className={styles.fileLabel}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileSelect}
+                className={styles.hiddenInput}
+                disabled={processing}
+              />
+              📄 {pdfFile ? pdfFile.name : "Choose PDF File"}
             </label>
+            <p className={styles.dropText}>Or drag and drop a PDF file here</p>
           </div>
 
           {pdfFile && (
             <div className={styles.fileInfo}>
-              <p><strong>File:</strong> {pdfFile.name} ({(pdfFile.size / 1024 / 1024).toFixed(2)} MB)</p>
+              <p><strong>File:</strong> {pdfFile.name}</p>
+              <p><strong>Size:</strong> {formatFileSize(pdfFile.size)}</p>
+              <p><strong>Type:</strong> PDF Document</p>
+              <button onClick={clearFile} className={styles.clearBtn}>
+                Clear File
+              </button>
+            </div>
+          )}
+
+          {processing && (
+            <div className={styles.progressContainer}>
+              <div className={styles.progressBar}>
+                <div
+                  className={styles.progressFill}
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+              <p>Processing PDF...</p>
             </div>
           )}
 
           <div className={styles.sizeSelector}>
-            <h3>Page Size</h3>
+            <h3>Target Page Size</h3>
             <div className={styles.sizeOptions}>
               {Object.entries(pageSizes).map(([key, size]) => (
                 <button
                   key={key}
                   className={`${styles.sizeBtn} ${pageSize === key ? styles.active : ''}`}
                   onClick={() => setPageSize(key)}
+                  disabled={processing}
                 >
                   <div className={styles.sizeName}>{key}</div>
                   <div className={styles.sizeDesc}>{size.desc}</div>
@@ -122,6 +235,7 @@ export default function ChangePageSize() {
               <button
                 className={`${styles.sizeBtn} ${pageSize === 'custom' ? styles.active : ''}`}
                 onClick={() => setPageSize('custom')}
+                disabled={processing}
               >
                 <div className={styles.sizeName}>Custom</div>
                 <div className={styles.sizeDesc}>Define your own size</div>
@@ -140,6 +254,7 @@ export default function ChangePageSize() {
                     value={unit}
                     onChange={(e) => setUnit(e.target.value as typeof unit)}
                     className={styles.unitSelect}
+                    disabled={processing}
                   >
                     <option value="points">Points</option>
                     <option value="mm">Millimeters</option>
@@ -156,6 +271,7 @@ export default function ChangePageSize() {
                     value={customWidth}
                     onChange={(e) => setCustomWidth(parseInt(e.target.value) || 1)}
                     className={styles.dimensionInput}
+                    disabled={processing}
                   />
                 </div>
 
@@ -168,6 +284,7 @@ export default function ChangePageSize() {
                     value={customHeight}
                     onChange={(e) => setCustomHeight(parseInt(e.target.value) || 1)}
                     className={styles.dimensionInput}
+                    disabled={processing}
                   />
                 </div>
               </div>
@@ -179,10 +296,14 @@ export default function ChangePageSize() {
             disabled={!pdfFile || processing}
             className={styles.convertBtn}
           >
-            {processing ? 'Changing Page Size...' : 'Change Page Size'}
+            {processing ? "🔄 Changing Page Size..." : "🚀 Change Page Size"}
           </button>
 
-          {error && <div className={styles.error}>{error}</div>}
+          {message && (
+            <p className={`${styles.message} ${styles[messageType]}`}>
+              {message}
+            </p>
+          )}
         </div>
 
         <div className={styles.previewSection}>
@@ -250,17 +371,6 @@ export default function ChangePageSize() {
           </div>
         </div>
       </div>
-
-      <ToolInfo
-        howItWorks="Upload your PDF file<br>Select a standard page size or enter custom dimensions<br>Choose your preferred unit (points, mm, or inches)<br>Click 'Change Page Size' to download resized PDF"
-        faqs={[
-          { title: "What happens to the content when changing page size?", content: "Content is scaled to fit the new dimensions while maintaining aspect ratio." },
-          { title: "Can I specify exact dimensions?", content: "Yes, use the Custom option and enter width and height in your preferred unit." },
-          { title: "What units can I use?", content: "Points (PDF standard), millimeters, or inches." },
-          { title: "Will images be affected?", content: "Images will be scaled along with the rest of the content." }
-        ]}
-        tips={["Choose standard sizes for printing<br>Use points for precise PDF dimensions<br>Preview the aspect ratio before processing<br>Always keep a backup of the original"]}
-      />
     </main>
   );
 }

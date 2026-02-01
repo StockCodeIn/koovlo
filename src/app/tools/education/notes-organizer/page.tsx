@@ -12,6 +12,8 @@ interface Note {
   createdAt: string;
   updatedAt: string;
   isFavorite: boolean;
+  isPinned: boolean;
+  color?: string;
 }
 
 interface Category {
@@ -38,6 +40,10 @@ export default function NotesOrganizerTool() {
   const [showFavorites, setShowFavorites] = useState(false);
   const [sortBy, setSortBy] = useState<'date' | 'title' | 'category'>('date');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [lastSaved, setLastSaved] = useState<string>('');
+  const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryColor, setNewCategoryColor] = useState('#007bff');
 
   useEffect(() => {
     const saved = localStorage.getItem('notes');
@@ -52,6 +58,7 @@ export default function NotesOrganizerTool() {
 
   useEffect(() => {
     localStorage.setItem('notes', JSON.stringify(notes));
+    setLastSaved(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
   }, [notes]);
 
   useEffect(() => {
@@ -68,6 +75,8 @@ export default function NotesOrganizerTool() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       isFavorite: false,
+      isPinned: false,
+      color: '#ffffff',
     };
 
     setNotes(prev => [newNote, ...prev]);
@@ -107,6 +116,7 @@ export default function NotesOrganizerTool() {
       title: `${note.title} (Copy)`,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      isPinned: false,
     };
 
     setNotes(prev => [duplicatedNote, ...prev]);
@@ -117,7 +127,6 @@ export default function NotesOrganizerTool() {
   const getFilteredNotes = () => {
     let filtered = notes;
 
-    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(note =>
         note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -126,18 +135,18 @@ export default function NotesOrganizerTool() {
       );
     }
 
-    // Filter by category
     if (selectedCategory) {
       filtered = filtered.filter(note => note.category === selectedCategory);
     }
 
-    // Filter by favorites
     if (showFavorites) {
       filtered = filtered.filter(note => note.isFavorite);
     }
 
-    // Sort notes
     filtered.sort((a, b) => {
+      if (a.isPinned !== b.isPinned) {
+        return b.isPinned ? 1 : -1;
+      }
       if (sortBy === 'title') {
         return a.title.localeCompare(b.title);
       } else if (sortBy === 'category') {
@@ -150,6 +159,43 @@ export default function NotesOrganizerTool() {
     });
 
     return filtered;
+  };
+
+  const togglePin = (id: string) => {
+    setNotes(prev => prev.map(note =>
+      note.id === id ? { ...note, isPinned: !note.isPinned } : note
+    ));
+  };
+
+  const addCategory = () => {
+    if (!newCategoryName.trim()) return;
+    const newCategory: Category = {
+      id: Date.now().toString(),
+      name: newCategoryName,
+      color: newCategoryColor,
+    };
+    setCategories(prev => [...prev, newCategory]);
+    setNewCategoryName('');
+    setNewCategoryColor('#007bff');
+  };
+
+  const deleteCategory = (id: string) => {
+    setCategories(prev => prev.filter(cat => cat.id !== id));
+    setNotes(prev => prev.map(note => note.category === id ? { ...note, category: '' } : note));
+  };
+
+  const deleteSelectedNotes = () => {
+    if (selectedNotes.length === 0) return;
+    if (confirm(`Delete ${selectedNotes.length} selected note(s)?`)) {
+      setNotes(prev => prev.filter(note => !selectedNotes.includes(note.id)));
+      setSelectedNotes([]);
+    }
+  };
+
+  const toggleNoteSelection = (id: string) => {
+    setSelectedNotes(prev => 
+      prev.includes(id) ? prev.filter(nId => nId !== id) : [...prev, id]
+    );
   };
 
   const exportNotes = () => {
@@ -212,6 +258,7 @@ export default function NotesOrganizerTool() {
   const stats = {
     total: notes.length,
     favorites: notes.filter(n => n.isFavorite).length,
+    pinned: notes.filter(n => n.isPinned).length,
     categories: new Set(notes.map(n => n.category)).size,
   };
 
@@ -223,8 +270,14 @@ export default function NotesOrganizerTool() {
             📝 Notes Organizer
           </h1>
           <p className={styles.subtitle}>
-            Organize your study notes with categories, tags, and search functionality
+            Professional note-taking with categories, tags, pinning, and advanced organization
           </p>
+          <div className={styles.proInfo}>
+            💾 <strong>Auto-Save:</strong> Every change is automatically saved | 
+            {lastSaved && <><strong>Last saved:</strong> {lastSaved}</> }
+            <br/>
+            ⚠️ <strong>Note:</strong> Data is stored on this device only. Clear browser cache = data loss (Backend sync coming soon)
+          </div>
         </div>
 
         <div className={styles.stats}>
@@ -235,6 +288,10 @@ export default function NotesOrganizerTool() {
           <div className={styles.stat}>
             <span className={styles.statValue}>{stats.favorites}</span>
             <span className={styles.statLabel}>Favorites</span>
+          </div>
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{stats.pinned}</span>
+            <span className={styles.statLabel}>Pinned</span>
           </div>
           <div className={styles.stat}>
             <span className={styles.statValue}>{stats.categories}</span>
@@ -301,13 +358,18 @@ export default function NotesOrganizerTool() {
 
           <div className={styles.actions}>
             <button onClick={createNewNote} className={styles.newBtn}>
-              New Note
+              ✨ New Note
             </button>
+            {selectedNotes.length > 0 && (
+              <button onClick={deleteSelectedNotes} className={styles.deleteSelectedBtn}>
+                🗑️ Delete {selectedNotes.length}
+              </button>
+            )}
             <button onClick={exportNotes} className={styles.exportBtn}>
-              Export
+              📥 Export All
             </button>
             <label className={styles.importBtn}>
-              Import
+              📤 Import
               <input
                 type="file"
                 accept=".json"
@@ -315,6 +377,58 @@ export default function NotesOrganizerTool() {
                 style={{ display: 'none' }}
               />
             </label>
+          </div>
+
+          <div className={styles.categoryManager}>
+            <div className={styles.categoryHeader}>
+              <h4>Manage Categories</h4>
+              <button 
+                className={styles.expandBtn}
+                onClick={() => {
+                  const cm = document.querySelector(`.${styles.categoryForm}`);
+                  if (cm) cm.classList.toggle(styles.hidden);
+                }}
+              >
+                +
+              </button>
+            </div>
+            <div className={`${styles.categoryForm} ${styles.hidden}`}>
+              <input
+                type="text"
+                placeholder="Category name"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                className={styles.categoryInput}
+              />
+              <input
+                type="color"
+                value={newCategoryColor}
+                onChange={(e) => setNewCategoryColor(e.target.value)}
+                className={styles.colorPicker}
+              />
+              <button onClick={addCategory} className={styles.addCategoryBtn}>
+                Add
+              </button>
+            </div>
+            <div className={styles.categoryList}>
+              {categories.map(cat => (
+                <div key={cat.id} className={styles.categoryItem}>
+                  <span 
+                    className={styles.categoryDot}
+                    style={{ backgroundColor: cat.color }}
+                  />
+                  <span className={styles.categoryName}>{cat.name}</span>
+                  {!defaultCategories.some(dc => dc.id === cat.id) && (
+                    <button 
+                      onClick={() => deleteCategory(cat.id)}
+                      className={styles.deleteCategoryBtn}
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -334,11 +448,32 @@ export default function NotesOrganizerTool() {
                     setIsEditing(false);
                   }}
                 >
+                  <div className={styles.noteCheckbox}>
+                    <input
+                      type="checkbox"
+                      checked={selectedNotes.includes(note.id)}
+                      onChange={() => toggleNoteSelection(note.id)}
+                      onClick={(e) => e.stopPropagation()}
+                      className={styles.checkbox}
+                    />
+                  </div>
                   <div className={styles.noteHeader}>
-                    <h3 className={styles.noteTitle}>
-                      {note.title || 'Untitled'}
-                    </h3>
+                    <div>
+                      <h3 className={styles.noteTitle}>
+                        {note.isPinned && '📌 '}
+                        {note.title || 'Untitled'}
+                      </h3>
+                    </div>
                     <div className={styles.noteActions}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          togglePin(note.id);
+                        }}
+                        className={`${styles.pinIcon} ${note.isPinned ? styles.pinned : ''}`}
+                      >
+                        📌
+                      </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

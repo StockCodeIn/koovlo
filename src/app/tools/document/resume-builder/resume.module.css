@@ -1,0 +1,490 @@
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.icon {
+  background: none;
+  -webkit-text-fill-color: initial;
+}
+
+.textGradient {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.mainContent {
+  display: grid;
+  grid-template-columns: 450px 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.editorPanel {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.editorPanel h2 {
+  margin: 0 0 1.5rem 0;
+  color: #333;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.sectionHeader h3 {
+  margin: 0;
+  color: #555;
+  font-size: 1.1rem;
+}
+
+.addBtn, .removeBtn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.addBtn {
+  background: #28a745;
+  color: white;
+}
+
+.addBtn:hover {
+  background: #218838;
+}
+
+.removeBtn {
+  background: #dc3545;
+  color: white;
+}
+
+.removeBtn:hover {
+  background: #c82333;
+}
+
+.formGroup {
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.input, .textarea, .select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.input:focus, .textarea:focus, .select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.entryCard {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid #e0e0e0;
+}
+
+.entryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.entryHeader strong {
+  color: #333;
+}
+
+.skillTag {
+  display: inline-block;
+  background: #667eea;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+.previewPanel {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.previewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.previewHeader h2 {
+  margin: 0;
+  color: #333;
+  font-size: 1.3rem;
+}
+
+.themeSelector {
+  display: flex;
+  gap: 8px;
+}
+
+.themeBtn {
+  width: 32px;
+  height: 32px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.themeBtn:hover {
+  transform: scale(1.1);
+}
+
+.themeBtn.active {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
+}
+
+.resumePreview {
+  background: white;
+  padding: 2rem;
+  min-height: 600px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Resume Template Styles */
+.resumeHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 3px solid;
+}
+
+.resumeHeader h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.resumeHeader .contact {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.resumeHeader .contact span {
+  word-break: break-all;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.resumeSection {
+  margin-bottom: 1.5rem;
+}
+
+.resumeSection h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid;
+}
+
+.resumeEntry {
+  margin-bottom: 1rem;
+}
+
+.resumeEntry h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.resumeEntry .meta {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.resumeEntry p {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.skillsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skillBadge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.actionBar {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.exportBtn, .saveBtn, .loadBtn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.exportBtn {
+  background: #667eea;
+  color: white;
+  flex: 1;
+}
+
+.exportBtn:hover {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.saveBtn {
+  background: #28a745;
+  color: white;
+}
+
+.saveBtn:hover {
+  background: #218838;
+}
+
+.loadBtn {
+  background: #17a2b8;
+  color: white;
+}
+
+.loadBtn:hover {
+  background: #138496;
+}
+
+/* Color Themes */
+.theme-blue .resumeHeader {
+  border-bottom-color: #667eea;
+}
+
+.theme-blue .resumeSection h2 {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+.theme-blue .skillBadge {
+  background: #e7eaf6;
+  color: #667eea;
+}
+
+.theme-green .resumeHeader {
+  border-bottom-color: #28a745;
+}
+
+.theme-green .resumeSection h2 {
+  color: #28a745;
+  border-bottom-color: #28a745;
+}
+
+.theme-green .skillBadge {
+  background: #d4edda;
+  color: #28a745;
+}
+
+.theme-purple .resumeHeader {
+  border-bottom-color: #764ba2;
+}
+
+.theme-purple .resumeSection h2 {
+  color: #764ba2;
+  border-bottom-color: #764ba2;
+}
+
+.theme-purple .skillBadge {
+  background: #f3e5f5;
+  color: #764ba2;
+}
+
+.theme-dark .resumeHeader {
+  border-bottom-color: #343a40;
+}
+
+.theme-dark .resumeSection h2 {
+  color: #343a40;
+  border-bottom-color: #343a40;
+}
+
+.theme-dark .skillBadge {
+  background: #e9ecef;
+  color: #343a40;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .mainContent {
+    grid-template-columns: 400px 1fr;
+  }
+}
+
+@media (max-width: 968px) {
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .previewPanel {
+    position: relative;
+    top: 0;
+    max-height: none;
+  }
+
+  .editorPanel {
+    max-height: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+
+  .resumeHeader h1 {
+    font-size: 2rem;
+  }
+
+  .actionBar {
+    flex-direction: column;
+  }
+
+  .exportBtn, .saveBtn, .loadBtn {
+    width: 100%;
+  }
+}
+
+@media print {
+  .editorPanel,
+  .actionBar,
+  .previewHeader,
+  .container > h1,
+  .container > p {
+    display: none !important;
+  }
+
+  .mainContent {
+    grid-template-columns: 1fr;
+  }
+
+  .previewPanel {
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .resumePreview {
+    border: none;
+    padding: 0;
+  }
+}

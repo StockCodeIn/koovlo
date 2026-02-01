@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./attendance.module.css";
 import ToolInfo from "@/components/ToolInfo";
 
@@ -16,9 +16,40 @@ export default function AttendanceTracker() {
     { id: 2, name: "Student 2", attendance: [] }
   ]);
   const [className, setClassName] = useState("My Class");
-  const [currentDate, setCurrentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
   const [dates, setDates] = useState<string[]>([new Date().toISOString().split('T')[0]]);
   const [viewMode, setViewMode] = useState<'daily' | 'summary'>('daily');
+  const [bulkNames, setBulkNames] = useState("");
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load data from localStorage on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('attendanceData');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          setStudents(data.students);
+          setDates(data.dates);
+          setClassName(data.className);
+        } catch (error) {
+          console.error('Failed to load attendance data:', error);
+        }
+      }
+      setIsLoaded(true);
+    }
+  }, []);
+
+  // Auto-save data to localStorage whenever it changes
+  useEffect(() => {
+    if (isLoaded && typeof window !== 'undefined') {
+      localStorage.setItem('attendanceData', JSON.stringify({
+        students,
+        dates,
+        className
+      }));
+    }
+  }, [students, dates, className, isLoaded]);
 
   const addStudent = () => {
     const newId = Math.max(...students.map(s => s.id)) + 1;
@@ -27,6 +58,25 @@ export default function AttendanceTracker() {
       name: `Student ${newId}`,
       attendance: new Array(dates.length).fill('absent')
     }]);
+  };
+
+  const addStudentsFromList = () => {
+    const names = bulkNames
+      .split("\n")
+      .map(name => name.trim())
+      .filter(Boolean);
+
+    if (names.length === 0) return;
+
+    const startId = Math.max(...students.map(s => s.id)) + 1;
+    const newStudents = names.map((name, index) => ({
+      id: startId + index,
+      name,
+      attendance: new Array(dates.length).fill('absent')
+    }));
+
+    setStudents(prev => [...prev, ...newStudents]);
+    setBulkNames("");
   };
 
   const removeStudent = (id: number) => {
@@ -53,13 +103,9 @@ export default function AttendanceTracker() {
   };
 
   const addDate = () => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(newDate.getDate() + 1);
-    const dateString = newDate.toISOString().split('T')[0];
-    setDates([...dates, dateString]);
-    setCurrentDate(dateString);
+    if (!newDate || dates.includes(newDate)) return;
+    setDates([...dates, newDate]);
 
-    // Add attendance slot for all students
     setStudents(students.map(student => ({
       ...student,
       attendance: [...student.attendance, 'absent']
@@ -74,6 +120,14 @@ export default function AttendanceTracker() {
         attendance: student.attendance.filter((_, index) => index !== dateIndex)
       })));
     }
+  };
+
+  const markAllForDate = (dateIndex: number, status: 'present' | 'absent' | 'late' | 'excused') => {
+    setStudents(students.map(student => {
+      const newAttendance = [...student.attendance];
+      newAttendance[dateIndex] = status;
+      return { ...student, attendance: newAttendance };
+    }));
   };
 
   const getAttendanceStats = (student: Student) => {
@@ -130,6 +184,35 @@ export default function AttendanceTracker() {
     }
   };
 
+  const clearAllData = () => {
+    if (typeof window !== 'undefined' && confirm('Are you sure? This will delete all attendance data.')) {
+      setStudents([
+        { id: 1, name: "Student 1", attendance: [] },
+        { id: 2, name: "Student 2", attendance: [] }
+      ]);
+      setDates([new Date().toISOString().split('T')[0]]);
+      setClassName("My Class");
+      localStorage.removeItem('attendanceData');
+    }
+  };
+
+  const downloadBackup = () => {
+    const backup = {
+      timestamp: new Date().toISOString(),
+      className,
+      students,
+      dates
+    };
+    
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `attendance_backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <main className={styles.container}>
       <section className={styles.tool}>
@@ -151,6 +234,44 @@ export default function AttendanceTracker() {
               />
             </div>
 
+            <div className={styles.quickDate}
+            >
+              <label>Add Date:</label>
+              <div className={styles.dateControls}>
+                <input
+                  type="date"
+                  value={newDate}
+                  onChange={(e) => setNewDate(e.target.value)}
+                  className={styles.dateInput}
+                />
+                <button onClick={addDate} className={styles.addDateBtn}>Add</button>
+              </div>
+              <div className={styles.quickActions}>
+                <button
+                  className={styles.quickBtn}
+                  onClick={() => setNewDate(new Date().toISOString().split('T')[0])}
+                >
+                  Today
+                </button>
+                {dates.length > 0 && (
+                  <>
+                    <button
+                      className={styles.quickBtnPresent}
+                      onClick={() => markAllForDate(dates.length - 1, 'present')}
+                    >
+                      Mark All Present
+                    </button>
+                    <button
+                      className={styles.quickBtnAbsent}
+                      onClick={() => markAllForDate(dates.length - 1, 'absent')}
+                    >
+                      Mark All Absent
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
             <div className={styles.viewToggle}>
               <button
                 className={viewMode === 'daily' ? styles.active : ''}
@@ -170,73 +291,146 @@ export default function AttendanceTracker() {
               <button onClick={addStudent} className={styles.addBtn}>
                 Add Student
               </button>
-              <button onClick={addDate} className={styles.addDateBtn}>
-                Add Date
-              </button>
               <button onClick={exportReport} className={styles.exportBtn}>
                 Export Report
+              </button>
+              <button onClick={downloadBackup} className={styles.backupBtn}>
+                💾 Backup
+              </button>
+              <button onClick={clearAllData} className={styles.clearBtn}>
+                🗑️ Clear
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.bulkAdd}>
+            <label>Quick Add Students (one per line)</label>
+            <div className={styles.bulkRow}>
+              <textarea
+                value={bulkNames}
+                onChange={(e) => setBulkNames(e.target.value)}
+                placeholder={`Amit Sharma
+Neha Singh
+Rahul Verma`}
+                className={styles.bulkInput}
+              />
+              <button onClick={addStudentsFromList} className={styles.bulkBtn}>
+                Add Names
               </button>
             </div>
           </div>
 
           {viewMode === 'daily' ? (
             <div className={styles.dailyView}>
-              <div className={styles.datesHeader}>
-                <div className={styles.studentColumn}>Student</div>
-                {dates.map((date, index) => (
-                  <div key={date} className={styles.dateColumn}>
-                    <div className={styles.date}>
-                      {new Date(date).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </div>
-                    <button
-                      onClick={() => removeDate(index)}
-                      className={styles.removeDateBtn}
-                      disabled={dates.length <= 1}
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              <div className={styles.attendanceGrid}>
-                {students.map(student => (
-                  <div key={student.id} className={styles.studentRow}>
-                    <div className={styles.studentInfo}>
-                      <input
-                        type="text"
-                        value={student.name}
-                        onChange={(e) => updateStudentName(student.id, e.target.value)}
-                        className={styles.studentNameInput}
-                      />
+              {/* Desktop View */}
+              <div className={styles.desktopView}>
+                <div className={styles.datesHeader}>
+                  <div className={styles.studentColumn}>Student</div>
+                  {dates.map((date, index) => (
+                    <div key={date} className={styles.dateColumn}>
+                      <div className={styles.date}>
+                        {new Date(date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </div>
                       <button
-                        onClick={() => removeStudent(student.id)}
-                        className={styles.removeStudentBtn}
-                        disabled={students.length <= 2}
+                        onClick={() => removeDate(index)}
+                        className={styles.removeDateBtn}
+                        disabled={dates.length <= 1}
                       >
                         ×
                       </button>
                     </div>
+                  ))}
+                </div>
 
-                    {dates.map((_, dateIndex) => (
-                      <div key={dateIndex} className={styles.attendanceCell}>
-                        <select
-                          value={student.attendance[dateIndex] || 'absent'}
-                          onChange={(e) => markAttendance(student.id, dateIndex, e.target.value as any)}
-                          style={{
-                            backgroundColor: getStatusColor(student.attendance[dateIndex] || 'absent')
-                          }}
+                <div className={styles.attendanceGrid}>
+                  {students.map(student => (
+                    <div key={student.id} className={styles.studentRow}>
+                      <div className={styles.studentInfo}>
+                        <input
+                          type="text"
+                          value={student.name}
+                          onChange={(e) => updateStudentName(student.id, e.target.value)}
+                          className={styles.studentNameInput}
+                        />
+                        <button
+                          onClick={() => removeStudent(student.id)}
+                          className={styles.removeStudentBtn}
+                          disabled={students.length <= 2}
                         >
-                          <option value="present">Present</option>
-                          <option value="absent">Absent</option>
-                          <option value="late">Late</option>
-                          <option value="excused">Excused</option>
-                        </select>
+                          ×
+                        </button>
                       </div>
-                    ))}
+
+                      {dates.map((_, dateIndex) => (
+                        <div key={dateIndex} className={styles.attendanceCell}>
+                          <select
+                            value={student.attendance[dateIndex] || 'absent'}
+                            onChange={(e) => markAttendance(student.id, dateIndex, e.target.value as any)}
+                            style={{
+                              backgroundColor: getStatusColor(student.attendance[dateIndex] || 'absent')
+                            }}
+                          >
+                            <option value="present">Present</option>
+                            <option value="absent">Absent</option>
+                            <option value="late">Late</option>
+                            <option value="excused">Excused</option>
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile View */}
+              <div className={styles.mobileView}>
+                {dates.map((date, dateIndex) => (
+                  <div key={date} className={styles.dateCard}>
+                    <div className={styles.dateCardHeader}>
+                      <h3>{new Date(date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</h3>
+                      <button
+                        onClick={() => removeDate(dateIndex)}
+                        className={styles.removeDateBtn}
+                        disabled={dates.length <= 1}
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <div className={styles.dateCardBody}>
+                      {students.map(student => (
+                        <div key={student.id} className={styles.mobileAttendanceRow}>
+                          <div className={styles.mobileStudentInfo}>
+                            <div className={styles.studentName}>
+                              {student.name}
+                            </div>
+                            <button
+                              onClick={() => removeStudent(student.id)}
+                              className={styles.mobileRemoveBtn}
+                              disabled={students.length <= 2}
+                              title="Delete student"
+                            >
+                              ×
+                            </button>
+                          </div>
+                          <select
+                            value={student.attendance[dateIndex] || 'absent'}
+                            onChange={(e) => markAttendance(student.id, dateIndex, e.target.value as any)}
+                            style={{
+                              backgroundColor: getStatusColor(student.attendance[dateIndex] || 'absent')
+                            }}
+                            className={styles.mobileSelect}
+                          >
+                            <option value="present">Present</option>
+                            <option value="absent">Absent</option>
+                            <option value="late">Late</option>
+                            <option value="excused">Excused</option>
+                          </select>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -296,7 +490,7 @@ export default function AttendanceTracker() {
       </section>
 
       <ToolInfo
-        howItWorks="1. Set your class name and add students.<br>2. Add dates for tracking attendance.<br>3. Mark attendance for each student on each date.<br>4. Switch between daily and summary views.<br>5. Export reports for record keeping."
+        howItWorks="1. Enter class name and add dates quickly.<br>2. Paste student names or add manually.<br>3. Use Mark All Present/Absent for fast entry.<br>4. Switch to summary view for overview.<br>5. Export reports when done."
         faqs={[
           {
             title: "How is attendance percentage calculated?",

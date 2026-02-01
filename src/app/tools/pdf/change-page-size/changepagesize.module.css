@@ -1,8 +1,39 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 1rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.pageTitle {
+  font-size: 2.2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.icon {
+  background: none;
+  -webkit-text-fill-color: initial;
+}
+
+.textGradient {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  text-align: center;
+  color: #6c757d;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
 }
 
 .converter {
@@ -11,9 +42,10 @@
   gap: 2rem;
   margin: 2rem 0;
   background: #f8f9fa;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 .inputSection {
@@ -22,8 +54,42 @@
   gap: 1.5rem;
 }
 
-.fileInput {
+.dropZone {
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: white;
   position: relative;
+}
+
+.dropZone.dragOver {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  transform: scale(1.02);
+}
+
+.fileLabel {
+  display: inline-block;
+  padding: 1rem 2rem;
+  border: 2px dashed #667eea;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  color: #495057;
+  position: relative;
+  z-index: 1;
+}
+
+.fileLabel:hover {
+  border-color: #5a67d8;
+  background: #f7fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 }
 
 .hiddenInput {
@@ -32,23 +98,14 @@
   width: 100%;
   height: 100%;
   cursor: pointer;
+  top: 0;
+  left: 0;
 }
 
-.fileLabel {
-  display: block;
-  padding: 1rem;
-  border: 2px dashed #007bff;
-  border-radius: 8px;
-  background: white;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-}
-
-.fileLabel:hover {
-  border-color: #0056b3;
-  background: #f0f8ff;
+.dropText {
+  color: #6c757d;
+  font-size: 0.95rem;
+  margin: 12px 0 8px 0;
 }
 
 .fileInfo {
@@ -62,6 +119,41 @@
   margin: 0.5rem 0;
   font-size: 0.9rem;
   color: #495057;
+}
+
+.clearBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+.clearBtn:hover {
+  background: #c82333;
+}
+
+.progressContainer {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.3s ease;
 }
 
 .sizeSelector {
@@ -94,14 +186,19 @@
 }
 
 .sizeBtn:hover {
-  border-color: #007bff;
+  border-color: #667eea;
   box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
 }
 
 .sizeBtn.active {
-  border-color: #007bff;
+  border-color: #667eea;
   background: #f0f8ff;
   box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+}
+
+.sizeBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .sizeName {
@@ -161,12 +258,18 @@
   font-size: 0.9rem;
   background: white;
   cursor: pointer;
+  transition: border-color 0.3s ease;
 }
 
 .unitSelect:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
+}
+
+.unitSelect:disabled {
+  background: #f8f9fa;
+  cursor: not-allowed;
 }
 
 .dimensionGroup {
@@ -191,43 +294,66 @@
 
 .dimensionInput:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
+}
+
+.dimensionInput:disabled {
+  background: #f8f9fa;
+  cursor: not-allowed;
 }
 
 .convertBtn {
   padding: 1rem 2rem;
-  background: #28a745;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 1rem;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .convertBtn:hover:not(:disabled) {
-  background: #218838;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
 }
 
 .convertBtn:disabled {
-  background: #6c757d;
+  background: #adb5bd;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
-.error {
-  background: #f8d7da;
-  color: #721c24;
+.message {
+  margin-top: 1rem;
   padding: 1rem;
   border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background: #f8d7da;
+  color: #721c24;
   border: 1px solid #f5c6cb;
-  margin-top: 1rem;
+}
+
+.message.info {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
 }
 
 .previewSection {
@@ -319,7 +445,7 @@
 }
 
 .guideItem strong {
-  color: #007bff;
+  color: #667eea;
 }
 
 .aspectRatios {
@@ -347,7 +473,7 @@
 }
 
 .ratio strong {
-  color: #007bff;
+  color: #667eea;
 }
 
 .warning {
@@ -395,8 +521,8 @@
   }
 
   .fileLabel {
-    padding: 0.75rem;
-    font-size: 0.9rem;
+    padding: 0.875rem 1.5rem;
+    font-size: 0.95rem;
   }
 
   .convertBtn {
@@ -410,5 +536,86 @@
 
   .previewSection {
     gap: 1rem;
+  }
+
+  .pageTitle {
+    font-size: 1.8rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .converter {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .dropZone {
+    padding: 1rem;
+  }
+
+  .fileLabel {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .dropText {
+    font-size: 0.8rem;
+  }
+
+  .sizeSelector {
+    padding: 1rem;
+  }
+
+  .sizeBtn {
+    padding: 0.75rem;
+  }
+
+  .sizeName {
+    font-size: 0.9rem;
+  }
+
+  .sizeDesc {
+    font-size: 0.8rem;
+  }
+
+  .sizePoints {
+    font-size: 0.75rem;
+  }
+
+  .customSize {
+    padding: 1rem;
+  }
+
+  .convertBtn {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .pagePreview {
+    padding: 0.75rem;
+  }
+
+  .sizeGuide,
+  .aspectRatios,
+  .warning {
+    padding: 0.75rem;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
   }
 }

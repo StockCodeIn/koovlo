@@ -5,6 +5,36 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.icon {
+  /* Emoji ka asli color dikhane ke liye ispar koi gradient nahi lagana */
+  background: none;
+  -webkit-text-fill-color: initial;
+}
+
+.textGradient {
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.description {
+  text-align: center;
+  color: var(--brand-muted);
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
 .converter {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -22,8 +52,23 @@
   gap: 1.5rem;
 }
 
+.dropZone {
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.dropZone.dragOver {
+  border-color: var(--brand-primary);
+  background: rgba(0, 123, 255, 0.05);
+}
+
 .fileInput {
   position: relative;
+  display: inline-flex;
 }
 
 .hiddenInput {
@@ -51,6 +96,12 @@
   background: #f0f8ff;
 }
 
+.dropText {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
 .fileInfo {
   background: white;
   padding: 1rem;
@@ -62,6 +113,21 @@
   margin: 0.5rem 0;
   font-size: 0.9rem;
   color: #495057;
+}
+
+.clearBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+.clearBtn:hover {
+  background: #c82333;
 }
 
 .pageInput {
@@ -94,6 +160,11 @@
   outline: none;
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.pageTextarea:disabled {
+  background: #f8f9fa;
+  cursor: not-allowed;
 }
 
 .inputHelp {
@@ -149,12 +220,38 @@
   font-size: 0.9rem;
   background: white;
   cursor: pointer;
+  transition: border-color 0.3s ease;
 }
 
 .countSelect:focus {
   outline: none;
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.countSelect:disabled {
+  background: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.progressContainer {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  transition: width 0.3s ease;
 }
 
 .convertBtn {
@@ -189,6 +286,15 @@
   padding: 1rem;
   border-radius: 8px;
   border: 1px solid #f5c6cb;
+  margin-top: 1rem;
+}
+
+.success {
+  background: #d4edda;
+  color: #155724;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #c3e6cb;
   margin-top: 1rem;
 }
 
@@ -348,17 +454,38 @@
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .pageTitle {
+    font-size: 1.8rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .description {
+    font-size: 0.9rem;
   }
 
   .converter {
     grid-template-columns: 1fr;
     gap: 1.5rem;
-    padding: 1.5rem;
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .dropZone {
+    padding: 16px;
   }
 
   .fileLabel {
     padding: 0.75rem;
     font-size: 0.9rem;
+  }
+
+  .dropText {
+    font-size: 0.8rem;
   }
 
   .convertBtn {
@@ -378,7 +505,111 @@
     padding: 1rem;
   }
 
+  .inputSection {
+    gap: 1rem;
+  }
+
+  .fileInfo {
+    padding: 0.75rem;
+  }
+
+  .pageInput {
+    padding: 1rem;
+  }
+
+  .duplicateOptions {
+    padding: 1rem;
+  }
+
+  .progressContainer {
+    margin: 0.5rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.8rem;
+  }
+
+  .converter {
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+  }
+
+  .dropZone {
+    padding: 12px;
+  }
+
+  .fileLabel {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .dropText {
+    font-size: 0.7rem;
+  }
+
+  .inputHelp ul {
+    padding-left: 1rem;
+  }
+
+  .inputHelp li {
+    font-size: 0.8rem;
+  }
+
+  .pageNumber {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+
+  .morePages {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+
+  .convertBtn {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .fileInfo {
+    text-align: center;
+    padding: 0.5rem;
+  }
+
+  .fileInfo p {
+    font-size: 0.8rem;
+  }
+
+  .pagePreview {
+    padding: 0.75rem;
+  }
+
+  .duplicationGuide {
+    padding: 0.75rem;
+  }
+
+  .quickActions {
+    padding: 0.75rem;
+  }
+
   .actionButtons {
     grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .quickBtn {
+    padding: 0.4rem;
+    font-size: 0.75rem;
   }
 }

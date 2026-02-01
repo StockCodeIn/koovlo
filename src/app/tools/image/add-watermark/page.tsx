@@ -1,471 +1,668 @@
-'use client';
+"use client";
 
-import React, { useState, useRef } from 'react';
-import ToolInfo from '@/components/ToolInfo';
-import styles from './addwatermark.module.css';
+import { useState, useRef } from "react";
+import React from "react";
+import styles from "./addwatermark.module.css";
+import ToolInfo from "@/components/ToolInfo";
 
-export default function AddWatermarkToImage() {
-  const [imageFile, setImageFile] = useState<File | null>(null);
+type ImageItem = {
+  id: string;
+  file: File;
+  preview: string;
+  watermarkedBlob: Blob | null;
+  status: "pending" | "processing" | "done" | "error";
+};
+
+type WatermarkMode = "text" | "image";
+
+export default function AddWatermark() {
+  const [images, setImages] = useState<ImageItem[]>([]);
+  const [dragActive, setDragActive] = useState(false);
+  const [watermarkMode, setWatermarkMode] = useState<WatermarkMode>("text");
+  const [watermarkText, setWatermarkText] = useState("© My Brand");
+  const [watermarkImage, setWatermarkImage] = useState<string | null>(null);
   const [watermarkFile, setWatermarkFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>('');
-  const [watermarkPreview, setWatermarkPreview] = useState<string>('');
-  const [watermarkText, setWatermarkText] = useState('');
-  const [watermarkType, setWatermarkType] = useState<'text' | 'image'>('text');
-  const [position, setPosition] = useState<'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center'>('bottom-right');
-  const [opacity, setOpacity] = useState(50);
-  const [fontSize, setFontSize] = useState(24);
-  const [fontColor, setFontColor] = useState('#ffffff');
-  const [fontFamily, setFontFamily] = useState('Arial');
-  const [rotation, setRotation] = useState(0);
-  const [tileMode, setTileMode] = useState(false);
-  const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState('');
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  const fonts = [
-    'Arial', 'Helvetica', 'Times New Roman', 'Georgia', 'Verdana',
-    'Courier New', 'Impact', 'Comic Sans MS', 'Trebuchet MS', 'Lucida Console'
-  ];
-
-  const colors = [
-    '#ffffff', '#000000', '#ff0000', '#00ff00', '#0000ff', '#ffff00',
-    '#ff00ff', '#00ffff', '#ffa500', '#800080', '#ffc0cb', '#a52a2a'
-  ];
+  const [position, setPosition] = useState<"top-left" | "top-right" | "bottom-left" | "bottom-right" | "center">("bottom-right");
+  const [opacity, setOpacity] = useState(70);
+  const [fontSize, setFontSize] = useState(32);
+  const [fontColor, setFontColor] = useState("#000000");
+  const [scale, setScale] = useState(30);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const watermarkInputRef = useRef<HTMLInputElement>(null);
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const positions = [
-    { value: 'top-left', label: 'Top Left' },
-    { value: 'top-right', label: 'Top Right' },
-    { value: 'bottom-left', label: 'Bottom Left' },
-    { value: 'bottom-right', label: 'Bottom Right' },
-    { value: 'center', label: 'Center' }
+    { value: "top-left", label: "🔷 Top Left" },
+    { value: "top-right", label: "🔶 Top Right" },
+    { value: "bottom-left", label: "🔹 Bottom Left" },
+    { value: "bottom-right", label: "🔸 Bottom Right" },
+    { value: "center", label: "⭕ Center" },
   ];
 
-  const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      if (!selectedFile.type.startsWith('image/')) {
-        setError('Please select an image file');
-        return;
-      }
-      setImageFile(selectedFile);
+  const colors = ["#ffffff", "#000000", "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff", "#ffa500"];
 
+  const handleFiles = async (files: FileList | null) => {
+    if (!files) return;
+
+    const newImages: ImageItem[] = [];
+
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith("image/")) continue;
+
+      const preview = URL.createObjectURL(file);
+      const img = new Image();
+      img.src = preview;
+
+      await new Promise((resolve) => {
+        img.onload = () => {
+          newImages.push({
+            id: Math.random().toString(36),
+            file,
+            preview,
+            watermarkedBlob: null,
+            status: "pending",
+          });
+          resolve(null);
+        };
+        img.onerror = () => resolve(null);
+      });
+    }
+
+    setImages((prev) => [...prev, ...newImages]);
+  };
+
+  const handleWatermarkFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      setWatermarkFile(file);
       const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
+      reader.onload = (evt) => {
+        setWatermarkImage(evt.target?.result as string);
       };
-      reader.readAsDataURL(selectedFile);
-      setError('');
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleWatermarkSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      if (!selectedFile.type.startsWith('image/')) {
-        setError('Please select an image file for watermark');
-        return;
-      }
-      setWatermarkFile(selectedFile);
+  // Live preview update
+  const updatePreview = () => {
+    if (images.length === 0 || !previewCanvasRef.current) return;
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setWatermarkPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(selectedFile);
-      setError('');
-    }
-  };
-
-  const applyWatermark = async () => {
-    if (!imageFile) {
-      setError('Please select an image file');
-      return;
-    }
-
-    if (watermarkType === 'text' && !watermarkText.trim()) {
-      setError('Please enter watermark text');
-      return;
-    }
-
-    if (watermarkType === 'image' && !watermarkFile) {
-      setError('Please select a watermark image');
-      return;
-    }
-
-    setProcessing(true);
-    setError('');
-
-    try {
-      // In a real implementation, this would use Canvas API to add watermark
-      // For now, we'll show a placeholder
-      setError('Watermark addition requires Canvas API processing. This feature is under development.');
-
-      setTimeout(() => {
-        setProcessing(false);
-      }, 2000);
-
-    } catch (err) {
-      setError('Failed to add watermark to image');
-      setProcessing(false);
-    }
-  };
-
-  const renderPreview = () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !imagePreview) return;
-
-    const ctx = canvas.getContext('2d');
+    const canvas = previewCanvasRef.current;
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const img = new Image();
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
+    const firstImage = new Image();
+    firstImage.src = images[0].preview;
 
-      // Draw watermark preview
-      ctx.save();
+    firstImage.onload = () => {
+      // Set canvas to image size (with max width for performance)
+      const maxWidth = 800;
+      const imageScale = Math.min(1, maxWidth / firstImage.width);
+      canvas.width = firstImage.width * imageScale;
+      canvas.height = firstImage.height * imageScale;
+
+      ctx.drawImage(firstImage, 0, 0, canvas.width, canvas.height);
       ctx.globalAlpha = opacity / 100;
 
-      if (watermarkType === 'text' && watermarkText) {
-        ctx.font = `${fontSize}px ${fontFamily}`;
+      if (watermarkMode === "text") {
+        const scaledFontSize = fontSize * imageScale;
+        ctx.font = `bold ${scaledFontSize}px Arial`;
         ctx.fillStyle = fontColor;
-        ctx.rotate((rotation * Math.PI) / 180);
+        ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+        ctx.shadowBlur = 6 * imageScale;
+        ctx.shadowOffsetX = 2 * imageScale;
+        ctx.shadowOffsetY = 2 * imageScale;
 
         const textWidth = ctx.measureText(watermarkText).width;
-        const textHeight = fontSize;
+        const textHeight = scaledFontSize;
 
-        let x, y;
+        let x = 0, y = 0;
+        const padding = 30 * imageScale;
+
         switch (position) {
-          case 'top-left':
-            x = 20;
-            y = textHeight + 20;
+          case "top-left":
+            x = padding;
+            y = textHeight + padding;
             break;
-          case 'top-right':
-            x = canvas.width - textWidth - 20;
-            y = textHeight + 20;
+          case "top-right":
+            x = canvas.width - textWidth - padding;
+            y = textHeight + padding;
             break;
-          case 'bottom-left':
-            x = 20;
-            y = canvas.height - 20;
+          case "bottom-left":
+            x = padding;
+            y = canvas.height - padding;
             break;
-          case 'bottom-right':
-            x = canvas.width - textWidth - 20;
-            y = canvas.height - 20;
+          case "bottom-right":
+            x = canvas.width - textWidth - padding;
+            y = canvas.height - padding;
             break;
-          case 'center':
+          case "center":
             x = (canvas.width - textWidth) / 2;
             y = (canvas.height + textHeight) / 2;
             break;
-          default:
-            x = canvas.width - textWidth - 20;
-            y = canvas.height - 20;
         }
 
         ctx.fillText(watermarkText, x, y);
-      } else if (watermarkType === 'image' && watermarkPreview) {
-        const watermarkImg = new Image();
-        watermarkImg.onload = () => {
-          ctx.rotate((rotation * Math.PI) / 180);
+      } else if (watermarkMode === "image" && watermarkImage) {
+        const watermark = new Image();
+        watermark.src = watermarkImage;
 
-          let x, y, width, height;
-          const aspectRatio = watermarkImg.width / watermarkImg.height;
-          width = Math.min(canvas.width * 0.3, 200);
-          height = width / aspectRatio;
+        watermark.onload = () => {
+          const maxWidth = (canvas.width * scale) / 100;
+          const scaledHeight = (watermark.height / watermark.width) * maxWidth;
+
+          let x = 0, y = 0;
+          const padding = 30 * imageScale;
 
           switch (position) {
-            case 'top-left':
-              x = 20;
-              y = 20;
+            case "top-left":
+              x = padding;
+              y = padding;
               break;
-            case 'top-right':
-              x = canvas.width - width - 20;
-              y = 20;
+            case "top-right":
+              x = canvas.width - maxWidth - padding;
+              y = padding;
               break;
-            case 'bottom-left':
-              x = 20;
-              y = canvas.height - height - 20;
+            case "bottom-left":
+              x = padding;
+              y = canvas.height - scaledHeight - padding;
               break;
-            case 'bottom-right':
-              x = canvas.width - width - 20;
-              y = canvas.height - height - 20;
+            case "bottom-right":
+              x = canvas.width - maxWidth - padding;
+              y = canvas.height - scaledHeight - padding;
               break;
-            case 'center':
-              x = (canvas.width - width) / 2;
-              y = (canvas.height - height) / 2;
+            case "center":
+              x = (canvas.width - maxWidth) / 2;
+              y = (canvas.height - scaledHeight) / 2;
               break;
-            default:
-              x = canvas.width - width - 20;
-              y = canvas.height - height - 20;
           }
 
-          ctx.drawImage(watermarkImg, x, y, width, height);
-          ctx.restore();
+          ctx.drawImage(watermark, x, y, maxWidth, scaledHeight);
         };
-        watermarkImg.src = watermarkPreview;
       }
 
-      ctx.restore();
+      ctx.globalAlpha = 1;
     };
-    img.src = imagePreview;
   };
 
-  // Update preview when settings change
+  // Update preview when settings or images change
   React.useEffect(() => {
-    if (imagePreview) {
-      renderPreview();
+    updatePreview();
+  }, [images, watermarkMode, watermarkText, watermarkImage, position, opacity, fontSize, fontColor, scale]);
+
+  const applyWatermark = async (img: ImageItem): Promise<ImageItem> => {
+    return new Promise((resolve) => {
+      const image = new Image();
+      image.src = img.preview;
+
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve({ ...img, status: "error" });
+          return;
+        }
+
+        ctx.drawImage(image, 0, 0);
+        ctx.globalAlpha = opacity / 100;
+
+        if (watermarkMode === "text") {
+          ctx.font = `bold ${fontSize}px Arial`;
+          ctx.fillStyle = fontColor;
+          ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+          ctx.shadowBlur = 6;
+          ctx.shadowOffsetX = 2;
+          ctx.shadowOffsetY = 2;
+
+          const textWidth = ctx.measureText(watermarkText).width;
+          const textHeight = fontSize;
+
+          let x = 0, y = 0;
+          const padding = 30;
+
+          switch (position) {
+            case "top-left":
+              x = padding;
+              y = textHeight + padding;
+              break;
+            case "top-right":
+              x = canvas.width - textWidth - padding;
+              y = textHeight + padding;
+              break;
+            case "bottom-left":
+              x = padding;
+              y = canvas.height - padding;
+              break;
+            case "bottom-right":
+              x = canvas.width - textWidth - padding;
+              y = canvas.height - padding;
+              break;
+            case "center":
+              x = (canvas.width - textWidth) / 2;
+              y = (canvas.height + textHeight) / 2;
+              break;
+          }
+
+          ctx.fillText(watermarkText, x, y);
+          ctx.globalAlpha = 1;
+
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                resolve({ ...img, watermarkedBlob: blob, status: "done" });
+              } else {
+                resolve({ ...img, status: "error" });
+              }
+            },
+            "image/jpeg",
+            0.95
+          );
+        } else if (watermarkMode === "image" && watermarkImage) {
+          const watermark = new Image();
+          watermark.src = watermarkImage;
+
+          watermark.onload = () => {
+            const maxWidth = (canvas.width * scale) / 100;
+            const scaledHeight = (watermark.height / watermark.width) * maxWidth;
+
+            let x = 0, y = 0;
+            const padding = 30;
+
+            switch (position) {
+              case "top-left":
+                x = padding;
+                y = padding;
+                break;
+              case "top-right":
+                x = canvas.width - maxWidth - padding;
+                y = padding;
+                break;
+              case "bottom-left":
+                x = padding;
+                y = canvas.height - scaledHeight - padding;
+                break;
+              case "bottom-right":
+                x = canvas.width - maxWidth - padding;
+                y = canvas.height - scaledHeight - padding;
+                break;
+              case "center":
+                x = (canvas.width - maxWidth) / 2;
+                y = (canvas.height - scaledHeight) / 2;
+                break;
+            }
+
+            ctx.drawImage(watermark, x, y, maxWidth, scaledHeight);
+            ctx.globalAlpha = 1;
+
+            canvas.toBlob(
+              (blob) => {
+                if (blob) {
+                  resolve({ ...img, watermarkedBlob: blob, status: "done" });
+                } else {
+                  resolve({ ...img, status: "error" });
+                }
+              },
+              "image/jpeg",
+              0.95
+            );
+          };
+
+          watermark.onerror = () => {
+            // If watermark image fails to load, apply without watermark
+            ctx.globalAlpha = 1;
+            canvas.toBlob(
+              (blob) => {
+                if (blob) {
+                  resolve({ ...img, watermarkedBlob: blob, status: "done" });
+                } else {
+                  resolve({ ...img, status: "error" });
+                }
+              },
+              "image/jpeg",
+              0.95
+            );
+          };
+        } else {
+          // No watermark (either text mode with no text, or image mode with no image)
+          ctx.globalAlpha = 1;
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                resolve({ ...img, watermarkedBlob: blob, status: "done" });
+              } else {
+                resolve({ ...img, status: "error" });
+              }
+            },
+            "image/jpeg",
+            0.95
+          );
+        }
+      };
+
+      image.onerror = () => resolve({ ...img, status: "error" });
+    });
+  };
+
+  const applyToAll = async () => {
+    const pending = images.filter((i) => i.status === "pending");
+
+    for (const img of pending) {
+      setImages((prev) =>
+        prev.map((i) => (i.id === img.id ? { ...i, status: "processing" } : i))
+      );
+
+      const result = await applyWatermark(img);
+
+      setImages((prev) =>
+        prev.map((i) => (i.id === result.id ? result : i))
+      );
     }
-  }, [imagePreview, watermarkText, watermarkType, position, opacity, fontSize, fontColor, fontFamily, rotation, watermarkPreview]);
+  };
+
+  const downloadImage = (img: ImageItem) => {
+    if (!img.watermarkedBlob) return;
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(img.watermarkedBlob);
+    const nameWithoutExt = img.file.name.split(".")[0];
+    link.download = `${nameWithoutExt}-watermarked.jpg`;
+    link.click();
+  };
+
+  const downloadAll = () => {
+    images.forEach((img, index) => {
+      if (img.status === "done") {
+        setTimeout(() => downloadImage(img), index * 100);
+      }
+    });
+  };
+
+  const removeImage = (id: string) => {
+    setImages((prev) => prev.filter((i) => i.id !== id));
+  };
+
+  const clearAll = () => {
+    images.forEach((img) => URL.revokeObjectURL(img.preview));
+    setImages([]);
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    handleFiles(e.dataTransfer.files);
+  };
 
   return (
     <main className={styles.container}>
-      <h1>Add Watermark to Image</h1>
-      <p>Add text or image watermarks to protect your images</p>
+      <section className={styles.header}>
+        <h1 className={styles.pageTitle}>
+          <span className={styles.icon}>💧</span>
+          <span className={styles.textGradient}>Add Watermark</span>
+        </h1>
+        <p className={styles.subtitle}>Protect your images with text or logo watermarks in batch.</p>
+      </section>
 
-      <div className={styles.editor}>
-        <div className={styles.controls}>
-          <div className={styles.fileInputs}>
-            <div className={styles.fileInput}>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageSelect}
-                className={styles.hiddenInput}
-                id="main-image"
-              />
-              <label htmlFor="main-image" className={styles.fileLabel}>
-                {imageFile ? imageFile.name : 'Choose Main Image'}
-              </label>
-            </div>
-
-            {imageFile && (
-              <div className={styles.fileInfo}>
-                <p><strong>Main Image:</strong> {imageFile.name} ({(imageFile.size / 1024).toFixed(2)} KB)</p>
-              </div>
-            )}
+      <section className={styles.controls}>
+        <div className={styles.controlGroup}>
+          <label>Watermark Type</label>
+          <div className={styles.radioGroup}>
+            <button
+              onClick={() => setWatermarkMode("text")}
+              className={watermarkMode === "text" ? styles.active : ""}
+            >
+              📝 Text
+            </button>
+            <button
+              onClick={() => setWatermarkMode("image")}
+              className={watermarkMode === "image" ? styles.active : ""}
+            >
+              🖼️ Image
+            </button>
           </div>
+        </div>
 
-          <div className={styles.watermarkType}>
-            <h3>Watermark Type</h3>
-            <div className={styles.typeButtons}>
-              <button
-                className={`${styles.typeBtn} ${watermarkType === 'text' ? styles.active : ''}`}
-                onClick={() => setWatermarkType('text')}
-              >
-                Text Watermark
-              </button>
-              <button
-                className={`${styles.typeBtn} ${watermarkType === 'image' ? styles.active : ''}`}
-                onClick={() => setWatermarkType('image')}
-              >
-                Image Watermark
-              </button>
-            </div>
-          </div>
-
-          {watermarkType === 'text' ? (
-            <div className={styles.textWatermark}>
-              <label htmlFor="watermark-text">Watermark Text:</label>
+        {watermarkMode === "text" ? (
+          <>
+            <div className={styles.controlGroup}>
+              <label>Text</label>
               <input
-                id="watermark-text"
                 type="text"
                 value={watermarkText}
                 onChange={(e) => setWatermarkText(e.target.value)}
-                placeholder="Enter watermark text..."
+                placeholder="Enter watermark text"
                 className={styles.textInput}
               />
             </div>
-          ) : (
-            <div className={styles.imageWatermark}>
+
+            <div className={styles.controlGroup}>
+              <label>Font Size: {fontSize}px</label>
               <input
-                type="file"
-                accept="image/*"
-                onChange={handleWatermarkSelect}
-                className={styles.hiddenInput}
-                id="watermark-image"
+                type="range"
+                min="12"
+                max="72"
+                value={fontSize}
+                onChange={(e) => setFontSize(+e.target.value)}
+                className={styles.slider}
               />
-              <label htmlFor="watermark-image" className={styles.fileLabel}>
-                {watermarkFile ? watermarkFile.name : 'Choose Watermark Image'}
-              </label>
-
-              {watermarkFile && (
-                <div className={styles.fileInfo}>
-                  <p><strong>Watermark:</strong> {watermarkFile.name} ({(watermarkFile.size / 1024).toFixed(2)} KB)</p>
-                </div>
-              )}
             </div>
-          )}
 
-          <div className={styles.positionControl}>
-            <label htmlFor="position">Position:</label>
-            <select
-              id="position"
-              value={position}
-              onChange={(e) => setPosition(e.target.value as any)}
-              className={styles.selectInput}
+            <div className={styles.controlGroup}>
+              <label>Color</label>
+              <div className={styles.colorGrid}>
+                {colors.map((color) => (
+                  <button
+                    key={color}
+                    className={fontColor === color ? styles.colorActive : ""}
+                    style={{
+                      backgroundColor: color,
+                      border: "2px solid #e5e7eb",
+                      borderRadius: "8px",
+                      width: "40px",
+                      height: "40px",
+                      cursor: "pointer",
+                      transition: "all 0.2s",
+                    }}
+                    onClick={() => setFontColor(color)}
+                  />
+                ))}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className={styles.controlGroup}>
+            <label>Upload Watermark Image</label>
+            <button
+              onClick={() => watermarkInputRef.current?.click()}
+              className={styles.uploadBtn}
             >
-              {positions.map((pos) => (
-                <option key={pos.value} value={pos.value}>
-                  {pos.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className={styles.opacityControl}>
-            <label htmlFor="opacity">Opacity: {opacity}%</label>
+              {watermarkFile ? `✓ ${watermarkFile.name}` : "📤 Choose File"}
+            </button>
             <input
-              id="opacity"
+              ref={watermarkInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleWatermarkFile}
+              style={{ display: "none" }}
+            />
+          </div>
+        )}
+
+        <div className={styles.controlGroup}>
+          <label>Position</label>
+          <div className={styles.radioGroup}>
+            {positions.map((pos) => (
+              <button
+                key={pos.value}
+                onClick={() => setPosition(pos.value as any)}
+                className={position === pos.value ? styles.active : ""}
+              >
+                {pos.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.controlGroup}>
+          <label>Opacity: {opacity}%</label>
+          <input
+            type="range"
+            min="10"
+            max="100"
+            value={opacity}
+            onChange={(e) => setOpacity(+e.target.value)}
+            className={styles.slider}
+          />
+        </div>
+
+        {watermarkMode === "image" && (
+          <div className={styles.controlGroup}>
+            <label>Scale: {scale}%</label>
+            <input
               type="range"
               min="10"
-              max="100"
-              value={opacity}
-              onChange={(e) => setOpacity(parseInt(e.target.value))}
+              max="50"
+              value={scale}
+              onChange={(e) => setScale(+e.target.value)}
               className={styles.slider}
             />
           </div>
+        )}
+      </section>
 
-          <div className={styles.rotationControl}>
-            <label htmlFor="rotation">Rotation: {rotation}°</label>
-            <input
-              id="rotation"
-              type="range"
-              min="-180"
-              max="180"
-              value={rotation}
-              onChange={(e) => setRotation(parseInt(e.target.value))}
-              className={styles.slider}
-            />
+      {images.length > 0 && (
+        <section className={styles.previewSection}>
+          <h3 className={styles.previewTitle}>🔍 Live Preview</h3>
+          <p className={styles.previewSubtitle}>Adjust settings above and see real-time changes • {images.length} image{images.length > 1 ? 's' : ''} selected</p>
+          <div className={styles.previewContainer}>
+            <canvas ref={previewCanvasRef} className={styles.previewCanvas} />
           </div>
+          
+          <div className={styles.previewActions}>
+            <button
+              onClick={async () => {
+                await applyToAll();
+              }}
+              className={styles.btnPreviewPrimary}
+              disabled={images.every((i) => i.status === "done")}
+            >
+              💧 Apply Watermark to All {images.length} Image{images.length > 1 ? 's' : ''}
+            </button>
+            <button
+              onClick={downloadAll}
+              className={styles.btnPreviewSecondary}
+              disabled={images.every((i) => i.status !== "done")}
+            >
+              ⬇️ Download All ({images.filter((i) => i.status === "done").length})
+            </button>
+            <button onClick={clearAll} className={styles.btnPreviewDanger}>
+              🗑️ Clear & Start Over
+            </button>
+          </div>
+        </section>
+      )}
 
-          {watermarkType === 'text' && (
-            <div className={styles.textSettings}>
-              <h4>Text Settings</h4>
+      <section
+        className={`${styles.dropzone} ${dragActive ? styles.dragActive : ""}`}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+        onClick={() => fileInputRef.current?.click()}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) => handleFiles(e.target.files)}
+          style={{ display: "none" }}
+        />
+        <div className={styles.dropzoneContent}>
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+          </svg>
+          <h3>Drop images here or click to browse</h3>
+          <p>Support: JPG, PNG, WebP, GIF • Multiple files allowed</p>
+        </div>
+      </section>
 
-              <div className={styles.fontSelect}>
-                <label htmlFor="font">Font:</label>
-                <select
-                  id="font"
-                  value={fontFamily}
-                  onChange={(e) => setFontFamily(e.target.value)}
-                  className={styles.selectInput}
-                >
-                  {fonts.map((font) => (
-                    <option key={font} value={font} style={{ fontFamily: font }}>
-                      {font}
-                    </option>
-                  ))}
-                </select>
+      {images.length > 0 && (
+        <>
+          <section className={styles.statusSection}>
+            <div className={styles.statusHeader}>
+              <h4>📋 Processing Status</h4>
+              <div className={styles.statusCounts}>
+                <span className={styles.statusPending}>⏳ Pending: {images.filter((i) => i.status === "pending").length}</span>
+                <span className={styles.statusProcessing}>⚙️ Processing: {images.filter((i) => i.status === "processing").length}</span>
+                <span className={styles.statusDone}>✅ Done: {images.filter((i) => i.status === "done").length}</span>
               </div>
-
-              <div className={styles.sizeControl}>
-                <label htmlFor="size">Size: {fontSize}px</label>
-                <input
-                  id="size"
-                  type="range"
-                  min="8"
-                  max="72"
-                  value={fontSize}
-                  onChange={(e) => setFontSize(parseInt(e.target.value))}
-                  className={styles.slider}
-                />
-              </div>
-
-              <div className={styles.colorPicker}>
-                <label>Color:</label>
-                <div className={styles.colorGrid}>
-                  {colors.map((color) => (
-                    <button
-                      key={color}
-                      className={`${styles.colorBtn} ${fontColor === color ? styles.active : ''}`}
-                      style={{ backgroundColor: color }}
-                      onClick={() => setFontColor(color)}
-                    />
-                  ))}
+            </div>
+            <div className={styles.imageList}>
+              {images.map((img) => (
+                <div key={img.id} className={styles.imageRow}>
+                  <img src={img.preview} alt={img.file.name} className={styles.imageThumbnail} />
+                  <span className={styles.imageName}>{img.file.name}</span>
+                  <span className={`${styles.imageStatus} ${styles['status' + img.status.charAt(0).toUpperCase() + img.status.slice(1)]}`}>
+                    {img.status === "pending" && "⏳ Waiting"}
+                    {img.status === "processing" && "⚙️ Processing..."}
+                    {img.status === "done" && "✅ Ready"}
+                    {img.status === "error" && "❌ Error"}
+                  </span>
+                  {img.status === "done" && (
+                    <button onClick={() => downloadImage(img)} className={styles.btnDownloadSmall}>
+                      ⬇️
+                    </button>
+                  )}
+                  <button onClick={() => removeImage(img.id)} className={styles.btnRemoveSmall}>
+                    🗑️
+                  </button>
                 </div>
-              </div>
+              ))}
             </div>
-          )}
-
-          <div className={styles.tileMode}>
-            <label className={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={tileMode}
-                onChange={(e) => setTileMode(e.target.checked)}
-                className={styles.checkbox}
-              />
-              Tile watermark across image
-            </label>
-          </div>
-
-          <button
-            onClick={applyWatermark}
-            disabled={!imageFile || processing || (watermarkType === 'text' && !watermarkText.trim()) || (watermarkType === 'image' && !watermarkFile)}
-            className={styles.applyBtn}
-          >
-            {processing ? 'Adding Watermark...' : 'Add Watermark'}
-          </button>
-
-          {error && <div className={styles.error}>{error}</div>}
-        </div>
-
-        <div className={styles.previewSection}>
-          <h3>Preview</h3>
-
-          <div className={styles.canvasContainer}>
-            {imagePreview ? (
-              <canvas
-                ref={canvasRef}
-                className={styles.canvas}
-              />
-            ) : (
-              <div className={styles.noImage}>
-                <div className={styles.placeholderIcon}>🖼️</div>
-                <p>Select an image to see preview</p>
-              </div>
-            )}
-          </div>
-
-          <div className={styles.previewInfo}>
-            <h4>Preview Information</h4>
-            <div className={styles.infoContent}>
-              <div className={styles.infoItem}>
-                <strong>Type:</strong> {watermarkType === 'text' ? 'Text' : 'Image'}
-              </div>
-              <div className={styles.infoItem}>
-                <strong>Position:</strong> {positions.find(p => p.value === position)?.label}
-              </div>
-              <div className={styles.infoItem}>
-                <strong>Opacity:</strong> {opacity}%
-              </div>
-              <div className={styles.infoItem}>
-                <strong>Rotation:</strong> {rotation}°
-              </div>
-              {watermarkType === 'text' && (
-                <>
-                  <div className={styles.infoItem}>
-                    <strong>Font:</strong> {fontFamily}
-                  </div>
-                  <div className={styles.infoItem}>
-                    <strong>Size:</strong> {fontSize}px
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+          </section>
+        </>
+      )}
 
       <ToolInfo
-        howItWorks="Upload your main image<br>Choose watermark type (text or image)<br>Configure watermark settings (position, opacity, etc.)<br>Preview the result<br>Download the watermarked image"
+        howItWorks="1. Choose watermark type (text or image)<br>2. Configure watermark settings (text, position, opacity)<br>3. Drag & drop or select multiple images<br>4. Click 'Watermark All' to apply<br>5. Download watermarked images individually or all at once"
         faqs={[
-          { title: "Can I use both text and image watermarks?", content: "Currently supports one type at a time. Multiple watermarks may be added in future updates." },
-          { title: "What image formats are supported?", content: "JPG, PNG, WebP, GIF, and other common formats for both main image and watermark." },
-          { title: "Will the original image quality be preserved?", content: "Yes, watermarking preserves original quality with minimal compression." },
-          { title: "Can I tile watermarks across the image?", content: "Yes, enable tile mode to repeat the watermark across the entire image." }
+          {
+            title: "Can I use both text and image watermarks?",
+            content: "Currently, you can use one type at a time. Choose either text or image watermark.",
+          },
+          {
+            title: "What image formats are supported?",
+            content: "JPG, PNG, WebP, GIF, and other common formats. Output is always JPEG for compatibility.",
+          },
+          {
+            title: "Will this affect image quality?",
+            content: "Minimal quality loss with 95% JPEG compression. Watermarks are applied without significant degradation.",
+          },
+          {
+            title: "Can I batch process with different settings?",
+            content: "All images in a batch will receive the same watermark settings. For different settings, process in separate batches.",
+          },
         ]}
-        tips={["Use semi-transparent watermarks for better visibility<br>Position watermarks in corners to avoid covering important content<br>Test different opacity levels for best results<br>Use high-contrast colors for text watermarks"]}
+        tips={[
+          "Use semi-transparent watermarks for better visibility of content",
+          "Position watermarks in corners to minimize coverage of important areas",
+          "Smaller font sizes work better for images with fine details",
+          "Test with 2-3 images first before processing your entire batch",
+        ]}
       />
     </main>
   );

@@ -1,86 +1,441 @@
 .container {
   display: flex;
   justify-content: center;
-  padding: 40px 20px;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
-.box {
-  max-width: 700px;
+.converter {
+  max-width: 800px;
   width: 100%;
-  background: #fff;
-  padding: 30px 24px;
-  border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
-  text-align: center;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
 .pageTitle {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
-  text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px; /* Emoji aur text ke beech space */
+  gap: 12px;
+  margin-bottom: 12px;
+  text-align: center;
 }
 
 .icon {
-  /* Emoji ka asli color dikhane ke liye ispar koi gradient nahi lagana */
   background: none;
-  -webkit-text-fill-color: initial; 
+  -webkit-text-fill-color: initial;
 }
 
 .textGradient {
-  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.fileInput {
-  margin: 20px 0;
+
+.description {
+  text-align: center;
+  color: #6c757d;
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
 }
 
-.uploadLabel {
-  background: var(--brand-primary, #2f80ed);
-  color: #fff;
-  padding: 12px 24px;
-  border-radius: 8px;
-  cursor: pointer;
+.inputSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dropZone {
+  border: 2px dashed #dee2e6;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: #f8f9fa;
+  position: relative;
+}
+
+.dropZone.dragOver {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  transform: scale(1.02);
+}
+
+.fileLabel {
   display: inline-block;
+  padding: 1rem 2rem;
+  border: 2px dashed #667eea;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
   font-weight: 600;
-  transition: background 0.3s;
+  color: #495057;
+  position: relative;
+  z-index: 1;
 }
 
-.uploadLabel:hover {
-  background: var(--brand-secondary, #56ccf2);
+.fileLabel:hover {
+  border-color: #5a67d8;
+  background: #f7fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.hiddenInput {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+}
+
+.dropText {
+  color: #6c757d;
+  font-size: 0.95rem;
+  margin: 12px 0 8px 0;
+}
+
+.supportedFormats {
+  color: #adb5bd;
+  font-size: 0.85rem;
+  margin: 0;
+  font-weight: 500;
 }
 
 .fileList {
-  list-style: none;
-  text-align: left;
-  font-size: 0.9rem;
-  margin: 10px 0 20px;
-  color: #555;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
 }
 
-.button {
-  background: var(--brand-primary, #2f80ed);
-  color: #fff;
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+.fileListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.fileListHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #495057;
   font-weight: 600;
-  transition: transform 0.2s, background 0.3s;
 }
 
-.button:hover {
-  transform: scale(1.05);
-  background: var(--brand-secondary, #56ccf2);
+.clearAllBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.clearAllBtn:hover {
+  background: #c82333;
+}
+
+.fileItems {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.fileItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f1f3f4;
+  transition: background 0.2s ease;
+}
+
+.fileItem:last-child {
+  border-bottom: none;
+}
+
+.fileItem:hover {
+  background: #f8f9fa;
+}
+
+.fileInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.fileName {
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.fileSize {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
+
+.removeBtn {
+  background: #e9ecef;
+  color: #6c757d;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.removeBtn:hover:not(:disabled) {
+  background: #dc3545;
+  color: white;
+  transform: scale(1.1);
+}
+
+.removeBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.progressContainer {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  transition: width 0.3s ease;
+}
+
+.actionSection {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.convertBtn {
+  padding: 1rem 3rem;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  min-width: 200px;
+}
+
+.convertBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.convertBtn:disabled {
+  background: #adb5bd;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .message {
-  margin-top: 16px;
-  color: #333;
-  font-size: 0.95rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.message.info {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    min-height: auto;
+  }
+
+  .converter {
+    padding: 1.5rem;
+    margin: 1rem 0;
+  }
+
+  .pageTitle {
+    font-size: 1.8rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .description {
+    font-size: 1rem;
+  }
+
+  .dropZone {
+    padding: 1.5rem;
+  }
+
+  .fileLabel {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .dropText {
+    font-size: 0.9rem;
+  }
+
+  .supportedFormats {
+    font-size: 0.8rem;
+  }
+
+  .fileListHeader {
+    padding: 1rem;
+  }
+
+  .fileListHeader h3 {
+    font-size: 1rem;
+  }
+
+  .fileItem {
+    padding: 1rem;
+  }
+
+  .fileName {
+    font-size: 0.9rem;
+  }
+
+  .fileSize {
+    font-size: 0.75rem;
+  }
+
+  .convertBtn {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+    min-width: 180px;
+  }
+
+  .progressContainer {
+    margin: 1rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .converter {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .dropZone {
+    padding: 1rem;
+  }
+
+  .fileLabel {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .dropText {
+    font-size: 0.8rem;
+  }
+
+  .fileListHeader {
+    padding: 0.75rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+
+  .fileListHeader h3 {
+    text-align: center;
+  }
+
+  .clearAllBtn {
+    align-self: center;
+  }
+
+  .fileItem {
+    padding: 0.75rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+
+  .fileInfo {
+    text-align: center;
+  }
+
+  .removeBtn {
+    align-self: center;
+  }
+
+  .convertBtn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    min-width: 160px;
+  }
 }

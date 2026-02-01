@@ -5,13 +5,14 @@
 }
 
 .box {
-  max-width: 1000px;
+  max-width: 1200px;
   width: 100%;
   background: #fff;
   padding: 30px 20px;
   border-radius: 14px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
   text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .pageTitle {
@@ -21,13 +22,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px; /* Emoji aur text ke beech space */
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .icon {
   /* Emoji ka asli color dikhane ke liye ispar koi gradient nahi lagana */
   background: none;
-  -webkit-text-fill-color: initial; 
+  -webkit-text-fill-color: initial;
 }
 
 .textGradient {
@@ -37,13 +39,132 @@
   -webkit-text-fill-color: transparent;
 }
 
+.description {
+  text-align: center;
+  color: var(--brand-muted);
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
+.dropZone {
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: white;
+  margin-bottom: 20px;
+}
+
+.dropZone.dragOver {
+  border-color: var(--brand-primary);
+  background: rgba(0, 123, 255, 0.05);
+}
+
 .fileInput {
-  margin: 20px auto;
+  position: relative;
+  display: inline-flex;
+}
+
+.hiddenInput {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.fileLabel {
+  display: block;
+  padding: 1rem;
+  border: 2px dashed #007bff;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.fileLabel:hover {
+  border-color: #0056b3;
+  background: #f0f8ff;
+}
+
+.dropText {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.fileInfo {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+  text-align: left;
+}
+
+.fileInfo p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+}
+
+.clearBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+.clearBtn:hover {
+  background: #c82333;
+}
+
+.progressContainer {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  transition: width 0.3s ease;
+}
+
+.stats {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stats p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .previewGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
   margin: 20px 0;
 }
@@ -54,17 +175,37 @@
   border: 1px solid #eee;
   border-radius: 8px;
   padding: 10px;
-  transition: transform 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .pageCard:hover {
   transform: translateY(-3px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--brand-primary);
+}
+
+.pageNumber {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  background: var(--brand-primary);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  z-index: 1;
 }
 
 .pageCard img {
   width: 100%;
   border-radius: 6px;
+  margin-bottom: 8px;
 }
 
 .pageActions {
@@ -72,30 +213,53 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
-  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
-.pageActions button {
+.moveBtn {
   border: none;
-  background: #eee;
+  background: #007bff;
+  color: white;
   border-radius: 6px;
-  padding: 4px 8px;
+  padding: 6px 8px;
   cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.moveBtn:hover:not(:disabled) {
+  background: #0056b3;
+  transform: scale(1.1);
+}
+
+.moveBtn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.pageIndex {
+  font-weight: 600;
+  color: #495057;
+  min-width: 20px;
+  text-align: center;
 }
 
 .deleteBtn {
-  background: #ff4d4d;
+  background: #dc3545;
   color: #fff;
   border: none;
   border-radius: 6px;
-  padding: 6px 10px;
+  padding: 8px 12px;
   cursor: pointer;
-  margin-top: 6px;
   font-size: 0.85rem;
+  font-weight: 500;
+  width: 100%;
+  transition: all 0.2s ease;
 }
 
 .deleteBtn:hover {
-  background: #ff3333;
+  background: #c82333;
+  transform: translateY(-1px);
 }
 
 .button {
@@ -103,18 +267,256 @@
   background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
   color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
+  border-radius: 10px;
+  padding: 14px 28px;
   cursor: pointer;
   font-weight: 600;
-  transition: transform 0.2s;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
-.button:hover {
+.button:hover:not(:disabled) {
   transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .message {
   margin-top: 16px;
-  color: #444;
+  color: #28a745;
+  background: #d4edda;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #c3e6cb;
+}
+
+.error {
+  margin-top: 16px;
+  color: #721c24;
+  background: #f8d7da;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #f5c6cb;
+}
+
+.success {
+  margin-top: 16px;
+  color: #155724;
+  background: #d4edda;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #c3e6cb;
+}
+
+.instructions {
+  margin-top: 30px;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.instructions h3 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 1.1rem;
+}
+
+.instructions ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.instructions li {
+  margin: 8px 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 16px;
+  }
+
+  .box {
+    padding: 20px 16px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .pageTitle {
+    font-size: 1.8rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .dropZone {
+    padding: 16px;
+  }
+
+  .fileLabel {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .dropText {
+    font-size: 0.8rem;
+  }
+
+  .previewGrid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .pageCard {
+    padding: 8px;
+  }
+
+  .pageNumber {
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+  }
+
+  .moveBtn {
+    padding: 4px 6px;
+    font-size: 0.9rem;
+  }
+
+  .deleteBtn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .button {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+
+  .stats {
+    padding: 12px;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .instructions {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 16px 12px;
+  }
+
+  .box {
+    padding: 16px 12px;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.8rem;
+  }
+
+  .dropZone {
+    padding: 12px;
+  }
+
+  .fileLabel {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .dropText {
+    font-size: 0.7rem;
+  }
+
+  .previewGrid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+  }
+
+  .pageCard {
+    padding: 6px;
+  }
+
+  .pageNumber {
+    width: 18px;
+    height: 18px;
+    font-size: 0.6rem;
+    top: 3px;
+    left: 3px;
+  }
+
+  .pageCard img {
+    margin-bottom: 6px;
+  }
+
+  .pageActions {
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  .moveBtn {
+    padding: 3px 5px;
+    font-size: 0.8rem;
+  }
+
+  .pageIndex {
+    font-size: 0.8rem;
+    min-width: 16px;
+  }
+
+  .deleteBtn {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+
+  .button {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
+  .fileInfo {
+    padding: 10px;
+    text-align: center;
+  }
+
+  .fileInfo p {
+    font-size: 0.8rem;
+  }
+
+  .stats {
+    padding: 10px;
+  }
+
+  .stats p {
+    font-size: 0.8rem;
+  }
+
+  .instructions {
+    padding: 12px;
+  }
+
+  .instructions h3 {
+    font-size: 1rem;
+  }
+
+  .instructions li {
+    font-size: 0.8rem;
+  }
 }

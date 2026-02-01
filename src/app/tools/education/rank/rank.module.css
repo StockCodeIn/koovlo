@@ -1,5 +1,5 @@
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -13,19 +13,137 @@
   margin-top: 2rem;
 }
 
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
 .title {
   font-size: 2rem;
   font-weight: bold;
   color: #343a40;
   margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #6c757d;
+  margin: 0.5rem 0 0 0;
+  font-size: 1rem;
+}
+
+.dataInfo {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e7f3ff 0%, #f0e8ff 100%);
+  border-left: 4px solid #667eea;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.95rem;
 }
 
-.icon {
-  font-size: 2rem;
+.infoItem {
+  color: #343a40;
+  display: flex;
+  align-items: center;
+}
+
+.infoSeparator {
+  color: #bbb;
+}
+
+/* Smart Dashboard */
+.smartDashboard {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.dashboardSection {
+  margin-bottom: 1.5rem;
+}
+
+.dashboardSection:last-child {
+  margin-bottom: 0;
+}
+
+.dashboardSection h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  opacity: 0.95;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.statNumber {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.statName {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.topPerformers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.performerCard {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  backdrop-filter: blur(10px);
+}
+
+.performerRank {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: rgba(255, 215, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.performerInfo {
+  flex: 1;
+}
+
+.performerName {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.performerStats {
+  font-size: 0.8rem;
+  opacity: 0.85;
 }
 
 .inputSection {
@@ -33,6 +151,24 @@
   padding: 2rem;
   border-radius: 8px;
   margin-bottom: 2rem;
+}
+
+.assessmentInput {
+  margin-bottom: 1.5rem;
+}
+
+.assessmentNameInput {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #dee2e6;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.assessmentNameInput:focus {
+  outline: none;
+  border-color: #667eea;
 }
 
 .studentsList {
@@ -119,8 +255,11 @@
 
 .addBtn,
 .calculateBtn,
+.analyticsBtn,
+.historyBtn,
+.exportBtn,
 .clearBtn {
-  padding: 12px 24px;
+  padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 8px;
   font-weight: 500;
@@ -140,12 +279,42 @@
 }
 
 .calculateBtn {
-  background: #007bff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
 .calculateBtn:hover {
-  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.analyticsBtn {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.analyticsBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+}
+
+.historyBtn {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+}
+
+.historyBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);
+}
+
+.exportBtn {
+  background: #ffc107;
+  color: #333;
+}
+
+.exportBtn:hover {
+  background: #ffb300;
   transform: translateY(-1px);
 }
 
@@ -166,11 +335,33 @@
   margin-bottom: 2rem;
 }
 
-.resultsSection h3 {
-  margin: 0 0 1.5rem 0;
+.resultsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.resultsHeader h3 {
+  margin: 0;
   color: #343a40;
-  text-align: center;
   font-size: 1.3rem;
+}
+
+.deleteBtn {
+  padding: 0.5rem 1rem;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
 }
 
 .rankingsTable {
@@ -261,7 +452,6 @@
 }
 
 .statCard {
-  background: #f8f9fa;
   padding: 1rem;
   border-radius: 6px;
   text-align: center;
@@ -317,7 +507,144 @@
   font-size: 1.1rem;
 }
 
+/* Assessment History */
+.historySection {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.historySection h3 {
+  margin: 0 0 1.5rem 0;
+  color: #343a40;
+}
+
+.assessmentsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.assessmentCard {
+  background: white;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.assessmentCard:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.assessmentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+}
+
+.assessmentHeader h4 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.assessmentHeader p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.assessmentMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: right;
+  font-size: 0.85rem;
+}
+
+.viewBtn {
+  padding: 0.4rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.viewBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* Analytics Section */
+.analyticsSection {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  border: 2px solid #f0e8ff;
+  margin-bottom: 2rem;
+}
+
+.analyticsSection h3 {
+  margin: 0 0 1.5rem 0;
+  color: #343a40;
+}
+
+.performanceTable {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.consistencyBar {
+  width: 100%;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.25rem;
+}
+
+.consistencyFill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #20c997);
+  transition: width 0.3s ease;
+}
+
+.consistency {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.trend {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 /* Responsive design */
+@media (max-width: 1024px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .topPerformers {
+    grid-template-columns: 1fr;
+  }
+
+  .assessmentsList {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -327,8 +654,38 @@
     padding: 1.5rem;
   }
 
+  .header {
+    margin-bottom: 1.5rem;
+  }
+
   .title {
     font-size: 1.5rem;
+  }
+
+  .dataInfo {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .smartDashboard {
+    padding: 1.5rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .statCard {
+    padding: 0.75rem;
+  }
+
+  .statNumber {
+    font-size: 1.5rem;
+  }
+
+  .topPerformers {
+    grid-template-columns: 1fr;
   }
 
   .studentRow {
@@ -342,6 +699,19 @@
 
   .nameInput,
   .scoreInput {
+    width: 100%;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .addBtn,
+  .calculateBtn,
+  .analyticsBtn,
+  .historyBtn,
+  .exportBtn,
+  .clearBtn {
     width: 100%;
   }
 
@@ -383,35 +753,110 @@
     text-align: left;
   }
 
-  .statsGrid {
-    grid-template-columns: repeat(2, 1fr);
+  .assessmentsList {
+    grid-template-columns: 1fr;
+  }
+
+  .assessmentMeta {
+    text-align: left;
   }
 
   .scaleGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .performanceTable {
+    overflow-x: auto;
   }
 }
 
 @media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .tool {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
   .inputSection {
     padding: 1rem;
   }
 
-  .controls {
-    flex-direction: column;
-  }
-
-  .addBtn,
-  .calculateBtn,
-  .clearBtn {
-    width: 100%;
+  .assessmentNameInput {
+    font-size: 0.9rem;
   }
 
   .statsGrid {
     grid-template-columns: 1fr;
   }
 
+  .statCard {
+    padding: 0.5rem;
+  }
+
+  .statNumber {
+    font-size: 1.3rem;
+  }
+
+  .statName {
+    font-size: 0.75rem;
+  }
+
+  .performerCard {
+    padding: 0.75rem;
+  }
+
+  .performerRank {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
   .scaleGrid {
     grid-template-columns: 1fr;
+  }
+
+  .resultsHeader {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .resultsHeader h3 {
+    font-size: 1.1rem;
+  }
+
+  .deleteBtn {
+    width: 100%;
+  }
+
+  .tableRow .percentile {
+    display: none;
+  }
+
+  .tableRow .grade {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .analyticsSection {
+    padding: 1rem;
+  }
+
+  .performanceTable {
+    font-size: 0.85rem;
+  }
+
+  .consistency {
+    font-size: 0.75rem;
+  }
+
+  .trend {
+    font-size: 0.75rem;
   }
 }

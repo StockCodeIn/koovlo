@@ -1,14 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./text-summarizer.module.css";
 import ToolInfo from "@/components/ToolInfo";
+
+interface SummaryHistory {
+  id: string;
+  originalText: string;
+  summary: string;
+  mode: 'extractive' | 'bullet-points' | 'key-sentences';
+  compressionRatio: number;
+  createdAt: string;
+  summaryLength: number;
+}
+
+interface SummaryStats {
+  totalSummaries: number;
+  totalWordsProcessed: number;
+  totalWordsSaved: number;
+  averageCompression: number;
+  favoriteMode: string;
+}
 
 export default function TextSummarizer() {
   const [inputText, setInputText] = useState("");
   const [summary, setSummary] = useState("");
   const [summaryLength, setSummaryLength] = useState(30); // percentage
   const [isLoading, setIsLoading] = useState(false);
+  const [summaryMode, setSummaryMode] = useState<'extractive' | 'bullet-points' | 'key-sentences'>('extractive');
+  const [history, setHistory] = useState<SummaryHistory[]>([]);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [lastSaved, setLastSaved] = useState("");
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("text-summarizer-data");
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        setHistory(data.history || []);
+      } catch (e) {
+        console.error("Error loading data:", e);
+      }
+    }
+  }, []);
+
+  // Save to localStorage whenever history changes
+  useEffect(() => {
+    if (history.length > 0) {
+      localStorage.setItem("text-summarizer-data", JSON.stringify({ history }));
+      setLastSaved(new Date().toLocaleTimeString());
+    }
+  }, [history]);
 
   const sampleTexts = [
     {
@@ -30,60 +74,129 @@ export default function TextSummarizer() {
     setSummary("");
   };
 
+  const createBulletPointsSummary = (text: string): string => {
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    const targetPoints = Math.max(3, Math.min(7, Math.ceil(sentences.length * (summaryLength / 100))));
+    
+    const sentenceScores = sentences.map((sentence, index) => {
+      const sentenceWords = sentence.split(/\s+/).filter(w => w.length > 0);
+      let score = 0;
+      
+      if (sentenceWords.length > 5 && sentenceWords.length < 30) score += 1;
+      if (index < sentences.length * 0.4) score += 1.5;
+      
+      const keywords = ['important', 'significant', 'key', 'main', 'primary', 'result', 'shows', 'demonstrates'];
+      if (keywords.some(word => sentence.toLowerCase().includes(word))) score += 1.5;
+      
+      return { sentence: sentence.trim(), score, index };
+    });
+    
+    sentenceScores.sort((a, b) => b.score - a.score);
+    const selectedSentences = sentenceScores.slice(0, targetPoints);
+    selectedSentences.sort((a, b) => a.index - b.index);
+    
+    return selectedSentences.map(s => `• ${s.sentence}`).join('\n');
+  };
+
+  const createKeySentencesSummary = (text: string): string => {
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    if (sentences.length <= 2) return text;
+    
+    // Get first and last sentence + most important middle ones
+    const firstSentence = sentences[0].trim();
+    const lastSentence = sentences[sentences.length - 1].trim();
+    const middleSentences = sentences.slice(1, -1);
+    
+    const targetMiddle = Math.max(1, Math.ceil(middleSentences.length * (summaryLength / 100)));
+    
+    const middleScores = middleSentences.map((sentence, index) => {
+      const words = sentence.split(/\s+/).filter(w => w.length > 0);
+      let score = words.length > 8 && words.length < 25 ? 1 : 0.5;
+      
+      const keywords = ['important', 'key', 'significant', 'main', 'essential', 'critical', 'however', 'therefore'];
+      if (keywords.some(word => sentence.toLowerCase().includes(word))) score += 2;
+      
+      return { sentence: sentence.trim(), score };
+    });
+    
+    middleScores.sort((a, b) => b.score - a.score);
+    const selectedMiddle = middleScores.slice(0, targetMiddle).map(s => s.sentence);
+    
+    return [firstSentence, ...selectedMiddle, lastSentence].join('. ') + '.';
+  };
+
   const summarizeText = () => {
-    if (!inputText.trim()) return;
+    if (!inputText.trim()) {
+      alert('Please enter some text to summarize.');
+      return;
+    }
 
     setIsLoading(true);
 
-    // Simple extractive summarization algorithm
     setTimeout(() => {
-      const sentences = inputText.split(/[.!?]+/).filter(s => s.trim().length > 0);
-      const words = inputText.split(/\s+/).filter(w => w.length > 0);
+      let summaryText = '';
+      
+      if (summaryMode === 'bullet-points') {
+        summaryText = createBulletPointsSummary(inputText);
+      } else if (summaryMode === 'key-sentences') {
+        summaryText = createKeySentencesSummary(inputText);
+      } else {
+        // Extractive mode (original algorithm)
+        const sentences = inputText.split(/[.!?]+/).filter(s => s.trim().length > 0);
+        const words = inputText.split(/\s+/).filter(w => w.length > 0);
 
-      if (sentences.length <= 3) {
-        setSummary(inputText);
-        setIsLoading(false);
-        return;
+        if (sentences.length <= 3) {
+          summaryText = inputText;
+        } else {
+          const targetSentences = Math.max(2, Math.ceil(sentences.length * (summaryLength / 100)));
+
+          const sentenceScores = sentences.map((sentence, index) => {
+            const sentenceWords = sentence.split(/\s+/).filter(w => w.length > 0);
+            let score = 0;
+
+            const lengthScore = sentenceWords.length > 5 && sentenceWords.length < 30 ? 1 : 0.5;
+            score += lengthScore;
+
+            const positionScore = index === 0 || index === sentences.length - 1 ? 1.5 :
+                                index < sentences.length * 0.3 ? 1.2 : 0.8;
+            score += positionScore;
+
+            const importantWords = ['important', 'significant', 'key', 'main', 'primary', 'major', 'essential', 'critical'];
+            const keywordScore = importantWords.some(word =>
+              sentence.toLowerCase().includes(word.toLowerCase())
+            ) ? 1.5 : 1;
+            score += keywordScore;
+
+            return { sentence: sentence.trim(), score, index };
+          });
+
+          sentenceScores.sort((a, b) => b.score - a.score);
+          const selectedSentences = sentenceScores.slice(0, targetSentences);
+          selectedSentences.sort((a, b) => a.index - b.index);
+          summaryText = selectedSentences.map(s => s.sentence).join('. ') + '.';
+        }
       }
 
-      // Calculate target number of sentences for summary
-      const targetSentences = Math.max(2, Math.ceil(sentences.length * (summaryLength / 100)));
-
-      // Score sentences based on various factors
-      const sentenceScores = sentences.map((sentence, index) => {
-        const sentenceWords = sentence.split(/\s+/).filter(w => w.length > 0);
-        let score = 0;
-
-        // Length score (prefer medium-length sentences)
-        const lengthScore = sentenceWords.length > 5 && sentenceWords.length < 30 ? 1 : 0.5;
-        score += lengthScore;
-
-        // Position score (prefer sentences at the beginning and end)
-        const positionScore = index === 0 || index === sentences.length - 1 ? 1.5 :
-                            index < sentences.length * 0.3 ? 1.2 : 0.8;
-        score += positionScore;
-
-        // Keyword score (sentences with important words)
-        const importantWords = ['important', 'significant', 'key', 'main', 'primary', 'major', 'essential', 'critical'];
-        const keywordScore = importantWords.some(word =>
-          sentence.toLowerCase().includes(word.toLowerCase())
-        ) ? 1.5 : 1;
-        score += keywordScore;
-
-        return { sentence: sentence.trim(), score, index };
-      });
-
-      // Sort by score and select top sentences
-      sentenceScores.sort((a, b) => b.score - a.score);
-      const selectedSentences = sentenceScores.slice(0, targetSentences);
-
-      // Sort back to original order for coherent summary
-      selectedSentences.sort((a, b) => a.index - b.index);
-
-      const summaryText = selectedSentences.map(s => s.sentence).join('. ') + '.';
       setSummary(summaryText);
+      
+      // Save to history
+      const originalWords = inputText.split(/\s+/).filter(w => w.length > 0).length;
+      const summaryWords = summaryText.split(/\s+/).filter(w => w.length > 0).length;
+      const compressionRatio = originalWords > 0 ? ((originalWords - summaryWords) / originalWords * 100) : 0;
+      
+      const newHistoryItem: SummaryHistory = {
+        id: Date.now().toString(),
+        originalText: inputText.substring(0, 200) + (inputText.length > 200 ? '...' : ''),
+        summary: summaryText,
+        mode: summaryMode,
+        compressionRatio: parseFloat(compressionRatio.toFixed(1)),
+        createdAt: new Date().toISOString(),
+        summaryLength
+      };
+      
+      setHistory([newHistoryItem, ...history].slice(0, 50)); // Keep last 50
       setIsLoading(false);
-    }, 500); // Simulate processing time
+    }, 500);
   };
 
   const copyToClipboard = () => {
@@ -105,16 +218,114 @@ export default function TextSummarizer() {
     };
   };
 
+  const getAnalytics = (): SummaryStats => {
+    const totalSummaries = history.length;
+    const totalWordsProcessed = history.reduce((sum, item) => {
+      const words = item.originalText.split(/\s+/).filter(w => w.length > 0).length;
+      return sum + words;
+    }, 0);
+    const totalWordsSaved = history.reduce((sum, item) => {
+      const originalWords = item.originalText.split(/\s+/).filter(w => w.length > 0).length;
+      const summaryWords = item.summary.split(/\s+/).filter(w => w.length > 0).length;
+      return sum + (originalWords - summaryWords);
+    }, 0);
+    const averageCompression = history.length > 0 
+      ? history.reduce((sum, item) => sum + item.compressionRatio, 0) / history.length 
+      : 0;
+    
+    const modeCounts = history.reduce((acc, item) => {
+      acc[item.mode] = (acc[item.mode] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const favoriteMode = Object.keys(modeCounts).length > 0
+      ? Object.keys(modeCounts).reduce((a, b) => modeCounts[a] > modeCounts[b] ? a : b)
+      : 'extractive';
+
+    return {
+      totalSummaries,
+      totalWordsProcessed,
+      totalWordsSaved,
+      averageCompression: parseFloat(averageCompression.toFixed(1)),
+      favoriteMode
+    };
+  };
+
+  const deleteHistoryItem = (id: string) => {
+    setHistory(history.filter(item => item.id !== id));
+  };
+
+  const clearAllHistory = () => {
+    if (confirm('Are you sure you want to clear all summary history?')) {
+      setHistory([]);
+      localStorage.removeItem("text-summarizer-data");
+    }
+  };
+
   const stats = getStats();
+  const analytics = getAnalytics();
 
   return (
     <main className={styles.container}>
       <section className={styles.tool}>
-        <h1 className={styles.title}>
-          <span className={styles.icon}>📝</span>
-          Text Summarizer
-        </h1>
-        <p>Extract key points and create concise summaries from longer texts.</p>
+        <div className={styles.header}>
+          <h1 className={styles.title}>
+            📝 Text Summarizer
+          </h1>
+          <p className={styles.subtitle}>
+            Extract key points and create concise summaries with intelligent analytics
+          </p>
+          <div className={styles.dataInfo}>
+            <span className={styles.infoItem}>
+              💾 <strong>Auto-Save:</strong> All summaries are saved
+            </span>
+            <span className={styles.infoSeparator}>•</span>
+            <span className={styles.infoItem}>
+              {lastSaved && <><strong>Last saved:</strong> {lastSaved}</>}
+            </span>
+            <span className={styles.infoSeparator}>•</span>
+            <span className={styles.infoItem}>
+              📊 <strong>{history.length}</strong> summaries created
+            </span>
+          </div>
+        </div>
+
+        {/* Smart Analytics Dashboard */}
+        {history.length > 0 && (
+          <div className={styles.smartDashboard}>
+            <div className={styles.dashboardSection}>
+              <h3>📊 Summary Analytics</h3>
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <span className={styles.statNumber}>{analytics.totalSummaries}</span>
+                  <span className={styles.statName}>Total Summaries</span>
+                </div>
+                <div className={styles.statCard}>
+                  <span className={styles.statNumber}>{analytics.totalWordsProcessed}</span>
+                  <span className={styles.statName}>Words Processed</span>
+                </div>
+                <div className={styles.statCard}>
+                  <span className={styles.statNumber}>{analytics.totalWordsSaved}</span>
+                  <span className={styles.statName}>Words Saved</span>
+                </div>
+                <div className={styles.statCard}>
+                  <span className={styles.statNumber}>{analytics.averageCompression}%</span>
+                  <span className={styles.statName}>Avg Compression</span>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.dashboardSection}>
+              <h3>💡 Smart Insights</h3>
+              <div className={styles.insightCard}>
+                <div className={styles.insightPositive}>
+                  ✅ You've saved <strong>{analytics.totalWordsSaved} words</strong> of reading time across {analytics.totalSummaries} summaries!
+                  Your favorite mode is <strong>{analytics.favoriteMode}</strong>.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className={styles.summarizer}>
           <div className={styles.inputSection}>
@@ -130,6 +341,20 @@ export default function TextSummarizer() {
             </div>
 
             <div className={styles.controls}>
+              <div className={styles.modeControl}>
+                <label htmlFor="summaryMode">Summary Mode:</label>
+                <select
+                  id="summaryMode"
+                  value={summaryMode}
+                  onChange={(e) => setSummaryMode(e.target.value as any)}
+                  className={styles.modeSelect}
+                >
+                  <option value="extractive">Extractive (Coherent Paragraphs)</option>
+                  <option value="bullet-points">Bullet Points (Key Ideas)</option>
+                  <option value="key-sentences">Key Sentences (First + Last + Important)</option>
+                </select>
+              </div>
+
               <div className={styles.lengthControl}>
                 <label htmlFor="summaryLength">Summary Length: {summaryLength}%</label>
                 <input
@@ -149,6 +374,12 @@ export default function TextSummarizer() {
                   disabled={!inputText.trim() || isLoading}
                 >
                   {isLoading ? 'Summarizing...' : 'Summarize Text'}
+                </button>
+                <button onClick={() => setShowAnalytics(!showAnalytics)} className={styles.analyticsBtn}>
+                  📈 Analytics
+                </button>
+                <button onClick={() => setShowHistory(!showHistory)} className={styles.historyBtn}>
+                  📋 History
                 </button>
               </div>
             </div>
@@ -205,6 +436,84 @@ export default function TextSummarizer() {
             </div>
           )}
         </div>
+
+        {/* Detailed Analytics */}
+        {showAnalytics && history.length > 0 && (
+          <div className={styles.analyticsSection}>
+            <h3>📊 Detailed Analytics</h3>
+            <div className={styles.analyticsGrid}>
+              <div className={styles.analyticsCard}>
+                <h4>Summary Statistics</h4>
+                <div className={styles.analyticsMetric}>
+                  <span>Total Summaries Created</span>
+                  <span className={styles.metricValue}>{analytics.totalSummaries}</span>
+                </div>
+                <div className={styles.analyticsMetric}>
+                  <span>Total Words Processed</span>
+                  <span className={styles.metricValue}>{analytics.totalWordsProcessed.toLocaleString()}</span>
+                </div>
+                <div className={styles.analyticsMetric}>
+                  <span>Total Words Saved</span>
+                  <span className={styles.metricValue}>{analytics.totalWordsSaved.toLocaleString()}</span>
+                </div>
+                <div className={styles.analyticsMetric}>
+                  <span>Average Compression</span>
+                  <span className={styles.metricValue}>{analytics.averageCompression}%</span>
+                </div>
+              </div>
+              
+              <div className={styles.analyticsCard}>
+                <h4>Usage Patterns</h4>
+                <div className={styles.analyticsMetric}>
+                  <span>Favorite Mode</span>
+                  <span className={styles.metricValue}>{analytics.favoriteMode}</span>
+                </div>
+                <div className={styles.analyticsMetric}>
+                  <span>Estimated Reading Time Saved</span>
+                  <span className={styles.metricValue}>{Math.ceil(analytics.totalWordsSaved / 200)} min</span>
+                </div>
+                <div className={styles.analyticsMetric}>
+                  <span>Most Recent Summary</span>
+                  <span className={styles.metricValue}>{history.length > 0 ? new Date(history[0].createdAt).toLocaleDateString() : 'N/A'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* History Section */}
+        {showHistory && history.length > 0 && (
+          <div className={styles.historySection}>
+            <div className={styles.historyHeader}>
+              <h3>📋 Summary History</h3>
+              <button onClick={clearAllHistory} className={styles.clearBtn}>
+                Clear All
+              </button>
+            </div>
+            <div className={styles.historyList}>
+              {history.map(item => (
+                <div key={item.id} className={styles.historyCard}>
+                  <div className={styles.historyCardHeader}>
+                    <div>
+                      <span className={styles.historyMode}>{item.mode}</span>
+                      <span className={styles.historyDate}>{new Date(item.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <button onClick={() => deleteHistoryItem(item.id)} className={styles.deleteBtn}>
+                      Delete
+                    </button>
+                  </div>
+                  <div className={styles.historyText}>
+                    <strong>Original:</strong> {item.originalText}
+                  </div>
+                  <div className={styles.historyStats}>
+                    <span>Compression: {item.compressionRatio}%</span>
+                    <span>Length: {item.summaryLength}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className={styles.info}>
           <h4>How It Works</h4>

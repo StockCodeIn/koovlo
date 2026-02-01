@@ -2,6 +2,7 @@
   display: flex;
   justify-content: center;
   padding: 40px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .box {
@@ -21,13 +22,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px; /* Emoji aur text ke beech space */
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .icon {
   /* Emoji ka asli color dikhane ke liye ispar koi gradient nahi lagana */
   background: none;
-  -webkit-text-fill-color: initial; 
+  -webkit-text-fill-color: initial;
 }
 
 .textGradient {
@@ -37,21 +39,31 @@
   -webkit-text-fill-color: transparent;
 }
 
-.fileInput {
-  margin: 20px 0;
+.description {
+  text-align: center;
+  color: var(--brand-muted);
+  font-size: 1rem;
+  margin-bottom: 30px;
 }
-.fileInput {
-  display: inline-block;
-  background: gray;
+
+.dropZone {
   border: 2px dashed #ddd;
-  /* margin-right: 10px; */
   border-radius: 12px;
-  /* padding: 20px; */
-  cursor: pointer;
-  transition: border-color 0.3s ease;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: white;
+  margin-bottom: 20px;
 }
-.fileInput:hover {
+
+.dropZone.dragOver {
   border-color: var(--brand-primary);
+  background: rgba(0, 123, 255, 0.05);
+}
+
+.fileInput {
+  position: relative;
+  display: inline-flex;
 }
 
 .fileInput input {
@@ -59,34 +71,75 @@
 }
 
 .uploadLabel {
-  /* background: #ff6a00; */
-  color: #fff;
-  padding: 30px 30px;
-  /* border-radius: 8px; */
+  display: block;
+  padding: 1rem;
+  border: 2px dashed #007bff;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
   cursor: pointer;
-  display: inline-block;
-  font-weight: 600;
-  /* transition: background 0.3s; */
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
-/* .uploadLabel:hover {
-  background: #ee0979;
-} */
+.uploadLabel:hover {
+  border-color: #0056b3;
+  background: #f0f8ff;
+}
+
+.dropText {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.fileInfo {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  text-align: left;
+}
+
+.fileInfo p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+}
+
+.clearBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+.clearBtn:hover {
+  background: #c82333;
+}
 
 .angleSelect {
-  margin-top: 20px;
+  margin: 20px 0;
   text-align: left;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .angleSelect label {
   font-weight: 500;
-  margin-right: 8px;
+  margin-bottom: 8px;
   color: #333;
+  display: block;
 }
 
 .angleSelect select {
-  padding: 8px 10px;
-  border-radius: 6px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
   border: 1px solid #ccc;
   background: #fff;
   font-size: 0.95rem;
@@ -94,28 +147,253 @@
   transition: all 0.2s ease;
 }
 
-.angleSelect select:hover {
-  border-color: blue;
+.angleSelect select:hover:not(:disabled) {
+  border-color: var(--brand-primary);
+}
+
+.angleSelect select:disabled {
+  background: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.rotationPreview {
+  margin-top: 10px;
+  padding: 10px;
+  background: #f0f8ff;
+  border-radius: 6px;
+  border: 1px solid #b8daff;
+}
+
+.rotationPreview p {
+  margin: 0;
+  color: #004085;
+  font-size: 0.9rem;
+}
+
+.progressContainer {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  transition: width 0.3s ease;
 }
 
 .button {
   background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
   color: #fff;
-  padding: 12px 24px;
+  padding: 14px 28px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
-  transition: transform 0.2s, background 0.3s;
+  font-size: 1rem;
+  transition: all 0.3s ease;
   margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
-.button:hover {
+.button:hover:not(:disabled) {
   transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .message {
   margin-top: 16px;
-  color: #333;
-  font-size: 0.95rem;
+  color: #28a745;
+  background: #d4edda;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #c3e6cb;
+}
+
+.error {
+  margin-top: 16px;
+  color: #721c24;
+  background: #f8d7da;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #f5c6cb;
+}
+
+.success {
+  margin-top: 16px;
+  color: #155724;
+  background: #d4edda;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #c3e6cb;
+}
+
+.instructions {
+  margin-top: 30px;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.instructions h3 {
+  margin: 0 0 15px 0;
+  color: #495057;
+  font-size: 1.1rem;
+}
+
+.instructions ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.instructions li {
+  margin: 8px 0;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 16px;
+  }
+
+  .box {
+    padding: 20px 16px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .pageTitle {
+    font-size: 1.8rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .dropZone {
+    padding: 16px;
+  }
+
+  .uploadLabel {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .dropText {
+    font-size: 0.8rem;
+  }
+
+  .angleSelect {
+    max-width: 100%;
+  }
+
+  .angleSelect select {
+    padding: 12px;
+  }
+
+  .button {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+
+  .fileInfo {
+    padding: 12px;
+  }
+
+  .rotationPreview {
+    padding: 8px;
+  }
+
+  .instructions {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 16px 12px;
+  }
+
+  .box {
+    padding: 16px 12px;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.8rem;
+  }
+
+  .dropZone {
+    padding: 12px;
+  }
+
+  .uploadLabel {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .dropText {
+    font-size: 0.7rem;
+  }
+
+  .angleSelect select {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .button {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
+  .fileInfo {
+    padding: 10px;
+    text-align: center;
+  }
+
+  .fileInfo p {
+    font-size: 0.8rem;
+  }
+
+  .rotationPreview {
+    padding: 6px;
+  }
+
+  .rotationPreview p {
+    font-size: 0.8rem;
+  }
+
+  .instructions {
+    padding: 12px;
+  }
+
+  .instructions h3 {
+    font-size: 1rem;
+  }
+
+  .instructions li {
+    font-size: 0.8rem;
+  }
 }

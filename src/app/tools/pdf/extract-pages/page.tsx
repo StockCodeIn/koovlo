@@ -1,252 +1,232 @@
-'use client';
+// src/app/tools/pdf/extract-pages/page.tsx
+"use client";
 
-import { useState } from 'react';
-import ToolInfo from '@/components/ToolInfo';
-import styles from './extract.module.css';
+import { useState, useCallback } from "react";
+import { PDFDocument } from "pdf-lib";
+import styles from "./split.module.css";
+import ToolInfo from "@/components/ToolInfo";
 
-export default function ExtractPages() {
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
-  const [pagesToExtract, setPagesToExtract] = useState('');
-  const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState('');
-  const [totalPages, setTotalPages] = useState<number | null>(null);
+export default function PdfExtractPagesPage() {
+    const [file, setFile] = useState<File | null>(null);
+    const [pages, setPages] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState("");
+    const [dragOver, setDragOver] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [totalPages, setTotalPages] = useState<number | null>(null);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      if (selectedFile.type !== 'application/pdf') {
-        setError('Please select a PDF file');
-        return;
-      }
-      setPdfFile(selectedFile);
-      setError('');
-      // In a real implementation, we'd get total pages from pdf-lib
-      // For now, we'll set a placeholder
-      setTotalPages(null);
-    }
-  };
-
-  const parsePageRanges = (input: string): number[] => {
-    if (!input.trim()) return [];
-
-    const pages: number[] = [];
-    const ranges = input.split(',').map(r => r.trim());
-
-    for (const range of ranges) {
-      if (range.includes('-')) {
-        const [start, end] = range.split('-').map(n => parseInt(n.trim()));
-        if (isNaN(start) || isNaN(end) || start > end || start < 1) {
-          throw new Error(`Invalid range: ${range}`);
+    const handleFile = useCallback((selectedFile: File) => {
+        if (selectedFile.type !== "application/pdf") {
+            setMessage("Please upload a valid PDF file.");
+            return;
         }
-        for (let i = start; i <= end; i++) {
-          if (!pages.includes(i)) pages.push(i);
+        setFile(selectedFile);
+        setMessage("");
+        // Get total pages
+        selectedFile.arrayBuffer().then(bytes => {
+            PDFDocument.load(bytes).then(pdf => {
+                setTotalPages(pdf.getPageCount());
+            });
+        });
+    }, []);
+
+    const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const f = e.target.files?.[0];
+        if (f) handleFile(f);
+    };
+
+    const handleDrop = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        setDragOver(false);
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile) handleFile(droppedFile);
+    }, [handleFile]);
+
+    const handleDragOver = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        setDragOver(true);
+    }, []);
+
+    const handleDragLeave = useCallback(() => {
+        setDragOver(false);
+    }, []);
+
+    const parsePageInput = (input: string): number[] => {
+        if (!input.trim()) return [];
+        
+        const ranges = input.split(',').map(r => r.trim());
+        const pages: number[] = [];
+        
+        for (const range of ranges) {
+            if (range.includes('-')) {
+                const [start, end] = range.split('-').map(n => parseInt(n.trim()));
+                if (start && end && start <= end) {
+                    for (let i = start; i <= end; i++) {
+                        if (!pages.includes(i)) pages.push(i);
+                    }
+                }
+            } else {
+                const page = parseInt(range);
+                if (page && !pages.includes(page)) pages.push(page);
+            }
         }
-      } else {
-        const page = parseInt(range);
-        if (isNaN(page) || page < 1) {
-          throw new Error(`Invalid page number: ${range}`);
+        
+        return pages.sort((a, b) => a - b);
+    };
+
+    const getPreviewPages = () => {
+        return parsePageInput(pages).slice(0, 10);
+    };
+
+    const handleSplit = async () => {
+        if (!file) return setMessage("Please upload a PDF first.");
+        if (!pages.trim()) return setMessage("Enter page numbers to extract (e.g. 1-3,5)");
+
+        const pageNumbers = parsePageInput(pages);
+        if (pageNumbers.length === 0) return setMessage("No valid pages specified.");
+
+        setLoading(true);
+        setMessage("Extracting your PDF...");
+        setProgress(0);
+
+        try {
+            const bytes = await file.arrayBuffer();
+            const pdfDoc = await PDFDocument.load(bytes);
+            const totalPages = pdfDoc.getPageCount();
+
+            // Validate pages
+            const validPages = pageNumbers.filter(p => p >= 1 && p <= totalPages).map(p => p - 1);
+            if (validPages.length === 0) {
+                setMessage("No valid pages found in the document.");
+                setLoading(false);
+                return;
+            }
+
+            setProgress(50);
+
+            const newPdf = await PDFDocument.create();
+            const copied = await newPdf.copyPages(pdfDoc, validPages);
+            copied.forEach((p) => newPdf.addPage(p));
+
+            setProgress(80);
+
+            const splitBytes = await newPdf.save();
+            const blob = new Blob([splitBytes as unknown as BlobPart], { type: "application/pdf" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `extracted-pages-${validPages.length}.pdf`;
+            a.click();
+
+            setProgress(100);
+            setMessage("✅ PDF Extracted successfully!");
+        } catch (err) {
+            console.error(err);
+            setMessage("❌ Error Extracting PDF. Please try again.");
+        } finally {
+            setLoading(false);
+            setTimeout(() => setProgress(0), 1000);
         }
-        if (!pages.includes(page)) pages.push(page);
-      }
-    }
+    };
 
-    return pages.sort((a, b) => a - b);
-  };
+    const clearFile = () => {
+        setFile(null);
+        setPages("");
+        setMessage("");
+        setTotalPages(null);
+    };
 
-  const extractPages = async () => {
-    if (!pdfFile) {
-      setError('Please select a PDF file');
-      return;
-    }
-
-    if (!pagesToExtract.trim()) {
-      setError('Please specify pages to extract');
-      return;
-    }
-
-    try {
-      const pages = parsePageRanges(pagesToExtract);
-
-      if (pages.length === 0) {
-        setError('No valid pages specified');
-        return;
-      }
-
-      setProcessing(true);
-      setError('');
-
-      // In a real implementation, this would use pdf-lib
-      // For now, we'll show a placeholder
-      setError('PDF page extraction requires pdf-lib. This feature is under development.');
-
-      setTimeout(() => {
-        setProcessing(false);
-      }, 2000);
-
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid page specification');
-    }
-  };
-
-  const getPagePreview = () => {
-    if (!pagesToExtract.trim()) return [];
-
-    try {
-      const pages = parsePageRanges(pagesToExtract);
-      return pages.slice(0, 10); // Show first 10 pages to extract
-    } catch {
-      return [];
-    }
-  };
-
-  return (
-    <main className={styles.container}>
-      <h1>Extract Pages from PDF</h1>
-      <p>Create a new PDF with selected pages from your document</p>
-
-      <div className={styles.converter}>
-        <div className={styles.inputSection}>
-          <div className={styles.fileInput}>
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={handleFileSelect}
-              className={styles.hiddenInput}
-              id="pdf-file"
-            />
-            <label htmlFor="pdf-file" className={styles.fileLabel}>
-              {pdfFile ? pdfFile.name : 'Choose PDF File'}
-            </label>
-          </div>
-
-          {pdfFile && (
-            <div className={styles.fileInfo}>
-              <p><strong>File:</strong> {pdfFile.name} ({(pdfFile.size / 1024 / 1024).toFixed(2)} MB)</p>
-              {totalPages && <p><strong>Total Pages:</strong> {totalPages}</p>}
-            </div>
-          )}
-
-          <div className={styles.pageInput}>
-            <label htmlFor="pages">Pages to Extract:</label>
-            <textarea
-              id="pages"
-              value={pagesToExtract}
-              onChange={(e) => setPagesToExtract(e.target.value)}
-              placeholder="e.g., 1,3,5-7,10"
-              className={styles.pageTextarea}
-              rows={3}
-            />
-            <div className={styles.inputHelp}>
-              <p><strong>Examples:</strong></p>
-              <ul>
-                <li>Single page: <code>5</code></li>
-                <li>Multiple pages: <code>1,3,5</code></li>
-                <li>Page range: <code>5-10</code></li>
-                <li>Mixed: <code>1,3,5-7,10</code></li>
-              </ul>
-            </div>
-          </div>
-
-          <button
-            onClick={extractPages}
-            disabled={!pdfFile || !pagesToExtract.trim() || processing}
-            className={styles.convertBtn}
-          >
-            {processing ? 'Extracting Pages...' : 'Extract Pages'}
-          </button>
-
-          {error && <div className={styles.error}>{error}</div>}
-        </div>
-
-        <div className={styles.previewSection}>
-          <h3>Pages to Extract Preview</h3>
-
-          <div className={styles.pagePreview}>
-            {getPagePreview().length > 0 ? (
-              <div className={styles.pageList}>
-                <p><strong>Pages to be extracted:</strong></p>
-                <div className={styles.pageNumbers}>
-                  {getPagePreview().map((page, index) => (
-                    <span key={index} className={styles.pageNumber}>
-                      {page}
-                    </span>
-                  ))}
-                  {getPagePreview().length >= 10 && (
-                    <span className={styles.morePages}>...</span>
-                  )}
-                </div>
-                <p className={styles.extractInfo}>
-                  These pages will be combined into a new PDF in the order specified.
+    return (
+        <main className={styles.container}>
+            <section className={styles.box}>
+                <h1 className={styles.pageTitle}>
+                    <span className={styles.icon}>✂️</span>
+                    <span className={styles.textGradient}>Extract Pages from PDF</span>
+                </h1>
+                <p>
+                    Create a new PDF with selected pages. Fully offline & secure.
                 </p>
-              </div>
-            ) : (
-              <div className={styles.noPages}>
-                <p>📄 Enter page numbers to see preview</p>
-                <p className={styles.hint}>Use commas for multiple pages, hyphens for ranges</p>
-              </div>
-            )}
-          </div>
 
-          <div className={styles.extractionGuide}>
-            <h4>Extraction Guide</h4>
-            <div className={styles.guideContent}>
-              <div className={styles.guideItem}>
-                <strong>Page Order:</strong> Pages will appear in the order you specify
-              </div>
-              <div className={styles.guideItem}>
-                <strong>New PDF:</strong> Creates a separate PDF with only selected pages
-              </div>
-              <div className={styles.guideItem}>
-                <strong>Original File:</strong> Remains unchanged
-              </div>
-              <div className={styles.guideItem}>
-                <strong>Page Numbering:</strong> Starts from 1 in the new PDF
-              </div>
-            </div>
-          </div>
+                <div 
+                    className={`${styles.dropZone} ${dragOver ? styles.dragOver : ''}`}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                >
+                    <label className={styles.fileInput}>
+                        <input type="file" accept="application/pdf" onChange={handleFileInput} disabled={loading} />
+                        <span>{file ? file.name : "📂 Choose PDF File"}</span>
+                    </label>
+                    <p className={styles.dropText}>or drag and drop your PDF here</p>
+                    {file && (
+                        <div className={styles.fileInfo}>
+                            <p><strong>Size:</strong> {(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                            {totalPages && <p><strong>Total Pages:</strong> {totalPages}</p>}
+                            <button onClick={clearFile} className={styles.clearBtn}>Change File</button>
+                        </div>
+                    )}
+                </div>
 
-          <div className={styles.quickActions}>
-            <h4>Quick Actions</h4>
-            <div className={styles.actionButtons}>
-              <button
-                onClick={() => setPagesToExtract('1')}
-                className={styles.quickBtn}
-              >
-                First Page
-              </button>
-              <button
-                onClick={() => setPagesToExtract('1-5')}
-                className={styles.quickBtn}
-              >
-                First 5 Pages
-              </button>
-              <button
-                onClick={() => setPagesToExtract('odd')}
-                className={styles.quickBtn}
-              >
-                Odd Pages
-              </button>
-              <button
-                onClick={() => setPagesToExtract('even')}
-                className={styles.quickBtn}
-              >
-                Even Pages
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+                {file && (
+                    <div className={styles.inputGroup}>
+                        <label>Page Range:</label>
+                        <input
+                            type="text"
+                            placeholder="e.g. 1-3, 5, 8-10"
+                            value={pages}
+                            onChange={(e) => setPages(e.target.value)}
+                            disabled={loading}
+                        />
+                        <div className={styles.inputHelp}>
+                            <p><strong>Examples:</strong></p>
+                            <ul>
+                                <li>Single page: <code>5</code></li>
+                                <li>Multiple pages: <code>1,3,5</code></li>
+                                <li>Page range: <code>5-10</code></li>
+                                <li>Mixed: <code>1,3,5-7,10</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                )}
 
-      <ToolInfo
-        howItWorks="Upload your PDF file<br>Specify pages to extract (e.g., 1,3,5-7)<br>Review preview of pages to be extracted<br>Click 'Extract Pages' to download new PDF"
-        faqs={[
-          { title: "How do I specify page ranges?", content: "Use hyphens for ranges (5-10), commas for individual pages (1,3,5), or combine both (1,3,5-7)." },
-          { title: "Will the extracted pages maintain their original formatting?", content: "Yes, all content, images, and formatting are preserved exactly as in the original." },
-          { title: "Can I extract pages in a different order?", content: "Yes, specify pages in any order you want them to appear in the new PDF." },
-          { title: "What happens to bookmarks and links?", content: "Internal links within extracted pages are preserved. External references may be affected." }
-        ]}
-        tips={["Use page ranges for consecutive pages<br>Extract odd/even pages for double-sided documents<br>Pages will be renumbered starting from 1<br>Original PDF remains unchanged"]}
-      />
-    </main>
-  );
+                {pages && getPreviewPages().length > 0 && (
+                    <div className={styles.preview}>
+                        <h3>Pages to Extract:</h3>
+                        <div className={styles.pageNumbers}>
+                            {getPreviewPages().map((page, index) => (
+                                <span key={index} className={styles.pageNumber}>{page}</span>
+                            ))}
+                            {parsePageInput(pages).length > 10 && <span className={styles.morePages}>...</span>}
+                        </div>
+                    </div>
+                )}
+
+                {loading && (
+                    <div className={styles.progressContainer}>
+                        <div className={styles.progressBar}>
+                            <div className={styles.progressFill} style={{ width: `${progress}%` }}></div>
+                        </div>
+                        <p>{progress}% complete</p>
+                    </div>
+                )}
+
+                <button onClick={handleSplit} disabled={loading || !file || !pages.trim()} className={styles.button}>
+                    {loading ? "Extracting..." : "Extract Pages"}
+                </button>
+
+                {message && <p className={styles.message}>{message}</p>}
+            </section>
+
+            <ToolInfo
+                howItWorks="1. Upload a PDF file.<br>2. Enter page numbers or ranges (e.g. 1-3,5).<br>3. Click 'Extract Pages' to create a new PDF with selected pages."
+                faqs={[
+                    { title: "How to specify pages?", content: "Use commas for individual pages (1,3,5) and dashes for ranges (1-5)." },
+                    { title: "Is it secure?", content: "Yes, processing is done locally in your browser." },
+                    { title: "What's the maximum pages?", content: "Depends on your PDF size, but typically up to 1000 pages." }
+                ]}
+                tips={["Page numbers start from 1. Invalid ranges are ignored.", "Extracted pages maintain original quality.", "Use for sharing specific information from large documents."]}
+            />
+        </main>
+    );
 }

@@ -4,11 +4,11 @@
 import dynamic from "next/dynamic";
 import styles from "./toimage.module.css";
 
-// ✅ Sabse important: ssr: false se DOMMatrix error solve hoga
-const PdfConverter = dynamic(() => import("@/components/PdfConverter"), {
+// ✅ Dynamic import to fix DOMMatrix error
+const PdfToImageConverter = dynamic(() => import("@/components/PdfToImageConverter"), {
   ssr: false,
   loading: () => (
-    <div className={styles.box}>
+    <div className={styles.loading}>
       <p>Loading PDF Engine...</p>
     </div>
   ),
@@ -17,7 +17,15 @@ const PdfConverter = dynamic(() => import("@/components/PdfConverter"), {
 export default function PdfToImagePage() {
   return (
     <main className={styles.container}>
-      <PdfConverter />
+      <h1 className={styles.pageTitle}>
+        <span className={styles.icon}>📸</span>
+        <span className={styles.textGradient}>PDF to Image Converter</span>
+      </h1>
+      <p className={styles.description}>
+        Convert your PDF into high-quality images — choose the right balance between clarity and file size.
+      </p>
+
+      <PdfToImageConverter />
     </main>
   );
 }

@@ -1,17 +1,9 @@
 .container {
-  display: flex;
-  justify-content: center;
-  padding: 50px 20px;
-}
-
-.box {
-  max-width: 1000px;
-  width: 100%;
-  background: #fff;
-  padding: 40px 24px;
-  border-radius: 16px;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06);
-  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
 }
 
 .pageTitle {
@@ -20,43 +12,143 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .icon {
-  font-size: 1.8rem;
+  /* Emoji ka asli color dikhane ke liye ispar koi gradient nahi lagana */
+  background: none;
+  -webkit-text-fill-color: initial;
 }
 
 .textGradient {
   background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
-  background-clip: text;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.fileInput {
-  display: inline-block;
-  background: gray;
-  border: 2px dashed #ddd;
-  /* margin-right: 10px; */
+.description {
+  text-align: center;
+  color: var(--brand-muted);
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
+.converter {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin: 2rem 0;
+  background: #f8f9fa;
   border-radius: 12px;
-  padding: 30px;
-  cursor: pointer;
-  /* width: 200px; */
-  transition: border-color 0.3s ease;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.fileInput:hover {
+.inputSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.dropZone {
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.dropZone.dragOver {
   border-color: var(--brand-primary);
+  background: rgba(0, 123, 255, 0.05);
 }
 
-.fileInput input {
+.fileInput {
+  position: relative;
+}
+
+.hiddenInput {
   display: none;
 }
 
-.fileInput span {
+
+.fileLabel {
+  display: block;
+  padding: 1rem;
+  border: 2px dashed #007bff;
+  border-radius: 8px;
+  background: white;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
   font-weight: 500;
-  color: var(--brand-text);
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.fileLabel:hover {
+  border-color: #0056b3;
+  background: #f0f8ff;
+}
+
+.dropText {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.fileInfo {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.fileInfo p {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.clearBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-top: 10px;
+}
+
+.clearBtn:hover {
+  background: #c82333;
+}
+
+.progressContainer {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
+  transition: width 0.3s ease;
 }
 
 .metaGrid {
@@ -69,80 +161,330 @@
 
 .editSection,
 .infoSection {
-  background: #fafafa;
+  background: white;
   border-radius: 12px;
-  padding: 20px;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* ✅ Scoped h2 selectors (fixes the build error) */
 .editSection h2,
 .infoSection h2 {
-  font-size: 1.2rem;
-  margin-bottom: 14px;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
   color: var(--brand-primary);
+  font-weight: 600;
 }
 
 .inputGroup {
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
 }
 
 .inputGroup label {
   display: block;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 6px;
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
 }
 
 .inputGroup input {
   width: 100%;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 15px;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  font-size: 0.9rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.3s ease;
 }
 
 .inputGroup input:focus {
-  border-color: var(--brand-primary);
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
-.infoSection ul {
-  list-style: none;
-  padding: 0;
-}
-
-.infoSection li {
-  font-size: 0.95rem;
-  margin-bottom: 8px;
-  color: #444;
+.inputGroup input:disabled {
+  background: #f8f9fa;
+  cursor: not-allowed;
 }
 
 .button {
   background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
   color: #fff;
   border: none;
-  border-radius: 10px;
-  padding: 12px 24px;
+  border-radius: 8px;
+  padding: 0.875rem 1.5rem;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 10px;
-  transition: transform 0.2s ease;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+  font-size: 1rem;
 }
 
-.button:hover {
-  transform: scale(1.05);
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.infoSection ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.infoSection li {
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  color: #495057;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.infoSection li:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.infoSection li strong {
+  color: #007bff;
+  font-weight: 600;
 }
 
 .message {
-  margin-top: 20px;
-  color: #333;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
   font-weight: 500;
   text-align: center;
 }
 
+.message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.message.info {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .pageTitle {
+    font-size: 1.8rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+
+  .converter {
+    padding: 1rem;
+    margin: 1rem 0;
+  }
+
+  .dropZone {
+    padding: 16px;
+  }
+
+  .fileLabel {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .dropText {
+    font-size: 0.8rem;
+  }
+
   .metaGrid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 2rem;
   }
+
+  .editSection,
+  .infoSection {
+    padding: 1rem;
+  }
+
+  .editSection h2,
+  .infoSection h2 {
+    font-size: 1.1rem;
+  }
+
+  .inputGroup input {
+    padding: 0.625rem;
+    font-size: 0.85rem;
+  }
+
+  .button {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .infoSection li {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+    padding: 0.4rem 0;
+  }
+
+  .tips {
+    padding: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .tips h4 {
+    font-size: 0.95rem;
+  }
+
+  .tips li {
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.8rem;
+  }
+
+  .converter {
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+  }
+
+  .dropZone {
+    padding: 12px;
+  }
+
+  .fileLabel {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .dropText {
+    font-size: 0.7rem;
+  }
+
+  .fileInfo {
+    padding: 0.5rem;
+  }
+
+  .fileInfo p {
+    font-size: 0.8rem;
+  }
+
+  .editSection,
+  .infoSection {
+    padding: 0.75rem;
+  }
+
+  .editSection h2,
+  .infoSection h2 {
+    font-size: 1rem;
+  }
+
+  .inputGroup {
+    margin-bottom: 0.75rem;
+  }
+
+  .inputGroup label {
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .inputGroup input {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .button {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.85rem;
+  }
+
+  .infoSection li {
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
+    padding: 0.3rem 0;
+  }
+
+  .message {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+
+  .tips {
+    padding: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .tips h4 {
+    font-size: 0.9rem;
+  }
+
+  .tips li {
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
+  }
+}
+
+/* Tips Section */
+.tips {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.tips h4 {
+  margin: 0 0 1rem 0;
+  color: #495057;
+  font-size: 1rem;
+}
+
+.tips ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.tips li {
+  margin-bottom: 0.5rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }

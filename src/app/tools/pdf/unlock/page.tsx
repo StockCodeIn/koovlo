@@ -7,16 +7,14 @@ import styles from "./unlock.module.css";
 const PdfUnlocker = dynamic(() => import("@/components/PdfUnlocker"), {
   ssr: false,
   loading: () => (
-    <div className={styles.box}>
-      <p>Loading PDF engine...</p>
+    <div className={styles.container}>
+      <div className={styles.box}>
+        <p>Loading PDF engine...</p>
+      </div>
     </div>
   ),
 });
 
 export default function PdfUnlockPage() {
-  return (
-    <main className={styles.container}>
-      <PdfUnlocker />
-    </main>
-  );
+  return <PdfUnlocker />;
 }

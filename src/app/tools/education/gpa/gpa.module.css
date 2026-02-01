@@ -5,6 +5,28 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #343a40;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.icon {
+  font-size: 2rem;
+}
+
+.subtitle {
+  text-align: center;
+  color: #6c757d;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
 .calculator {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -18,23 +40,112 @@
 .inputSection {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
-.inputSection h2 {
-  margin: 0 0 1rem 0;
+.headerSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.headerSection h2 {
+  margin: 0;
   color: #343a40;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
+}
+
+.presetBtns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.presetBtn {
+  padding: 6px 12px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.presetBtn:hover {
+  background: #5a6268;
+}
+
+.bulkSection {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.bulkSection label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #495057;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.bulkRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.bulkInput {
+  flex: 1;
+  min-height: 70px;
+  padding: 8px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  resize: vertical;
+  font-family: 'Courier New', monospace;
+}
+
+.bulkInput:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.bulkBtn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #007bff;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  align-self: flex-start;
+  font-size: 0.85rem;
+}
+
+.bulkBtn:hover {
+  background: #0056b3;
 }
 
 .courseRow {
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  padding: 1rem;
+  padding: 0.75rem;
   background: #f8f9fa;
   border-radius: 8px;
   border: 1px solid #dee2e6;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .courseName {
@@ -101,13 +212,13 @@
 
 .addBtn,
 .calculateBtn {
-  padding: 12px 24px;
+  padding: 10px 20px;
   border: none;
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .addBtn {
@@ -120,49 +231,174 @@
   transform: translateY(-1px);
 }
 
-.calculateBtn {
-  background: #007bff;
-  color: white;
-}
-
-.calculateBtn:hover {
-  background: #0056b3;
-  transform: translateY(-1px);
-}
-
 .resultSection {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
-.resultSection h2 {
-  margin: 0;
+.currentGPA {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #dee2e6;
+}
+
+.currentGPA h2 {
+  margin: 0 0 1rem 0;
   color: #343a40;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   text-align: center;
 }
 
 .gpaDisplay {
   text-align: center;
-  padding: 2rem;
-  background: linear-gradient(135deg, #007bff, #0056b3);
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   border-radius: 12px;
   color: white;
+  margin-bottom: 1rem;
 }
 
 .gpaValue {
   display: block;
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: bold;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .gpaLabel {
-  font-size: 1.2rem;
+  font-size: 1rem;
   opacity: 0.9;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+}
+
+.credits {
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.targetSection {
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.targetSection h3 {
+  margin: 0 0 1rem 0;
+  color: #856404;
+  text-align: center;
+}
+
+.targetInput {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.targetGPAInput {
+  width: 80px;
+  padding: 10px;
+  border: 2px solid #ffc107;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.targetGPAInput:focus {
+  outline: none;
+  border-color: #ff9800;
+}
+
+.targetLabel {
+  font-weight: 600;
+  color: #856404;
+}
+
+.prediction {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.predictionText {
+  margin: 0 0 1rem 0;
+  color: #495057;
+  text-align: center;
+}
+
+.requiredGrade {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ff9800;
+  margin-bottom: 0.5rem;
+}
+
+.gradeEquiv {
+  text-align: center;
+  color: #6c757d;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.progressBar {
+  height: 12px;
+  background: #e9ecef;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #20c997);
+  transition: width 0.3s ease;
+}
+
+.gradeDistribution {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.gradeDistribution h3 {
+  margin: 0 0 1rem 0;
+  color: #343a40;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.distributionGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.distItem {
+  background: #f8f9fa;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.distGrade {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.distCount {
+  color: #6c757d;
+  font-size: 0.9rem;
 }
 
 .gradeScale {
@@ -210,27 +446,60 @@
     padding: 1rem;
   }
 
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
   .calculator {
     grid-template-columns: 1fr;
     padding: 1.5rem;
     gap: 1.5rem;
   }
 
-  .courseRow {
+  .headerSection {
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
     gap: 0.5rem;
-    padding: 0.75rem;
   }
 
-  .courseName,
+  .presetBtns {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .bulkRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bulkBtn {
+    align-self: stretch;
+  }
+
+  .courseRow {
+    flex-wrap: wrap;
+  }
+
+  .checkbox {
+    order: -1;
+  }
+
+  .courseName {
+    flex: 1 1 100%;
+    order: 0;
+  }
+
   .gradeSelect,
   .creditsInput {
-    width: 100%;
+    order: 1;
   }
 
   .removeBtn {
-    align-self: flex-end;
+    order: 2;
     width: 28px;
     height: 28px;
     font-size: 14px;
@@ -241,7 +510,7 @@
   }
 
   .gpaValue {
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .scaleGrid {
@@ -261,6 +530,15 @@
   }
 
   .gpaValue {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+
+  .targetGPAInput {
+    font-size: 1.25rem;
+    width: 70px;
+  }
+
+  .requiredGrade {
+    font-size: 1.5rem;
   }
 }
