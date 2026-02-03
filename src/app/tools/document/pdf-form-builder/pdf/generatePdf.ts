@@ -46,7 +46,7 @@ export async function generateFillablePdf(fields: FormField[], formTitle: string
         case "text": {
           const textField = form.createTextField(field.id);
           textField.setText("");
-          textField.enableMultiline(false);
+          textField.enableMultiline();
           textField.setFontSize(10);
           textField.addToPage(page, {
             x: field.x,
@@ -62,7 +62,7 @@ export async function generateFillablePdf(fields: FormField[], formTitle: string
         case "textarea": {
           const textAreaField = form.createTextField(field.id);
           textAreaField.setText("");
-          textAreaField.enableMultiline(true);
+          textAreaField.enableMultiline();
           textAreaField.setFontSize(10);
           textAreaField.addToPage(page, {
             x: field.x,

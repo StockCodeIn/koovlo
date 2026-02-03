@@ -83,17 +83,32 @@ export default function FormBuilder() {
   const selectedField = fields.find((f) => f.id === selectedId) || null;
 
   const addField = (type: FormField["type"]) => {
-    const newField: FormField = {
-      id: Date.now().toString(),
-      type,
-      label: `New ${type} field`,
-      required: false,
-      x: 50,
-      y: 50 + fields.length * 60,
-      width: type === "textarea" ? 400 : 300,
-      height: type === "textarea" ? 100 : type === "signature" ? 80 : 40,
-      ...(type === "select" || type === "radio" ? { options: ["Option 1", "Option 2"] } : {})
-    };
+    let newField: FormField;
+
+    if (type === "select" || type === "radio") {
+      newField = {
+        id: Date.now().toString(),
+        type,
+        label: `New ${type} field`,
+        required: false,
+        x: 50,
+        y: 50 + fields.length * 60,
+        width: 300,
+        height: 120,
+        options: ["Option 1", "Option 2"],
+      };
+    } else {
+      newField = {
+        id: Date.now().toString(),
+        type,
+        label: `New ${type} field`,
+        required: false,
+        x: 50,
+        y: 50 + fields.length * 60,
+        width: type === "textarea" ? 400 : 300,
+        height: type === "textarea" ? 100 : type === "signature" ? 80 : 40,
+      };
+    }
     setFields((prev) => [...prev, newField]);
     setSelectedId(newField.id);
   };
@@ -162,7 +177,9 @@ export default function FormBuilder() {
     }
     try {
       const pdfBytes = await generateFillablePdf(fields, formName);
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const bytes = new Uint8Array(pdfBytes);
+      const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+      const blob = new Blob([buffer], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
