@@ -2,23 +2,19 @@
 "use client";
 
 import FormBuilder from "./FormBuilder";
+import styles from './pdf-form-builder.module.css';
 
 export default function PdfFormBuilderPage() {
   return (
-    <main style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      <header
-        style={{
-          padding: "12px 16px",
-          borderBottom: "1px solid #e5e7eb",
-          fontWeight: 600,
-        }}
-      >
-        🧾 Create Fillable PDF Form
+    <main className={styles.container}>
+      <header className={styles.header}>
+        <div className={styles.headerContent}>
+          <h1>📝 PDF Form Builder</h1>
+          <p>Create professional fillable PDF forms in minutes - 100% Free!</p>
+        </div>
       </header>
-
-      <div style={{ flex: 1, overflow: "hidden" }}>
-        <FormBuilder />
-      </div>
+      <FormBuilder />
     </main>
   );
 }
+

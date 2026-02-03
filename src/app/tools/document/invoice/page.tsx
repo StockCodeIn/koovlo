@@ -1,150 +1,799 @@
 'use client';
 
-import { useState } from 'react';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { useState, useRef, useEffect } from 'react';
 import ToolInfo from '@/components/ToolInfo';
+import styles from './invoice.module.css';
+
+interface InvoiceItem {
+  id: string;
+  description: string;
+  quantity: number;
+  rate: number;
+  amount: number;
+}
+
+interface InvoiceData {
+  // Company Details
+  companyName: string;
+  companyEmail: string;
+  companyPhone: string;
+  companyAddress: string;
+  companyLogo: string;
+  
+  // Invoice Details
+  invoiceNumber: string;
+  invoiceDate: string;
+  dueDate: string;
+  
+  // Client Details
+  clientName: string;
+  clientEmail: string;
+  clientPhone: string;
+  clientAddress: string;
+  
+  // Items
+  items: InvoiceItem[];
+  
+  // Financial
+  currency: string;
+  taxRate: number;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  
+  // Additional
+  notes: string;
+  paymentTerms: string;
+  bankDetails: string;
+  signature: string;
+  signatureDate: string;
+  
+  // Styling
+  template: 'modern' | 'classic' | 'minimal' | 'elegant';
+  accentColor: string;
+}
 
 export default function InvoiceGeneratorPage() {
-  const [formData, setFormData] = useState({
+  const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     companyName: '',
-    customerName: '',
-    items: [{ description: '', quantity: 1, price: 0 }],
+    companyEmail: '',
+    companyPhone: '',
+    companyAddress: '',
+    companyLogo: '',
+    invoiceNumber: 'INV-000000',
+    invoiceDate: '',
+    dueDate: '',
+    clientName: '',
+    clientEmail: '',
+    clientPhone: '',
+    clientAddress: '',
+    items: [{ id: '1', description: '', quantity: 1, rate: 0, amount: 0 }],
+    currency: '$',
     taxRate: 0,
-    date: '',
-    subtotal: 0,
-    tax: 0,
-    total: 0
+    discountType: 'percentage',
+    discountValue: 0,
+    notes: '',
+    paymentTerms: 'Payment due within 30 days',
+    bankDetails: '',
+    signature: '',
+    signatureDate: '',
+    template: 'modern',
+    accentColor: '#2563eb'
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  // Initialize on client side only
+  useEffect(() => {
+    setInvoiceData(prev => ({
+      ...prev,
+      invoiceNumber: prev.invoiceNumber === 'INV-000000' ? `INV-${Date.now().toString().slice(-6)}` : prev.invoiceNumber,
+      invoiceDate: prev.invoiceDate === '' ? new Date().toISOString().split('T')[0] : prev.invoiceDate,
+      dueDate: prev.dueDate === '' ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : prev.dueDate,
+      signatureDate: prev.signatureDate === '' ? new Date().toISOString() : prev.signatureDate
+    }));
+  }, []);
+
+  // Auto-save to localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('invoice-draft');
+    if (saved) {
+      try {
+        setInvoiceData(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to load saved invoice');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('invoice-draft', JSON.stringify(invoiceData));
+  }, [invoiceData]);
+
+  // Calculate totals
+  const calculateTotals = () => {
+    const subtotal = invoiceData.items.reduce((sum, item) => sum + item.amount, 0);
+    const discount = invoiceData.discountType === 'percentage' 
+      ? (subtotal * invoiceData.discountValue / 100)
+      : invoiceData.discountValue;
+    const afterDiscount = subtotal - discount;
+    const tax = afterDiscount * (invoiceData.taxRate / 100);
+    const total = afterDiscount + tax;
+    
+    return { subtotal, discount, tax, total };
   };
 
-  const handleItemChange = (index: number, field: string, value: string | number) => {
-    const newItems = [...formData.items];
-    newItems[index] = { ...newItems[index], [field]: value };
-    const subtotal = newItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
-    const tax = subtotal * (formData.taxRate / 100);
-    const total = subtotal + tax;
-    setFormData({ ...formData, items: newItems, subtotal, tax, total });
+  const totals = calculateTotals();
+
+  // Handle logo upload
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setInvoiceData({ ...invoiceData, companyLogo: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  const handleTaxChange = (value: number) => {
-    const tax = formData.subtotal * (value / 100);
-    const total = formData.subtotal + tax;
-    setFormData({ ...formData, taxRate: value, tax, total });
+  // Handle signature upload
+  const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setInvoiceData({ 
+          ...invoiceData, 
+          signature: reader.result as string,
+          signatureDate: new Date().toISOString()
+        });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
+  // Item operations
   const addItem = () => {
-    setFormData({ ...formData, items: [...formData.items, { description: '', quantity: 1, price: 0 }] });
+    const newItem: InvoiceItem = {
+      id: Date.now().toString(),
+      description: '',
+      quantity: 1,
+      rate: 0,
+      amount: 0
+    };
+    setInvoiceData({ ...invoiceData, items: [...invoiceData.items, newItem] });
   };
 
-  const generateInvoice = async () => {
-    const pdfDoc = await PDFDocument.create();
-    const page = pdfDoc.addPage();
-    const { width, height } = page.getSize();
-
-    page.drawText('INVOICE', {
-      x: 50,
-      y: height - 100,
-      size: 24,
-      color: rgb(0, 0, 0),
+  const updateItem = (id: string, field: keyof InvoiceItem, value: string | number) => {
+    const updatedItems = invoiceData.items.map(item => {
+      if (item.id === id) {
+        const updated = { ...item, [field]: value };
+        if (field === 'quantity' || field === 'rate') {
+          updated.amount = updated.quantity * updated.rate;
+        }
+        return updated;
+      }
+      return item;
     });
+    setInvoiceData({ ...invoiceData, items: updatedItems });
+  };
 
-    page.drawText(`From: ${formData.companyName}`, {
-      x: 50,
-      y: height - 130,
-      size: 12,
-      color: rgb(0, 0, 0),
-    });
+  const removeItem = (id: string) => {
+    if (invoiceData.items.length > 1) {
+      setInvoiceData({ 
+        ...invoiceData, 
+        items: invoiceData.items.filter(item => item.id !== id) 
+      });
+    }
+  };
 
-    page.drawText(`To: ${formData.customerName}`, {
-      x: 50,
-      y: height - 150,
-      size: 12,
-      color: rgb(0, 0, 0),
-    });
+  // Export to PDF
+  const exportToPDF = async () => {
+    if (!previewRef.current) return;
 
-    page.drawText(`Date: ${formData.date}`, {
-      x: 50,
-      y: height - 170,
-      size: 12,
-      color: rgb(0, 0, 0),
-    });
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const jsPDF = (await import('jspdf')).default;
 
-    let y = height - 200;
-    page.drawText('Items:', { x: 50, y, size: 12 });
-    y -= 20;
-    formData.items.forEach(item => {
-      page.drawText(`${item.description} - Qty: ${item.quantity} - Price: ${item.price}`, { x: 50, y, size: 10 });
-      y -= 15;
-    });
+      const element = previewRef.current;
+      
+      // Create canvas with proper dimensions
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        logging: false,
+        allowTaint: true,
+        useCORS: true,
+        windowWidth: element.offsetWidth,
+        windowHeight: element.offsetHeight,
+        onclone: (clonedDocument) => {
+          const clonedElement = clonedDocument.querySelector('[class*="preview"]') as HTMLElement;
+          if (clonedElement) {
+            clonedElement.style.transform = 'none';
+            clonedElement.style.maxHeight = 'none';
+            clonedElement.style.overflow = 'visible';
+          }
+        }
+      });
 
-    page.drawText(`Subtotal: ${formData.subtotal}`, {
-      x: 50,
-      y: y - 20,
-      size: 12,
-      color: rgb(0, 0, 0),
-    });
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
 
-    page.drawText(`Tax (${formData.taxRate}%): ${formData.tax}`, {
-      x: 50,
-      y: y - 40,
-      size: 12,
-      color: rgb(0, 0, 0),
-    });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      
+      // Calculate image dimensions
+      const imgWidth = pageWidth - 10; // 5mm margin on each side
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      const imgData = canvas.toDataURL('image/png');
+      
+      let yPosition = 5; // 5mm top margin
+      let remainingHeight = imgHeight;
+      
+      // Add first page
+      pdf.addImage(imgData, 'PNG', 5, yPosition, imgWidth, imgHeight);
+      remainingHeight -= (pageHeight - 10); // 10mm total margin
+      
+      // Add subsequent pages if needed
+      let pageNum = 1;
+      while (remainingHeight > 0) {
+        pageNum++;
+        pdf.addPage();
+        yPosition -= (pageHeight - 10);
+        pdf.addImage(imgData, 'PNG', 5, yPosition, imgWidth, imgHeight);
+        remainingHeight -= (pageHeight - 10);
+      }
+      
+      pdf.save(`invoice-${invoiceData.invoiceNumber}.pdf`);
+    } catch (error) {
+      console.error('PDF Generation Error:', error);
+      alert('Failed to generate PDF. Please try again.');
+    }
+  };
 
-    page.drawText(`Total: ${formData.total}`, {
-      x: 50,
-      y: y - 60,
-      size: 12,
-      color: rgb(0, 0, 0),
-    });
+  // Print invoice
+  const printInvoice = () => {
+    window.print();
+  };
 
-    const pdfBytes = await pdfDoc.save();
-    const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'invoice.pdf';
-    a.click();
-    URL.revokeObjectURL(url);
+  // Clear form
+  const clearForm = () => {
+    if (confirm('Are you sure you want to clear the form?')) {
+      setInvoiceData({
+        ...invoiceData,
+        companyName: '',
+        companyEmail: '',
+        companyPhone: '',
+        companyAddress: '',
+        companyLogo: '',
+        invoiceNumber: `INV-${Date.now().toString().slice(-6)}`,
+        clientName: '',
+        clientEmail: '',
+        clientPhone: '',
+        clientAddress: '',
+        items: [{ id: '1', description: '', quantity: 1, rate: 0, amount: 0 }],
+        notes: '',
+        bankDetails: '',
+        signature: '',
+        signatureDate: new Date().toISOString()
+      });
+    }
   };
 
   return (
-    <main style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <h1>Invoice Generator</h1>
-      <p>Create professional invoices for your business transactions.</p>
+    <main className={styles.container}>
+      <div className={styles.header}>
+        <h1>Professional Invoice Generator</h1>
+        <p>Create beautiful, professional invoices in seconds</p>
+      </div>
 
-      <div style={{ marginBottom: '20px' }}>
-        <label>Company Name: <input type="text" name="companyName" value={formData.companyName} onChange={handleChange} /></label><br />
-        <label>Customer Name: <input type="text" name="customerName" value={formData.customerName} onChange={handleChange} /></label><br />
-        <label>Date: <input type="date" name="date" value={formData.date} onChange={handleChange} /></label><br />
-        <label>Tax Rate (%): <input type="number" value={formData.taxRate} onChange={(e) => handleTaxChange(parseFloat(e.target.value))} /></label><br />
-        
-        <h3>Items</h3>
-        {formData.items.map((item, index) => (
-          <div key={index}>
-            <input type="text" placeholder="Description" value={item.description} onChange={(e) => handleItemChange(index, 'description', e.target.value)} />
-            <input type="number" placeholder="Quantity" value={item.quantity} onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))} />
-            <input type="number" placeholder="Price" value={item.price} onChange={(e) => handleItemChange(index, 'price', parseFloat(e.target.value))} />
+      <div className={styles.mainContent}>
+        {/* Left Panel - Form */}
+        <div className={styles.formPanel}>
+          {/* Template Selection */}
+          <section className={styles.section}>
+            <h2>Template & Style</h2>
+            <div className={styles.templateGrid}>
+              {(['modern', 'classic', 'minimal', 'elegant'] as const).map(template => (
+                <button
+                  key={template}
+                  className={`${styles.templateBtn} ${invoiceData.template === template ? styles.active : ''}`}
+                  onClick={() => setInvoiceData({ ...invoiceData, template })}
+                >
+                  {template.charAt(0).toUpperCase() + template.slice(1)}
+                </button>
+              ))}
+            </div>
+            <div className={styles.formGroup}>
+              <label>Accent Color</label>
+              <input
+                type="color"
+                value={invoiceData.accentColor}
+                onChange={(e) => setInvoiceData({ ...invoiceData, accentColor: e.target.value })}
+                className={styles.colorPicker}
+              />
+            </div>
+          </section>
+
+          {/* Company Details */}
+          <section className={styles.section}>
+            <h2>Your Company Details</h2>
+            <div className={styles.formGroup}>
+              <label>Company Logo</label>
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                className={styles.fileInput}
+              />
+              {invoiceData.companyLogo && (
+                <div className={styles.logoPreview}>
+                  <img src={invoiceData.companyLogo} alt="Logo" />
+                  <button onClick={() => setInvoiceData({ ...invoiceData, companyLogo: '' })}>Remove</button>
+                </div>
+              )}
+            </div>
+            <div className={styles.formGroup}>
+              <label>Company Name *</label>
+              <input
+                type="text"
+                value={invoiceData.companyName}
+                onChange={(e) => setInvoiceData({ ...invoiceData, companyName: e.target.value })}
+                placeholder="Your Company Name"
+              />
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={invoiceData.companyEmail}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, companyEmail: e.target.value })}
+                  placeholder="company@example.com"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Phone</label>
+                <input
+                  type="tel"
+                  value={invoiceData.companyPhone}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, companyPhone: e.target.value })}
+                  placeholder="+1 (555) 000-0000"
+                />
+              </div>
+            </div>
+            <div className={styles.formGroup}>
+              <label>Address</label>
+              <textarea
+                value={invoiceData.companyAddress}
+                onChange={(e) => setInvoiceData({ ...invoiceData, companyAddress: e.target.value })}
+                placeholder="123 Business St, City, State, ZIP"
+                rows={2}
+              />
+            </div>
+          </section>
+
+          {/* Invoice Details */}
+          <section className={styles.section}>
+            <h2>Invoice Details</h2>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Invoice Number *</label>
+                <input
+                  type="text"
+                  value={invoiceData.invoiceNumber}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, invoiceNumber: e.target.value })}
+                  placeholder="INV-001"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Currency</label>
+                <select
+                  value={invoiceData.currency}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, currency: e.target.value })}
+                >
+                  <option value="$">$ USD</option>
+                  <option value="₹">₹ INR</option>
+                  <option value="€">€ EUR</option>
+                  <option value="£">£ GBP</option>
+                  <option value="¥">¥ JPY</option>
+                  <option value="$">$ CAD</option>
+                  <option value="$">$ AUD</option>
+                </select>
+              </div>
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Invoice Date *</label>
+                <input
+                  type="date"
+                  value={invoiceData.invoiceDate}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, invoiceDate: e.target.value })}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Due Date *</label>
+                <input
+                  type="date"
+                  value={invoiceData.dueDate}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, dueDate: e.target.value })}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Client Details */}
+          <section className={styles.section}>
+            <h2>Bill To (Client Details)</h2>
+            <div className={styles.formGroup}>
+              <label>Client Name *</label>
+              <input
+                type="text"
+                value={invoiceData.clientName}
+                onChange={(e) => setInvoiceData({ ...invoiceData, clientName: e.target.value })}
+                placeholder="Client Company or Person Name"
+              />
+            </div>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={invoiceData.clientEmail}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, clientEmail: e.target.value })}
+                  placeholder="client@example.com"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Phone</label>
+                <input
+                  type="tel"
+                  value={invoiceData.clientPhone}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, clientPhone: e.target.value })}
+                  placeholder="+1 (555) 000-0000"
+                />
+              </div>
+            </div>
+            <div className={styles.formGroup}>
+              <label>Address</label>
+              <textarea
+                value={invoiceData.clientAddress}
+                onChange={(e) => setInvoiceData({ ...invoiceData, clientAddress: e.target.value })}
+                placeholder="Client address"
+                rows={2}
+              />
+            </div>
+          </section>
+
+          {/* Items */}
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2>Items / Services</h2>
+              <button onClick={addItem} className={styles.addBtn}>+ Add Item</button>
+            </div>
+            <div className={styles.itemsContainer}>
+              {invoiceData.items.map((item, index) => (
+                <div key={item.id} className={styles.itemRow}>
+                  <div className={styles.itemNumber}>{index + 1}</div>
+                  <div className={styles.itemFields}>
+                    <div className={styles.formGroup}>
+                      <label>Description *</label>
+                      <input
+                        type="text"
+                        value={item.description}
+                        onChange={(e) => updateItem(item.id, 'description', e.target.value)}
+                        placeholder="Product or service description"
+                      />
+                    </div>
+                    <div className={styles.formRow}>
+                      <div className={styles.formGroup}>
+                        <label>Quantity</label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={item.quantity}
+                          onChange={(e) => updateItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Rate</label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={item.rate}
+                          onChange={(e) => updateItem(item.id, 'rate', parseFloat(e.target.value) || 0)}
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Amount</label>
+                        <input
+                          type="text"
+                          value={`${invoiceData.currency}${item.amount.toFixed(2)}`}
+                          readOnly
+                          className={styles.readOnly}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  {invoiceData.items.length > 1 && (
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className={styles.removeBtn}
+                      title="Remove item"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Financial Details */}
+          <section className={styles.section}>
+            <h2>Tax & Discount</h2>
+            <div className={styles.formRow}>
+              <div className={styles.formGroup}>
+                <label>Tax Rate (%)</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  value={invoiceData.taxRate}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, taxRate: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>Discount Type</label>
+                <select
+                  value={invoiceData.discountType}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, discountType: e.target.value as 'percentage' | 'fixed' })}
+                >
+                  <option value="percentage">Percentage (%)</option>
+                  <option value="fixed">Fixed Amount</option>
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label>Discount Value</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={invoiceData.discountValue}
+                  onChange={(e) => setInvoiceData({ ...invoiceData, discountValue: parseFloat(e.target.value) || 0 })}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* Signature */}
+          <section className={styles.section}>
+            <h2>Authorized Signature</h2>
+            <div className={styles.formGroup}>
+              <label>Upload Signature</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleSignatureUpload}
+                className={styles.fileInput}
+              />
+              {invoiceData.signature && (
+                <div className={styles.signaturePreview}>
+                  <img src={invoiceData.signature} alt="Signature" />
+                  <button onClick={() => setInvoiceData({ ...invoiceData, signature: '' })}>Remove</button>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Additional Info */}
+          <section className={styles.section}>
+            <h2>Additional Information</h2>
+            <div className={styles.formGroup}>
+              <label>Payment Terms</label>
+              <textarea
+                value={invoiceData.paymentTerms}
+                onChange={(e) => setInvoiceData({ ...invoiceData, paymentTerms: e.target.value })}
+                placeholder="Payment due within 30 days"
+                rows={2}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Bank Details</label>
+              <textarea
+                value={invoiceData.bankDetails}
+                onChange={(e) => setInvoiceData({ ...invoiceData, bankDetails: e.target.value })}
+                placeholder="Bank Name: XYZ Bank&#10;Account Number: 1234567890&#10;Routing Number: 987654321"
+                rows={3}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>Notes</label>
+              <textarea
+                value={invoiceData.notes}
+                onChange={(e) => setInvoiceData({ ...invoiceData, notes: e.target.value })}
+                placeholder="Thank you for your business!"
+                rows={3}
+              />
+            </div>
+          </section>
+
+          {/* Actions */}
+          <div className={styles.actions}>
+            <button onClick={exportToPDF} className={styles.primaryBtn}>
+              📄 Download PDF
+            </button>
+            <button onClick={printInvoice} className={styles.secondaryBtn}>
+              🖨️ Print
+            </button>
+            <button onClick={clearForm} className={styles.secondaryBtn}>
+              🗑️ Clear
+            </button>
           </div>
-        ))}
-        <button onClick={addItem}>Add Item</button><br />
-        <strong>Subtotal: {formData.subtotal}</strong><br />
-        <strong>Tax: {formData.tax}</strong><br />
-        <strong>Total: {formData.total}</strong><br />
-        <button onClick={generateInvoice} style={{ marginTop: '10px', padding: '10px 20px' }}>Generate Invoice</button>
+        </div>
+
+        {/* Right Panel - Preview */}
+        <div className={styles.previewPanel}>
+          <div className={styles.previewHeader}>
+            <h3>Live Preview</h3>
+          </div>
+          <div 
+            ref={previewRef} 
+            className={`${styles.preview} ${styles[invoiceData.template]}`}
+            style={{ '--accent-color': invoiceData.accentColor } as React.CSSProperties}
+          >
+            {/* Invoice Header */}
+            <div className={styles.invoiceHeader}>
+              <div className={styles.companyInfo}>
+                {invoiceData.companyLogo && (
+                  <img src={invoiceData.companyLogo} alt="Logo" className={styles.logo} />
+                )}
+                <h1>{invoiceData.companyName || 'Your Company'}</h1>
+                {invoiceData.companyEmail && <p>{invoiceData.companyEmail}</p>}
+                {invoiceData.companyPhone && <p>{invoiceData.companyPhone}</p>}
+                {invoiceData.companyAddress && <p className={styles.address}>{invoiceData.companyAddress}</p>}
+              </div>
+              <div className={styles.invoiceInfo}>
+                <h2 className={styles.invoiceTitle}>INVOICE</h2>
+                <div className={styles.invoiceMeta}>
+                  <div>
+                    <span className={styles.label}>Invoice #:</span>
+                    <span className={styles.value}>{invoiceData.invoiceNumber}</span>
+                  </div>
+                  <div>
+                    <span className={styles.label}>Date:</span>
+                    <span className={styles.value}>{invoiceData.invoiceDate}</span>
+                  </div>
+                  {invoiceData.dueDate && (
+                    <div>
+                      <span className={styles.label}>Due Date:</span>
+                      <span className={styles.value}>{invoiceData.dueDate}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Bill To */}
+            <div className={styles.billTo}>
+              <h3>Bill To:</h3>
+              <p className={styles.clientName}>{invoiceData.clientName || 'Client Name'}</p>
+              {invoiceData.clientEmail && <p>{invoiceData.clientEmail}</p>}
+              {invoiceData.clientPhone && <p>{invoiceData.clientPhone}</p>}
+              {invoiceData.clientAddress && <p className={styles.address}>{invoiceData.clientAddress}</p>}
+            </div>
+
+            {/* Items Table */}
+            <table className={styles.itemsTable}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Description</th>
+                  <th>Qty</th>
+                  <th>Rate</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {invoiceData.items.map((item, index) => (
+                  <tr key={item.id}>
+                    <td>{index + 1}</td>
+                    <td>{item.description || 'Item description'}</td>
+                    <td>{item.quantity}</td>
+                    <td>{invoiceData.currency}{item.rate.toFixed(2)}</td>
+                    <td>{invoiceData.currency}{item.amount.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Totals */}
+            <div className={styles.totals}>
+              <div className={styles.totalRow}>
+                <span>Subtotal:</span>
+                <span>{invoiceData.currency}{totals.subtotal.toFixed(2)}</span>
+              </div>
+              {totals.discount > 0 && (
+                <div className={styles.totalRow}>
+                  <span>Discount ({invoiceData.discountType === 'percentage' ? `${invoiceData.discountValue}%` : invoiceData.currency + invoiceData.discountValue}):</span>
+                  <span>-{invoiceData.currency}{totals.discount.toFixed(2)}</span>
+                </div>
+              )}
+              {invoiceData.taxRate > 0 && (
+                <div className={styles.totalRow}>
+                  <span>Tax ({invoiceData.taxRate}%):</span>
+                  <span>{invoiceData.currency}{totals.tax.toFixed(2)}</span>
+                </div>
+              )}
+              <div className={`${styles.totalRow} ${styles.grandTotal}`}>
+                <span>Total:</span>
+                <span>{invoiceData.currency}{totals.total.toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* Footer Info */}
+            <div className={styles.invoiceFooter}>
+              {invoiceData.paymentTerms && (
+                <div className={styles.footerSection}>
+                  <h4>Payment Terms</h4>
+                  <p>{invoiceData.paymentTerms}</p>
+                </div>
+              )}
+              {invoiceData.bankDetails && (
+                <div className={styles.footerSection}>
+                  <h4>Bank Details</h4>
+                  <p style={{ whiteSpace: 'pre-line' }}>{invoiceData.bankDetails}</p>
+                </div>
+              )}
+              {invoiceData.notes && (
+                <div className={styles.footerSection}>
+                  <h4>Notes</h4>
+                  <p>{invoiceData.notes}</p>
+                </div>
+              )}
+              {invoiceData.signature && (
+                <div className={styles.footerSection}>
+                  <h4>Authorized Signature</h4>
+                  <div className={styles.signatureDisplay}>
+                    <img src={invoiceData.signature} alt="Signature" />
+                    <div className={styles.signatureLine}></div>
+                    {invoiceData.signatureDate && (
+                      <p className={styles.signatureDate}>
+                        Signed: {new Date(invoiceData.signatureDate).toLocaleDateString()} at {new Date(invoiceData.signatureDate).toLocaleTimeString()}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       <ToolInfo
-        howItWorks="1. Enter billing information<br>2. Add products/services and amounts<br>3. Generate and download invoice"
+        howItWorks="1. Choose a template and customize colors<br>2. Fill in your company and client details<br>3. Add items with quantities and rates<br>4. Apply tax and discounts if needed<br>5. Download PDF or print directly"
         faqs={[
-          { title: "What's the difference between invoice and bill?", content: "An invoice is a bill sent to customers requesting payment." },
-          { title: "Can I add taxes?", content: "Yes, you can include tax calculations and discounts." }
+          { title: "Can I save my invoice for later?", content: "Yes! Your invoice is automatically saved to your browser's local storage." },
+          { title: "What's the difference between invoice and bill?", content: "An invoice is a commercial document for business transactions, while a bill is a request for immediate payment." },
+          { title: "Can I customize the look?", content: "Yes! Choose from 4 templates and customize the accent color to match your brand." },
+          { title: "How do discounts work?", content: "You can apply either percentage-based discounts (e.g., 10%) or fixed amount discounts." }
         ]}
-        tips={["Include payment terms and due dates", "Use clear item descriptions", "Keep records of all invoices"]}
+        tips={[
+          "Always include payment terms and due dates",
+          "Add your bank details for faster payments",
+          "Use professional language in notes section",
+          "Keep your invoice numbers sequential",
+          "Include detailed item descriptions"
+        ]}
       />
     </main>
   );

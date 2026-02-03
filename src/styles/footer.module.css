@@ -153,6 +153,15 @@
   .social .icons {
     justify-content: center;
   }
+
+  .form {
+    flex-direction: column;
+  }
+
+  .form input,
+  .form button {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -162,5 +171,13 @@
   }
   .form input {
     width: 100%;
+  }
+
+  .newsletter {
+    margin-bottom: 40px;
+  }
+
+  .bottom {
+    font-size: 0.85rem;
   }
 }

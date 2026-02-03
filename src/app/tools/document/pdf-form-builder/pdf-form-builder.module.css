@@ -1,0 +1,524 @@
+.container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+}
+
+.header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.headerContent h1 {
+  font-size: 1.8rem;
+  margin: 0 0 8px 0;
+  font-weight: 700;
+}
+
+.headerContent p {
+  margin: 0;
+  opacity: 0.95;
+  font-size: 0.95rem;
+}
+
+.builderWrapper {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Form Builder Styles */
+.formBuilder {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  height: 100%;
+  gap: 0;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  background: white;
+  border-right: 1px solid #e2e8f0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebarHeader {
+  padding: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.sidebarHeader h2 {
+  font-size: 1.1rem;
+  margin: 0 0 5px 0;
+  color: #1e293b;
+}
+
+.sidebarHeader p {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.sidebarContent {
+  padding: 15px;
+  flex: 1;
+}
+
+/* Toolbar */
+.toolbar {
+  padding: 15px 20px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toolBtn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolBtn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.toolBtn.primary {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.toolBtn.primary:hover {
+  background: #5568d3;
+}
+
+/* Templates Section */
+.templatesSection {
+  margin-bottom: 20px;
+}
+
+.templatesSection h3 {
+  font-size: 0.9rem;
+  color: #475569;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.templateGrid {
+  display: grid;
+  gap: 10px;
+}
+
+.templateCard {
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.templateCard:hover {
+  border-color: #667eea;
+  background: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.1);
+}
+
+.templateCard h4 {
+  font-size: 0.9rem;
+  margin: 0 0 4px 0;
+  color: #1e293b;
+}
+
+.templateCard p {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Field Palette */
+.fieldPalette {
+  display: grid;
+  gap: 8px;
+}
+
+.fieldBtn {
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fieldBtn:hover {
+  border-color: #667eea;
+  background: #f8fafc;
+  transform: translateX(4px);
+}
+
+.fieldIcon {
+  width: 32px;
+  height: 32px;
+  background: #eff6ff;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.fieldInfo h4 {
+  font-size: 0.85rem;
+  margin: 0 0 2px 0;
+  color: #1e293b;
+}
+
+.fieldInfo p {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Canvas */
+.canvas {
+  background: #f1f5f9;
+  position: relative;
+  overflow: auto;
+  padding: 40px;
+}
+
+.canvasPage {
+  width: 595px;
+  min-height: 842px;
+  background: white;
+  margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+  padding: 40px;
+}
+
+.emptyState {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #94a3b8;
+  max-width: 300px;
+}
+
+.emptyState h3 {
+  font-size: 1.2rem;
+  margin: 0 0 8px 0;
+}
+
+.emptyState p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Field on Canvas */
+.canvasField {
+  position: absolute;
+  border: 2px dashed #cbd5e1;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: move;
+  padding: 8px;
+  transition: all 0.2s;
+}
+
+.canvasField:hover {
+  border-color: #667eea;
+  background: rgba(239, 246, 255, 0.5);
+}
+
+.canvasField.selected {
+  border: 2px solid #667eea;
+  background: rgba(239, 246, 255, 0.8);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.fieldLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.required {
+  color: #ef4444;
+}
+
+.fieldPreview {
+  pointer-events: none;
+}
+
+.resizeHandle {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 12px;
+  height: 12px;
+  background: #667eea;
+  border-radius: 2px;
+  cursor: nwse-resize;
+}
+
+.deleteBtn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 24px;
+  height: 24px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.canvasField:hover .deleteBtn {
+  display: flex;
+}
+
+/* Properties Panel */
+.propertiesPanel {
+  background: white;
+  border-left: 1px solid #e2e8f0;
+  overflow-y: auto;
+}
+
+.propertiesEmpty {
+  padding: 40px 20px;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.propertiesEmpty h3 {
+  font-size: 1rem;
+  margin: 0 0 8px 0;
+}
+
+.propertiesEmpty p {
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.propertiesContent {
+  padding: 20px;
+}
+
+.propSection {
+  margin-bottom: 24px;
+}
+
+.propSection h3 {
+  font-size: 0.85rem;
+  color: #475569;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 0.85rem;
+  color: #475569;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.formGroup input[type="text"],
+.formGroup input[type="number"],
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.gridRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.optionItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.optionItem input {
+  flex: 1;
+}
+
+.optionItem button {
+  padding: 4px 8px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.addOptionBtn {
+  padding: 6px 12px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-top: 8px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .formBuilder {
+    grid-template-columns: 250px 1fr 280px;
+  }
+}
+
+@media (max-width: 900px) {
+  .formBuilder {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .toolbarLeft,
+  .toolbarRight {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .sidebar,
+  .propertiesPanel {
+    display: block;
+    border: none;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .sidebarHeader {
+    padding: 14px 16px;
+  }
+
+  .sidebarContent {
+    padding: 12px;
+  }
+
+  .templateGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .fieldPalette {
+    grid-template-columns: 1fr;
+  }
+
+  .canvas {
+    padding: 16px;
+  }
+
+  .canvasPage {
+    width: 100%;
+    min-height: 640px;
+    padding: 20px;
+  }
+
+  .canvasField {
+    min-width: 140px;
+  }
+
+  .propertiesContent {
+    padding: 16px;
+  }
+}

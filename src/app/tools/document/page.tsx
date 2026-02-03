@@ -2,31 +2,115 @@
 import ToolCard from "@/components/ToolCard";
 import styles from "../tools-common.module.css";
 
-export const metadata = {
-    title: "Document Tools – Koovlo",
-    description:
-        "Free online document generators and templates: resumes, invoices, certificates, and more.",
+const tools = [
+    {
+        title: "Resume & CV Builder",
+        desc: "Create ATS-ready resumes with templates and PDF export.",
+        link: "/tools/document/resume-builder",
+        icon: "📄",
+    },
+    {
+        title: "Invoice Generator",
+        desc: "Build professional invoices with totals, taxes, and branding.",
+        link: "/tools/document/invoice",
+        icon: "💳",
+    },
+    {
+        title: "PDF Form Builder",
+        desc: "Design fillable PDF forms with drag & drop fields.",
+        link: "/tools/document/pdf-form-builder",
+        icon: "📝",
+    },
+];
 
-};
+const faqs = [
+    {
+        q: "Are these document tools free to use?",
+        a: "Yes. All document tools are completely free and work directly in your browser.",
+    },
+    {
+        q: "Do I need to create an account?",
+        a: "No account is required. You can open a tool and start creating right away.",
+    },
+    {
+        q: "Can I download documents as PDF?",
+        a: "Yes. Most tools support PDF export so you can share or print your documents easily.",
+    },
+    {
+        q: "Is my data safe?",
+        a: "Your data stays in your browser for these tools, and you can delete it anytime.",
+    },
+];
 
 export default function DocumentToolsPage() {
     return (
-
         <main className={styles.container}>
-            <h1 className={styles.pageTitle}>
-                <span className={styles.icon}>📋</span>
-                <span className={styles.textGradient}>Document Tools</span>
-            </h1>
-            <p className={styles.subText}>
-                Create and generate various professional documents easily and quickly.
-            </p>
+            <section className={styles.hero}>
+                <h1 className={styles.pageTitle}>
+                    <span className={styles.icon}>📋</span>
+                    <span className={styles.textGradient}>Document Tools</span>
+                </h1>
+                <p className={styles.subText}>
+                    Create professional documents in minutes. Pick a tool below to build resumes, invoices, and fillable PDF forms — fast, free, and mobile-friendly.
+                </p>
+            </section>
 
-            <div className={styles.grid}>
-                <ToolCard title="Resume Builder" desc="Create professional resumes with PDF export" link="/tools/document/resume-builder" icon="📄" />
-                <ToolCard title="CV Builder" desc="Build comprehensive CVs" link="/tools/document/cv-builder" icon="📋" />
-                <ToolCard title="Invoice Generator" desc="Generate professional invoices" link="/tools/document/invoice" icon="💳" />
-                <ToolCard title="PDF Form Builder" desc="Create fillable PDF forms" link="/tools/document/pdf-form-builder" icon="📝" />
-            </div>
+            <section className={styles.section}>
+                <div className={styles.sectionHeader}>
+                    <h2>Popular Document Tools</h2>
+                    <p>Choose a tool and start creating instantly.</p>
+                </div>
+                <div className={styles.grid}>
+                    {tools.map((tool) => (
+                        <ToolCard
+                            key={tool.title}
+                            title={tool.title}
+                            desc={tool.desc}
+                            link={tool.link}
+                            icon={tool.icon}
+                        />
+                    ))}
+                </div>
+            </section>
+
+            <section className={styles.section}>
+                <div className={styles.sectionHeader}>
+                    <h2>Why use Koovlo Document Tools?</h2>
+                    <p>Built for speed, quality, and a great mobile experience.</p>
+                </div>
+                <div className={styles.featureGrid}>
+                    <div className={styles.featureCard}>
+                        <div className={styles.featureIcon}>⚡</div>
+                        <h3>Fast & Simple</h3>
+                        <p>Get professional results with easy-to-use templates and smart defaults.</p>
+                    </div>
+                    <div className={styles.featureCard}>
+                        <div className={styles.featureIcon}>📱</div>
+                        <h3>Mobile Friendly</h3>
+                        <p>Create and download documents from any device — desktop or phone.</p>
+                    </div>
+                    <div className={styles.featureCard}>
+                        <div className={styles.featureIcon}>🔒</div>
+                        <h3>Privacy First</h3>
+                        <p>Your data stays in your browser. You stay in control.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section className={styles.section}>
+                <div className={styles.sectionHeader}>
+                    <h2>Frequently Asked Questions</h2>
+                    <p>Quick answers to common questions.</p>
+                </div>
+                <div className={styles.faqGrid}>
+                    {faqs.map((item) => (
+                        <div key={item.q} className={styles.faqCard}>
+                            <h3>{item.q}</h3>
+                            <p>{item.a}</p>
+                        </div>
+                    ))}
+                </div>
+            </section>
         </main>
     );
 }

@@ -4,6 +4,31 @@
   padding: 40px 20px 80px;
 }
 
+.hero {
+  text-align: center;
+  padding: 10px 0 20px;
+}
+
+
+.section {
+  margin-top: 40px;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.sectionHeader h2 {
+  font-size: 1.35rem;
+  margin-bottom: 6px;
+}
+
+.sectionHeader p {
+  color: var(--brand-muted);
+  font-size: 0.98rem;
+}
+
 
 .pageTitle {
   font-size: 2rem;
@@ -44,6 +69,61 @@
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
+.featureGrid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.featureCard {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px;
+  text-align: left;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+
+.featureIcon {
+  font-size: 1.4rem;
+  margin-bottom: 6px;
+}
+
+.featureCard h3 {
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+}
+
+.featureCard p {
+  margin: 0;
+  color: var(--brand-muted);
+  font-size: 0.95rem;
+}
+
+.faqGrid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.faqCard {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.faqCard h3 {
+  margin: 0 0 6px 0;
+  font-size: 1rem;
+}
+
+.faqCard p {
+  margin: 0;
+  color: var(--brand-muted);
+  font-size: 0.95rem;
+}
+
 .grid :global(.card) {
   animation: fadeIn 0.4s ease;
 }
@@ -72,5 +152,9 @@
 
   .grid {
     gap: 14px;
+  }
+
+  .sectionHeader h2 {
+    font-size: 1.2rem;
   }
 }

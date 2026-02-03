@@ -208,6 +208,47 @@
   gap: 8px;
 }
 
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.templateCard {
+  border: 1px solid #e0e0e0;
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.templateCard:hover {
+  border-color: #667eea;
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.15);
+  transform: translateY(-1px);
+}
+
+.activeTemplate {
+  border-color: #667eea;
+  background: #f2f4ff;
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.2);
+}
+
+.templateTitle {
+  display: block;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.templateDesc {
+  display: block;
+  font-size: 12px;
+  color: #666;
+}
+
 .themeBtn {
   width: 32px;
   height: 32px;
@@ -364,6 +405,10 @@
   border-bottom-color: #667eea;
 }
 
+.theme-blue {
+  --accent: #667eea;
+}
+
 .theme-blue .resumeSection h2 {
   color: #667eea;
   border-bottom-color: #667eea;
@@ -376,6 +421,10 @@
 
 .theme-green .resumeHeader {
   border-bottom-color: #28a745;
+}
+
+.theme-green {
+  --accent: #28a745;
 }
 
 .theme-green .resumeSection h2 {
@@ -392,6 +441,10 @@
   border-bottom-color: #764ba2;
 }
 
+.theme-purple {
+  --accent: #764ba2;
+}
+
 .theme-purple .resumeSection h2 {
   color: #764ba2;
   border-bottom-color: #764ba2;
@@ -404,6 +457,144 @@
 
 .theme-dark .resumeHeader {
   border-bottom-color: #343a40;
+}
+
+.theme-dark {
+  --accent: #343a40;
+}
+
+/* Template Styles */
+.template-classic .resumeHeader {
+  text-align: center;
+}
+
+.template-classic .resumeSection h2 {
+  position: relative;
+  padding-left: 0.75rem;
+}
+
+.template-classic .resumeSection h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 70%;
+  background: var(--accent, #667eea);
+  border-radius: 4px;
+}
+
+.template-modern .resumeHeader {
+  text-align: left;
+  border-bottom-width: 2px;
+}
+
+.template-modern .resumeHeader .contact {
+  justify-content: flex-start;
+}
+
+.template-modern .resumeHeader .contact span {
+  background: rgba(0, 0, 0, 0.04);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.template-modern .resumeSection {
+  border-left: 3px solid var(--accent, #667eea);
+  padding-left: 1rem;
+}
+
+.template-modern .resumeSection h2 {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 1.05rem;
+  border-bottom: none;
+  padding-bottom: 0.25rem;
+}
+
+.template-minimal .resumeHeader {
+  border-bottom: none;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.template-minimal .resumeHeader .contact span {
+  border: 1px solid #e6e6e6;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.template-minimal .resumeSection h2 {
+  border-bottom: none;
+  font-weight: 600;
+  color: #444;
+  text-transform: uppercase;
+  font-size: 1rem;
+  letter-spacing: 0.6px;
+}
+
+.template-minimal .resumeEntry h3 {
+  font-size: 1rem;
+}
+
+.template-creative .resumeHeader {
+  background: var(--accent, #667eea);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border-bottom: none;
+}
+
+.template-creative .resumeHeader .contact {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.template-creative.resumePreview {
+  border: 2px solid var(--accent, #667eea);
+  background: linear-gradient(180deg, rgba(102, 126, 234, 0.06), transparent 30%);
+}
+
+.template-creative .resumeSection h2 {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(102, 126, 234, 0.12);
+  border-bottom: none;
+}
+
+/* Font Styles */
+.font-serif {
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+.font-sans {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.font-modern {
+  font-family: 'Inter', 'Segoe UI', 'Arial', sans-serif;
+}
+
+/* Density (Spacing) */
+.density-compact .resumeSection {
+  margin-bottom: 1rem;
+}
+
+.density-compact .resumeEntry {
+  margin-bottom: 0.6rem;
+}
+
+.density-compact .resumeEntry p {
+  line-height: 1.4;
+}
+
+.density-airy .resumeSection {
+  margin-bottom: 2rem;
+}
+
+.density-airy .resumeEntry p {
+  line-height: 1.8;
 }
 
 .theme-dark .resumeSection h2 {

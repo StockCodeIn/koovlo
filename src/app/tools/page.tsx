@@ -3,16 +3,43 @@ import ToolCard from "@/components/ToolCard";
 import styles from "./tools.module.css";
 import ToolsNav from "@/components/ToolsNav";
 
+const faqs = [
+  {
+    q: "Are all tools free to use?",
+    a: "Yes, all Koovlo tools are free and available directly in your browser.",
+  },
+  {
+    q: "Do I need to create an account?",
+    a: "No signup required. Just open any tool and start using it.",
+  },
+  {
+    q: "Is my data safe?",
+    a: "Most tools process data locally in your browser for better privacy.",
+  },
+  {
+    q: "Can I use these tools on mobile?",
+    a: "Yes. The tools are designed to work smoothly on phones and tablets.",
+  },
+];
+
 export default function AllTools() {
   return (
     <>
       <ToolsNav />
       <main className={styles.container}>
-        <h1 className={styles.mainTitle}>All Tools</h1>
+        <section className={styles.hero}>
+          <h1 className={styles.mainTitle}>All Tools</h1>
+          <p className={styles.subText}>
+            Explore every Koovlo tool in one place. Edit PDFs, images, documents, and text — fast, free, and mobile-friendly.
+          </p>
+        </section>
 
         {/* PDF Tools */}
         <section className={styles.section}>
-          <h2>📄 PDF Tools</h2>
+          <div className={styles.sectionHeader}>
+            <h2>📄 PDF Tools</h2>
+            <p>Merge, split, compress, convert, and manage PDFs easily.</p>
+          </div>
           <div className={styles.grid}>
             <ToolCard title="PDF Merge" desc="Combine multiple PDF files into one document" link="/tools/pdf/merge" icon="📎" />
             <ToolCard title="Extract PDF Pages" desc="Create a new PDF using selected pages only" link="/tools/pdf/extract-pages" icon="✂️" />
@@ -37,7 +64,10 @@ export default function AllTools() {
 
         {/* Image Tools */}
         <section className={styles.section}>
-          <h2>🖼️ Image Tools</h2>
+          <div className={styles.sectionHeader}>
+            <h2>🖼️ Image Tools</h2>
+            <p>Resize, compress, convert, and protect your images.</p>
+          </div>
           <div className={styles.grid}>
             <ToolCard title="Image Resize" desc="Resize multiple images with presets, percentage, or exact dimensions." link="/tools/image/resize" icon="📏" />
             <ToolCard title="Image Compress" desc="Compress multiple images at once. Fast, private, and free." link="/tools/image/compress" icon="🗜️" />
@@ -49,7 +79,10 @@ export default function AllTools() {
 
         {/* Education Tools */}
         <section className={styles.section}>
-          <h2>🎓 Education Tools</h2>
+          <div className={styles.sectionHeader}>
+            <h2>🎓 Education Tools</h2>
+            <p>Calculators and study helpers for students and teachers.</p>
+          </div>
           <div className={styles.grid}>
             <ToolCard title="Percentage Calculator" desc="Calculate exam percentage" link="/tools/education/percentage" icon="📊" />
             <ToolCard title="CGPA Calculator" desc="Calculate overall CGPA across all semesters with credits & percentage" link="/tools/education/cgpa" icon="📘" />
@@ -67,10 +100,12 @@ export default function AllTools() {
 
         {/* Document / Template Tools */}
         <section className={styles.section}>
-          <h2>📋 Document Tools</h2>
+          <div className={styles.sectionHeader}>
+            <h2>📋 Document Tools</h2>
+            <p>Create resumes, invoices, and fillable documents.</p>
+          </div>
           <div className={styles.grid}>
-            <ToolCard title="Resume Builder" desc="Create professional resumes with PDF export" link="/tools/document/resume-builder" icon="📄" />
-            <ToolCard title="CV Builder" desc="Build comprehensive CVs" link="/tools/document/cv-builder" icon="📋" />
+            <ToolCard title="Resume & CV Builder" desc="Create ATS-ready resumes with templates and PDF export" link="/tools/document/resume-builder" icon="📄" />
             <ToolCard title="Invoice Generator" desc="Generate professional invoices" link="/tools/document/invoice" icon="💳" />
             <ToolCard title="PDF Form Builder" desc="Create fillable PDF forms" link="/tools/document/pdf-form-builder" icon="📝" />
           </div>
@@ -78,7 +113,10 @@ export default function AllTools() {
 
         {/* Text / Web Tools */}
         <section className={styles.section}>
-          <h2>📝 Text/Web Tools</h2>
+          <div className={styles.sectionHeader}>
+            <h2>📝 Text/Web Tools</h2>
+            <p>Analyze, convert, and transform text instantly.</p>
+          </div>
           <div className={styles.grid}>
             <ToolCard title="Word Counter" desc="Count words, characters & reading time" link="/tools/text-web/word-counter" icon="📊" />
             <ToolCard title="Case Converter" desc="Convert text case instantly" link="/tools/text-web/case-converter" icon="🔄" />
@@ -88,6 +126,45 @@ export default function AllTools() {
             <ToolCard title="URL Encode/Decode" desc="Encode/decode URLs" link="/tools/text-web/url-encode" icon="🔗" />
             <ToolCard title="Regex Tester" desc="Test regular expressions" link="/tools/text-web/regex-tester" icon="🔍" />
             <ToolCard title="Lorem Ipsum Generator" desc="Generate placeholder text" link="/tools/text-web/lorem-ipsum" icon="📝" />
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2>Why Koovlo?</h2>
+            <p>Built to be fast, reliable, and privacy‑friendly.</p>
+          </div>
+          <div className={styles.featureGrid}>
+            <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>⚡</div>
+              <h3>Fast Results</h3>
+              <p>Get things done quickly with smart defaults.</p>
+            </div>
+            <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>🔒</div>
+              <h3>Privacy First</h3>
+              <p>Your data stays in your browser for most tools.</p>
+            </div>
+            <div className={styles.featureCard}>
+              <div className={styles.featureIcon}>📱</div>
+              <h3>Mobile Ready</h3>
+              <p>All tools are optimized for phones and tablets.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2>Frequently Asked Questions</h2>
+            <p>Quick answers to common questions.</p>
+          </div>
+          <div className={styles.faqGrid}>
+            {faqs.map((item) => (
+              <div key={item.q} className={styles.faqCard}>
+                <h3>{item.q}</h3>
+                <p>{item.a}</p>
+              </div>
+            ))}
           </div>
         </section>
       </main>

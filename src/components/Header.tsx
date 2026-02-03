@@ -16,16 +16,15 @@ export default function Header() {
           className={styles.menuButton}
           onClick={() => setOpen(!open)}
           aria-label="Toggle navigation"
+          aria-expanded={open}
         >
-          ☰
+          {open ? "✕" : "☰"}
         </button>
 
         <nav className={`${styles.nav} ${open ? styles.show : ""}`}>
           <Link href="/">Home</Link>
           <Link href="/tools">All Tools</Link>
-          <Link href="/tools/pdf">PDF</Link>
-          <Link href="/tools/image">Image</Link>
-          <Link href="/tools/education">Education</Link>
+          <Link href="/contact">Contact</Link>
         </nav>
       </div>
     </header>

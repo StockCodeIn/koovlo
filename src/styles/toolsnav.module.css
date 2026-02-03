@@ -1,6 +1,6 @@
 .navbar {
   position: sticky;
-  top: 60px;
+  top: 64px;
   z-index: 90;
   background: #fff;
   border-bottom: 1px solid #eee;
@@ -67,5 +67,9 @@
   .link {
     font-size: 0.85rem;
     padding: 7px 14px;
+  }
+
+  .navbar {
+    top: 56px;
   }
 }
