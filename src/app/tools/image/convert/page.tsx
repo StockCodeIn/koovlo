@@ -195,19 +195,19 @@ export default function ImageConvert() {
           <label>Output Format</label>
           <div className={styles.radioGroup}>
             <label className={styles.radio}>
-              <input type="radio" checked={format === "jpeg"} onChange={() => setFormat("jpeg")} />
+              <input type="radio" id="format-jpeg-convert" name="format" checked={format === "jpeg"} onChange={() => setFormat("jpeg")} />
               <span>📷 JPEG</span>
             </label>
             <label className={styles.radio}>
-              <input type="radio" checked={format === "jpg"} onChange={() => setFormat("jpg")} />
+              <input type="radio" id="format-jpg-convert" name="format" checked={format === "jpg"} onChange={() => setFormat("jpg")} />
               <span>📸 JPG</span>
             </label>
             <label className={styles.radio}>
-              <input type="radio" checked={format === "png"} onChange={() => setFormat("png")} />
+              <input type="radio" id="format-png-convert" name="format" checked={format === "png"} onChange={() => setFormat("png")} />
               <span>🖼️ PNG</span>
             </label>
             <label className={styles.radio}>
-              <input type="radio" checked={format === "webp"} onChange={() => setFormat("webp")} />
+              <input type="radio" id="format-webp-convert" name="format" checked={format === "webp"} onChange={() => setFormat("webp")} />
               <span>🌐 WebP</span>
             </label>
           </div>
@@ -215,8 +215,9 @@ export default function ImageConvert() {
 
         {(format === "jpeg" || format === "jpg" || format === "webp") && (
           <div className={styles.controlGroup}>
-            <label>Quality: {quality}%</label>
+            <label htmlFor="quality-slider">Quality: {quality}%</label>
             <input
+              id="quality-slider"
               type="range"
               min="10"
               max="100"
@@ -239,15 +240,15 @@ export default function ImageConvert() {
           <label>Resize Options</label>
           <div className={styles.radioGroup}>
             <label className={styles.radio}>
-              <input type="radio" checked={maintainSize} onChange={() => setMaintainSize(true)} />
+              <input type="radio" id="resize-original" name="resize" checked={maintainSize} onChange={() => setMaintainSize(true)} />
               <span>Keep Original Size</span>
             </label>
             <label className={styles.radio}>
-              <input type="radio" checked={!maintainSize && customWidth === 1920} onChange={() => { setMaintainSize(false); setCustomWidth(1920); }} />
+              <input type="radio" id="resize-1920" name="resize" checked={!maintainSize && customWidth === 1920} onChange={() => { setMaintainSize(false); setCustomWidth(1920); }} />
               <span>Max 1920px</span>
             </label>
             <label className={styles.radio}>
-              <input type="radio" checked={!maintainSize && customWidth === 1280} onChange={() => { setMaintainSize(false); setCustomWidth(1280); }} />
+              <input type="radio" id="resize-1280" name="resize" checked={!maintainSize && customWidth === 1280} onChange={() => { setMaintainSize(false); setCustomWidth(1280); }} />
               <span>Max 1280px</span>
             </label>
           </div>

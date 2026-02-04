@@ -3,17 +3,16 @@ import ToolCard from "@/components/ToolCard";
 import styles from "../tools-common.module.css";
 
 const tools = [
-  { title: "Percentage Calculator", desc: "Calculate exam percentage instantly.", link: "/tools/education/percentage", icon: "📊" },
-  { title: "CGPA Calculator", desc: "Compute CGPA across semesters with credits.", link: "/tools/education/cgpa", icon: "📘" },
-  { title: "GPA Calculator", desc: "Calculate semester GPA and target grades.", link: "/tools/education/gpa", icon: "📚" },
-  { title: "Grade Calculator", desc: "Calculate weighted grades and final scores.", link: "/tools/education/grade", icon: "🎓" },
-  { title: "Attendance Calculator", desc: "Track attendance and required classes.", link: "/tools/education/attendance", icon: "📅" },
-  { title: "Rank Calculator", desc: "Estimate rank and percentile quickly.", link: "/tools/education/rank", icon: "🏆" },
-  { title: "Text Summarizer", desc: "Summarize long text into key points.", link: "/tools/education/text-summarizer", icon: "📄" },
-  { title: "Flashcard Maker", desc: "Create study flashcards in seconds.", link: "/tools/education/flashcard", icon: "🃏" },
-  { title: "Quiz Generator", desc: "Generate practice quizzes instantly.", link: "/tools/education/quiz-generator", icon: "❓" },
-  { title: "Notes Organizer", desc: "Organize notes with tags and categories.", link: "/tools/education/notes-organizer", icon: "📓" },
-  { title: "Revision Planner", desc: "Plan your exam revision schedule.", link: "/tools/education/revision-planner", icon: "📅" },
+    { title: "GPA Calculator", desc: "Calculate GPA with credits and multiple grade scales", link: "/tools/education/gpa", icon: "📊", category: "Education" },
+    { title: "CGPA Calculator", desc: "Calculate CGPA across semesters with grade tracking", link: "/tools/education/cgpa", icon: "📈", category: "Education" },
+    { title: "Grade Calculator", desc: "Convert marks to grades with weighted subjects", link: "/tools/education/grade", icon: "📝", category: "Education" },
+    { title: "Percentage Calculator", desc: "Calculate percentages and CGPA conversions instantly", link: "/tools/education/percentage", icon: "🔢", category: "Education" },
+    { title: "Attendance Tracker", desc: "Track and calculate attendance percentage daily", link: "/tools/education/attendance", icon: "📅", category: "Education" },
+    { title: "Flashcard Creator", desc: "Create and study with categorized flashcards", link: "/tools/education/flashcard", icon: "🎴", category: "Education" },
+    { title: "Quiz Generator", desc: "Create custom quizzes with multiple question types", link: "/tools/education/quiz-generator", icon: "❓", category: "Education" },
+    { title: "Notes Organizer", desc: "Organize notes by category, tags, and colors", link: "/tools/education/notes-organizer", icon: "📓", category: "Education" },
+    { title: "Revision Planner", desc: "Plan study schedule and track exam preparation", link: "/tools/education/revision-planner", icon: "📅", category: "Education" },
+    { title: "Rank Calculator", desc: "Calculate rankings and score statistics instantly", link: "/tools/education/rank", icon: "🏆", category: "Education" },
 ];
 
 const faqs = [

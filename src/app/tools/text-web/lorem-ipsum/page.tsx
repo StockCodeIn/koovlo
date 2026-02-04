@@ -153,9 +153,10 @@ export default function LoremIpsumGenerator() {
           <h2>Settings</h2>
 
           <div className={styles.controlGroup}>
-            <label>
+            <label htmlFor="paragraphs-count">
               Number of Paragraphs:
               <input
+                id="paragraphs-count"
                 type="number"
                 min="1"
                 max="20"
@@ -167,9 +168,10 @@ export default function LoremIpsumGenerator() {
           </div>
 
           <div className={styles.controlGroup}>
-            <label>
+            <label htmlFor="words-per-para">
               Words per Paragraph:
               <input
+                id="words-per-para"
                 type="number"
                 min="10"
                 max="200"
@@ -181,8 +183,9 @@ export default function LoremIpsumGenerator() {
           </div>
 
           <div className={styles.controlGroup}>
-            <label className={styles.checkboxLabel}>
+            <label htmlFor="lorem-checkbox" className={styles.checkboxLabel}>
               <input
+                id="lorem-checkbox"
                 type="checkbox"
                 checked={startWithLorem}
                 onChange={(e) => setStartWithLorem(e.target.checked)}
@@ -214,10 +217,12 @@ export default function LoremIpsumGenerator() {
           </div>
 
           <textarea
+            id="lorem-output"
             value={generatedText}
             readOnly
             placeholder="Your lorem ipsum text will appear here..."
             className={styles.textarea}
+            aria-label="Generated Lorem Ipsum text"
           />
         </div>
       </div>

@@ -310,8 +310,9 @@ export default function InvoiceGeneratorPage() {
               ))}
             </div>
             <div className={styles.formGroup}>
-              <label>Accent Color</label>
+              <label htmlFor="accent-color">Accent Color</label>
               <input
+                id="accent-color"
                 type="color"
                 value={invoiceData.accentColor}
                 onChange={(e) => setInvoiceData({ ...invoiceData, accentColor: e.target.value })}
@@ -324,8 +325,9 @@ export default function InvoiceGeneratorPage() {
           <section className={styles.section}>
             <h2>Your Company Details</h2>
             <div className={styles.formGroup}>
-              <label>Company Logo</label>
+              <label htmlFor="company-logo">Company Logo</label>
               <input
+                id="company-logo"
                 ref={logoInputRef}
                 type="file"
                 accept="image/*"
@@ -340,8 +342,9 @@ export default function InvoiceGeneratorPage() {
               )}
             </div>
             <div className={styles.formGroup}>
-              <label>Company Name *</label>
+              <label htmlFor="company-name">Company Name *</label>
               <input
+                id="company-name"
                 type="text"
                 value={invoiceData.companyName}
                 onChange={(e) => setInvoiceData({ ...invoiceData, companyName: e.target.value })}
@@ -350,8 +353,9 @@ export default function InvoiceGeneratorPage() {
             </div>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label>Email</label>
+                <label htmlFor="company-email">Email</label>
                 <input
+                  id="company-email"
                   type="email"
                   value={invoiceData.companyEmail}
                   onChange={(e) => setInvoiceData({ ...invoiceData, companyEmail: e.target.value })}
@@ -359,8 +363,9 @@ export default function InvoiceGeneratorPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Phone</label>
+                <label htmlFor="company-phone">Phone</label>
                 <input
+                  id="company-phone"
                   type="tel"
                   value={invoiceData.companyPhone}
                   onChange={(e) => setInvoiceData({ ...invoiceData, companyPhone: e.target.value })}
@@ -369,8 +374,9 @@ export default function InvoiceGeneratorPage() {
               </div>
             </div>
             <div className={styles.formGroup}>
-              <label>Address</label>
+              <label htmlFor="company-address">Address</label>
               <textarea
+                id="company-address"
                 value={invoiceData.companyAddress}
                 onChange={(e) => setInvoiceData({ ...invoiceData, companyAddress: e.target.value })}
                 placeholder="123 Business St, City, State, ZIP"
@@ -384,8 +390,9 @@ export default function InvoiceGeneratorPage() {
             <h2>Invoice Details</h2>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label>Invoice Number *</label>
+                <label htmlFor="invoice-number">Invoice Number *</label>
                 <input
+                  id="invoice-number"
                   type="text"
                   value={invoiceData.invoiceNumber}
                   onChange={(e) => setInvoiceData({ ...invoiceData, invoiceNumber: e.target.value })}
@@ -393,8 +400,9 @@ export default function InvoiceGeneratorPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Currency</label>
+                <label htmlFor="currency-select">Currency</label>
                 <select
+                  id="currency-select"
                   value={invoiceData.currency}
                   onChange={(e) => setInvoiceData({ ...invoiceData, currency: e.target.value })}
                 >
@@ -410,16 +418,18 @@ export default function InvoiceGeneratorPage() {
             </div>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label>Invoice Date *</label>
+                <label htmlFor="invoice-date">Invoice Date *</label>
                 <input
+                  id="invoice-date"
                   type="date"
                   value={invoiceData.invoiceDate}
                   onChange={(e) => setInvoiceData({ ...invoiceData, invoiceDate: e.target.value })}
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Due Date *</label>
+                <label htmlFor="due-date">Due Date *</label>
                 <input
+                  id="due-date"
                   type="date"
                   value={invoiceData.dueDate}
                   onChange={(e) => setInvoiceData({ ...invoiceData, dueDate: e.target.value })}
@@ -432,8 +442,9 @@ export default function InvoiceGeneratorPage() {
           <section className={styles.section}>
             <h2>Bill To (Client Details)</h2>
             <div className={styles.formGroup}>
-              <label>Client Name *</label>
+              <label htmlFor="client-name">Client Name *</label>
               <input
+                id="client-name"
                 type="text"
                 value={invoiceData.clientName}
                 onChange={(e) => setInvoiceData({ ...invoiceData, clientName: e.target.value })}
@@ -442,8 +453,9 @@ export default function InvoiceGeneratorPage() {
             </div>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label>Email</label>
+                <label htmlFor="client-email">Email</label>
                 <input
+                  id="client-email"
                   type="email"
                   value={invoiceData.clientEmail}
                   onChange={(e) => setInvoiceData({ ...invoiceData, clientEmail: e.target.value })}
@@ -451,8 +463,9 @@ export default function InvoiceGeneratorPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Phone</label>
+                <label htmlFor="client-phone">Phone</label>
                 <input
+                  id="client-phone"
                   type="tel"
                   value={invoiceData.clientPhone}
                   onChange={(e) => setInvoiceData({ ...invoiceData, clientPhone: e.target.value })}
@@ -461,8 +474,9 @@ export default function InvoiceGeneratorPage() {
               </div>
             </div>
             <div className={styles.formGroup}>
-              <label>Address</label>
+              <label htmlFor="client-address">Address</label>
               <textarea
+                id="client-address"
                 value={invoiceData.clientAddress}
                 onChange={(e) => setInvoiceData({ ...invoiceData, clientAddress: e.target.value })}
                 placeholder="Client address"

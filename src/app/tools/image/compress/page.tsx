@@ -189,11 +189,11 @@ export default function ImageCompress() {
           <label>Format</label>
           <div className={styles.radioGroup}>
             <label className={styles.radio}>
-              <input type="radio" checked={format === "jpeg"} onChange={() => setFormat("jpeg")} />
+              <input type="radio" id="format-jpeg" name="format" checked={format === "jpeg"} onChange={() => setFormat("jpeg")} />
               <span>JPEG</span>
             </label>
             <label className={styles.radio}>
-              <input type="radio" checked={format === "webp"} onChange={() => setFormat("webp")} />
+              <input type="radio" id="format-webp" name="format" checked={format === "webp"} onChange={() => setFormat("webp")} />
               <span>WebP (Better)</span>
             </label>
           </div>
@@ -203,15 +203,15 @@ export default function ImageCompress() {
           <label>Max Width (optional)</label>
           <div className={styles.radioGroup}>
             <label className={styles.radio}>
-              <input type="radio" checked={maxWidth === null} onChange={() => setMaxWidth(null)} />
+              <input type="radio" id="width-original" name="maxWidth" checked={maxWidth === null} onChange={() => setMaxWidth(null)} />
               <span>Original</span>
             </label>
             <label className={styles.radio}>
-              <input type="radio" checked={maxWidth === 1920} onChange={() => setMaxWidth(1920)} />
+              <input type="radio" id="width-1920" name="maxWidth" checked={maxWidth === 1920} onChange={() => setMaxWidth(1920)} />
               <span>1920px</span>
             </label>
             <label className={styles.radio}>
-              <input type="radio" checked={maxWidth === 1280} onChange={() => setMaxWidth(1280)} />
+              <input type="radio" id="width-1280" name="maxWidth" checked={maxWidth === 1280} onChange={() => setMaxWidth(1280)} />
               <span>1280px</span>
             </label>
           </div>

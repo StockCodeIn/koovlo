@@ -211,7 +211,7 @@ export default function FormBuilder() {
           </button>
           <label className={styles.toolBtn}>
             📂 Load
-            <input type="file" accept=".json" onChange={loadForm} style={{ display: "none" }} />
+            <input id="load-form-file" type="file" accept=".json" onChange={loadForm} style={{ display: "none" }} />
           </label>
           <button className={styles.toolBtn} onClick={saveForm}>
             💾 Save
@@ -431,22 +431,22 @@ export default function FormBuilder() {
                 <h3>Position & Size</h3>
                 <div className={styles.gridRow}>
                   <div className={styles.formGroup}>
-                    <label>X</label>
-                    <input type="number" value={selectedField.x} onChange={(e) => updateField({ ...selectedField, x: Number(e.target.value) })} />
+                    <label htmlFor="field-x">X</label>
+                    <input id="field-x" type="number" value={selectedField.x} onChange={(e) => updateField({ ...selectedField, x: Number(e.target.value) })} />
                   </div>
                   <div className={styles.formGroup}>
-                    <label>Y</label>
-                    <input type="number" value={selectedField.y} onChange={(e) => updateField({ ...selectedField, y: Number(e.target.value) })} />
+                    <label htmlFor="field-y">Y</label>
+                    <input id="field-y" type="number" value={selectedField.y} onChange={(e) => updateField({ ...selectedField, y: Number(e.target.value) })} />
                   </div>
                 </div>
                 <div className={styles.gridRow}>
                   <div className={styles.formGroup}>
-                    <label>Width</label>
-                    <input type="number" value={selectedField.width} onChange={(e) => updateField({ ...selectedField, width: Number(e.target.value) })} />
+                    <label htmlFor="field-width">Width</label>
+                    <input id="field-width" type="number" value={selectedField.width} onChange={(e) => updateField({ ...selectedField, width: Number(e.target.value) })} />
                   </div>
                   <div className={styles.formGroup}>
-                    <label>Height</label>
-                    <input type="number" value={selectedField.height} onChange={(e) => updateField({ ...selectedField, height: Number(e.target.value) })} />
+                    <label htmlFor="field-height">Height</label>
+                    <input id="field-height" type="number" value={selectedField.height} onChange={(e) => updateField({ ...selectedField, height: Number(e.target.value) })} />
                   </div>
                 </div>
               </div>

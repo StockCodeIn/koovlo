@@ -3,24 +3,9 @@ import ToolCard from "@/components/ToolCard";
 import styles from "../tools-common.module.css";
 
 const tools = [
-    {
-        title: "Resume & CV Builder",
-        desc: "Create ATS-ready resumes with templates and PDF export.",
-        link: "/tools/document/resume-builder",
-        icon: "📄",
-    },
-    {
-        title: "Invoice Generator",
-        desc: "Build professional invoices with totals, taxes, and branding.",
-        link: "/tools/document/invoice",
-        icon: "💳",
-    },
-    {
-        title: "PDF Form Builder",
-        desc: "Design fillable PDF forms with drag & drop fields.",
-        link: "/tools/document/pdf-form-builder",
-        icon: "📝",
-    },
+    { title: "Resume & CV Builder", desc: "Create ATS-ready resumes and CVs with templates and PDF export", link: "/tools/document/resume-builder", icon: "📄", category: "Document" },
+    { title: "Invoice Generator", desc: "Create professional invoices with templates and PDF export", link: "/tools/document/invoice", icon: "🧾", category: "Document" },
+    { title: "PDF Form Builder", desc: "Create fillable PDF forms with drag-and-drop editor", link: "/tools/document/pdf-form-builder", icon: "📋", category: "Document" },
 ];
 
 const faqs = [

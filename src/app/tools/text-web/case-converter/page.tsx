@@ -202,10 +202,12 @@ export default function CaseConverter() {
         <div className={styles.inputSection}>
           <h2>Input Text</h2>
           <textarea
+            id="case-input"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Enter your text here..."
             className={styles.textarea}
+            aria-label="Text input for case conversion"
           />
         </div>
 
@@ -256,10 +258,12 @@ export default function CaseConverter() {
         <div className={styles.outputSection}>
           <h2>Output Text</h2>
           <textarea
+            id="case-output"
             value={outputText}
             readOnly
             placeholder="Converted text will appear here..."
             className={styles.textarea}
+            aria-label="Text output from case conversion"
           />
           <div className={styles.outputActions}>
             <button onClick={copyToClipboard} className={styles.actionBtn} disabled={!outputText}>

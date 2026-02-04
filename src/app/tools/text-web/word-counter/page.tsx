@@ -187,10 +187,12 @@ export default function WordCounter() {
         )}
 
         <textarea
+          id="word-counter-input"
           className={styles.textarea}
           placeholder="Paste or type your text here..."
           value={text}
           onChange={(e) => setText(e.target.value)}
+          aria-label="Text input for word counting"
         />
 
         <div className={styles.controls}>

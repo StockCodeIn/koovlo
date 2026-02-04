@@ -12,7 +12,10 @@ type ToolCardProps = {
 export default function ToolCard({ title, desc, link, icon = "🧩" }: ToolCardProps) {
   return (
     <Link href={link} className={styles.card}>
-      <div className={styles.icon}>{icon}</div>
+      <div className={styles.iconWrapper}>
+        <div className={styles.icon}>{icon}</div>
+        <div className={styles.arrow}>→</div>
+      </div>
       <div className={styles.textBox}>
         <h3>{title}</h3>
         <p>{desc}</p>

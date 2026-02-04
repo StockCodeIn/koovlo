@@ -3,11 +3,11 @@ import ToolCard from "@/components/ToolCard";
 import styles from "../tools-common.module.css";
 
 const tools = [
-  { title: "Image Resize", desc: "Resize multiple images with presets or exact dimensions.", link: "/tools/image/resize", icon: "📏" },
-  { title: "Image Compress", desc: "Compress images in bulk. Fast, private, and free.", link: "/tools/image/compress", icon: "🗜️" },
-  { title: "Image Convert", desc: "Convert images between formats instantly.", link: "/tools/image/convert", icon: "🔄" },
-  { title: "Add Image Watermark", desc: "Add text or logo watermark to images.", link: "/tools/image/add-watermark", icon: "💧" },
-  { title: "Strip Metadata", desc: "Remove EXIF metadata to protect privacy.", link: "/tools/image/strip-metadata", icon: "🗑️" },
+    { title: "Resize Image", desc: "Resize images with presets and aspect ratio control", link: "/tools/image/resize", icon: "📏", category: "Image" },
+    { title: "Compress Image", desc: "Reduce image size with quality and format control", link: "/tools/image/compress", icon: "📦", category: "Image" },
+    { title: "Convert Image", desc: "Convert between PNG, JPG, and WebP formats", link: "/tools/image/convert", icon: "🔄", category: "Image" },
+    { title: "Add Watermark", desc: "Add text and image watermarks to photos", link: "/tools/image/add-watermark", icon: "💧", category: "Image" },
+    { title: "Strip Metadata", desc: "Remove EXIF data and metadata from images", link: "/tools/image/strip-metadata", icon: "🧹", category: "Image" },
 ];
 
 const faqs = [

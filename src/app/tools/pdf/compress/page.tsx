@@ -186,7 +186,7 @@ export default function PdfCompress() {
           <span className={styles.textGradient}>Compress PDF</span>
         </h1>
         <p className={styles.description}>
-          Reduce PDF file size by optimizing internal structure. Best results with PDFs containing forms, annotations, or complex elements. Works fully offline — files never leave your device.
+          Reduce PDF file size with adjustable compression levels (Low, Medium, High). Optimize PDFs containing forms, annotations, and complex elements. Works offline — your files stay private on your device.
         </p>
 
         <div

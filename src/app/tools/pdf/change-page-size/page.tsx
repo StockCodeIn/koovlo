@@ -168,7 +168,7 @@ export default function ChangePageSize() {
         <span className={styles.textGradient}>Change PDF Page Size</span>
       </h1>
       <p className={styles.description}>
-        Resize all pages in your PDF to a different page size — perfect for printing or formatting.
+        Instantly resize all pages in your PDF to standard sizes (A4, A3, Letter, Legal) or custom dimensions. Perfect for printing, formatting, and document standardization.
       </p>
 
       <div className={styles.converter}>

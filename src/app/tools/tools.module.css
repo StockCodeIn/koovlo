@@ -13,8 +13,86 @@
   text-align: center;
   color: var(--brand-muted);
   margin-top: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 24px;
   font-size: 1.05rem;
+}
+
+/* Search Box Styles */
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 30px;
+  padding: 12px 20px;
+  max-width: 500px;
+  margin: 20px auto 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.searchBox:focus-within {
+  border-color: var(--brand-primary);
+  box-shadow: 0 6px 20px rgba(56, 37, 136, 0.15);
+  transform: scale(1.02);
+}
+
+.searchIcon {
+  font-size: 1.2rem;
+  color: var(--brand-primary);
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  background: transparent;
+  color: var(--brand-text);
+}
+
+.searchInput::placeholder {
+  color: #999;
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s ease;
+  padding: 4px 8px;
+  margin-right: -8px;
+}
+
+.clearBtn:hover {
+  color: var(--brand-primary);
+}
+
+.resultCount {
+  text-align: center;
+  color: var(--brand-muted);
+  font-size: 0.95rem;
+  margin-top: 12px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.count {
+  color: var(--brand-primary);
+  font-weight: 600;
 }
 
 .mainTitle {
@@ -132,6 +210,47 @@
   font-size: 0.95rem;
 }
 
+/* No Results State */
+.noResults {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.noResultsIcon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.noResults h3 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  color: var(--brand-text);
+}
+
+.noResults p {
+  color: var(--brand-muted);
+  margin-bottom: 20px;
+  font-size: 1rem;
+}
+
+.resetBtn {
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(56, 37, 136, 0.25);
+}
+
+.resetBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(56, 37, 136, 0.35);
+}
+
 /* --- Card hover animation tweak --- */
 .grid :global(.card) {
   animation: fadeIn 0.5s ease;
@@ -150,6 +269,16 @@
 
 /* --- Mobile Optimization --- */
 @media (max-width: 600px) {
+  .searchBox {
+    max-width: 100%;
+    margin: 16px auto 0;
+    padding: 10px 16px;
+  }
+
+  .searchInput {
+    font-size: 0.95rem;
+  }
+
   .mainTitle {
     font-size: 1.8rem;
   }
@@ -169,7 +298,7 @@
 
   .subText {
     font-size: 0.95rem;
-    margin-bottom: 22px;
+    margin-bottom: 16px;
   }
 
   .sectionHeader h2 {

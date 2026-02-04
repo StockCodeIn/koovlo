@@ -3,14 +3,15 @@ import ToolCard from "@/components/ToolCard";
 import styles from "../tools-common.module.css";
 
 const tools = [
-    { title: "Word Counter", desc: "Count words, characters, and reading time.", link: "/tools/text-web/word-counter", icon: "📊" },
-    { title: "Case Converter", desc: "Convert text case instantly.", link: "/tools/text-web/case-converter", icon: "🔄" },
-    { title: "Text to Speech", desc: "Turn text into natural speech.", link: "/tools/text-web/text-to-speech", icon: "🔊" },
-    { title: "JSON Formatter", desc: "Format, validate, and beautify JSON.", link: "/tools/text-web/json-formatter", icon: "🔧" },
-    { title: "Base64 Encode/Decode", desc: "Encode or decode Base64 quickly.", link: "/tools/text-web/base64", icon: "🔢" },
-    { title: "URL Encode/Decode", desc: "Encode or decode URLs safely.", link: "/tools/text-web/url-encode", icon: "🔗" },
-    { title: "Regex Tester", desc: "Test and debug regular expressions.", link: "/tools/text-web/regex-tester", icon: "🔍" },
-    { title: "Lorem Ipsum Generator", desc: "Generate placeholder text for design.", link: "/tools/text-web/lorem-ipsum", icon: "📝" },
+    { title: "Word Counter", desc: "Count words, characters, and reading time", link: "/tools/text-web/word-counter", icon: "📊", category: "Text/Web" },
+    { title: "Case Converter", desc: "Convert text to uppercase, lowercase, camelCase", link: "/tools/text-web/case-converter", icon: "🔤", category: "Text/Web" },
+    { title: "JSON Formatter", desc: "Format, validate, and minify JSON instantly", link: "/tools/text-web/json-formatter", icon: "{ }", category: "Text/Web" },
+    { title: "Base64 Encoder/Decoder", desc: "Encode and decode Base64 strings online", link: "/tools/text-web/base64", icon: "🔐", category: "Text/Web" },
+    { title: "URL Encoder/Decoder", desc: "Encode and decode URLs with custom options", link: "/tools/text-web/url-encode", icon: "🔗", category: "Text/Web" },
+    { title: "Text to Speech", desc: "Convert text to audio with voice selection", link: "/tools/text-web/text-to-speech", icon: "🔊", category: "Text/Web" },
+    { title: "Regex Tester", desc: "Test and debug regular expressions instantly", link: "/tools/text-web/regex-tester", icon: "🔍", category: "Text/Web" },
+    { title: "Lorem Ipsum Generator", desc: "Generate dummy text for mockups and designs", link: "/tools/text-web/lorem-ipsum", icon: "📄", category: "Text/Web" },
+    { title: "Text Summarizer", desc: "Summarize long text with multiple modes", link: "/tools/text-web/text-summarizer", icon: "📝", category: "Text/Web" },
 ];
 
 const faqs = [
