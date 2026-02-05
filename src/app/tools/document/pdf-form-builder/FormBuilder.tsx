@@ -1,68 +1,40 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FormField } from "./types/form-schema";
 import { generateFillablePdf } from "./pdf/generatePdf";
 import styles from "./pdf-form-builder.module.css";
 
-// Pre-built templates
-const TEMPLATES = [
-  {
-    id: "job-application",
-    name: "Job Application",
-    description: "Complete job application form",
-    fields: [
-      { id: "1", type: "text" as const, label: "Full Name", required: true, x: 50, y: 50, width: 400, height: 40 },
-      { id: "2", type: "text" as const, label: "Email Address", required: true, x: 50, y: 100, width: 400, height: 40 },
-      { id: "3", type: "text" as const, label: "Phone Number", required: true, x: 50, y: 150, width: 400, height: 40 },
-      { id: "4", type: "text" as const, label: "Position Applied For", required: true, x: 50, y: 200, width: 400, height: 40 },
-      { id: "5", type: "textarea" as const, label: "Previous Experience", required: false, x: 50, y: 250, width: 400, height: 100 },
-      { id: "6", type: "select" as const, label: "Education Level", required: true, x: 50, y: 370, width: 400, height: 40, options: ["High School", "Bachelor's", "Master's", "PhD"] },
-      { id: "7", type: "checkbox" as const, label: "I agree to terms and conditions", required: true, x: 50, y: 430, width: 300, height: 30 },
-      { id: "8", type: "signature" as const, label: "Signature", required: true, x: 50, y: 480, width: 300, height: 80 },
-    ]
-  },
-  {
-    id: "contact-form",
-    name: "Contact Form",
-    description: "Simple contact information form",
-    fields: [
-      { id: "1", type: "text" as const, label: "Name", required: true, x: 50, y: 50, width: 400, height: 40 },
-      { id: "2", type: "text" as const, label: "Email", required: true, x: 50, y: 100, width: 400, height: 40 },
-      { id: "3", type: "text" as const, label: "Subject", required: true, x: 50, y: 150, width: 400, height: 40 },
-      { id: "4", type: "textarea" as const, label: "Message", required: true, x: 50, y: 200, width: 400, height: 150 },
-    ]
-  },
-  {
-    id: "survey",
-    name: "Customer Survey",
-    description: "Feedback and rating form",
-    fields: [
-      { id: "1", type: "text" as const, label: "Your Name", required: false, x: 50, y: 50, width: 400, height: 40 },
-      { id: "2", type: "radio" as const, label: "How satisfied are you?", required: true, x: 50, y: 100, width: 400, height: 120, options: ["Very Satisfied", "Satisfied", "Neutral", "Dissatisfied"] },
-      { id: "3", type: "checkbox" as const, label: "Would you recommend us?", required: false, x: 50, y: 240, width: 400, height: 30 },
-      { id: "4", type: "textarea" as const, label: "Additional Comments", required: false, x: 50, y: 290, width: 400, height: 120 },
-    ]
-  },
-  {
-    id: "registration",
-    name: "Event Registration",
-    description: "Event registration form",
-    fields: [
-      { id: "1", type: "text" as const, label: "Full Name", required: true, x: 50, y: 50, width: 400, height: 40 },
-      { id: "2", type: "text" as const, label: "Email", required: true, x: 50, y: 100, width: 400, height: 40 },
-      { id: "3", type: "text" as const, label: "Organization", required: false, x: 50, y: 150, width: 400, height: 40 },
-      { id: "4", type: "select" as const, label: "Ticket Type", required: true, x: 50, y: 200, width: 400, height: 40, options: ["Standard", "VIP", "Student"] },
-      { id: "5", type: "checkbox" as const, label: "Vegetarian meal option", required: false, x: 50, y: 260, width: 400, height: 30 },
-      { id: "6", type: "textarea" as const, label: "Special Requirements", required: false, x: 50, y: 310, width: 400, height: 100 },
-    ]
-  }
+// Page size definitions (in pixels at 96 DPI for display)
+const PAGE_SIZES = {
+  A4: { name: "A4", width: 595, height: 842 },
+  A5: { name: "A5", width: 420, height: 595 },
+  Letter: { name: "Letter", width: 612, height: 792 },
+  Legal: { name: "Legal", width: 612, height: 1008 },
+};
+
+type ExtendedFormField = FormField & {
+  bgColor?: string;
+  lineColor?: string;
+  textColor?: string;
+};
+
+const FIELD_TYPES = [
+  { type: "text" as const, name: "Text Input", icon: "📝", desc: "Single line text" },
+  { type: "textarea" as const, name: "Text Area", icon: "📄", desc: "Multi-line text" },
+  { type: "checkbox" as const, name: "Checkbox", icon: "☑️", desc: "Yes/No option" },
+  { type: "radio" as const, name: "Radio Group", icon: "🔘", desc: "Select one" },
+  { type: "select" as const, name: "Dropdown", icon: "📋", desc: "Select from list" },
+  { type: "signature" as const, name: "Signature", icon: "✓", desc: "Sign here" },
 ];
 
 export default function FormBuilder() {
-  const [fields, setFields] = useState<FormField[]>([]);
+  const [fields, setFields] = useState<ExtendedFormField[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [formName, setFormName] = useState("My Form");
+  const [pageSize, setPageSize] = useState<keyof typeof PAGE_SIZES>("A4");
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const [dragType, setDragType] = useState<FormField["type"] | null>(null);
 
   // Auto-save to localStorage
   useEffect(() => {
@@ -71,19 +43,21 @@ export default function FormBuilder() {
       const data = JSON.parse(saved);
       setFields(data.fields || []);
       setFormName(data.formName || "My Form");
+      setPageSize(data.pageSize || "A4");
     }
   }, []);
 
   useEffect(() => {
     if (fields.length > 0) {
-      localStorage.setItem("pdf-form-builder-data", JSON.stringify({ fields, formName }));
+      localStorage.setItem("pdf-form-builder-data", JSON.stringify({ fields, formName, pageSize }));
     }
-  }, [fields, formName]);
+  }, [fields, formName, pageSize]);
 
-  const selectedField = fields.find((f) => f.id === selectedId) || null;
+  const selectedField = fields.find((f) => f.id === selectedId) as ExtendedFormField | undefined;
+  const pageConfig = PAGE_SIZES[pageSize];
 
   const addField = (type: FormField["type"]) => {
-    let newField: FormField;
+    let newField: ExtendedFormField;
 
     if (type === "select" || type === "radio") {
       newField = {
@@ -91,11 +65,14 @@ export default function FormBuilder() {
         type,
         label: `New ${type} field`,
         required: false,
-        x: 50,
-        y: 50 + fields.length * 60,
+        x: 20,
+        y: 20 + fields.length * 80,
         width: 300,
         height: 120,
         options: ["Option 1", "Option 2"],
+        bgColor: "#ffffff",
+        lineColor: "#000000",
+        textColor: "#000000",
       };
     } else {
       newField = {
@@ -103,32 +80,38 @@ export default function FormBuilder() {
         type,
         label: `New ${type} field`,
         required: false,
-        x: 50,
-        y: 50 + fields.length * 60,
+        x: 20,
+        y: 20 + fields.length * 80,
         width: type === "textarea" ? 400 : 300,
         height: type === "textarea" ? 100 : type === "signature" ? 80 : 40,
+        bgColor: "#ffffff",
+        lineColor: "#000000",
+        textColor: "#000000",
       };
     }
+
     setFields((prev) => [...prev, newField]);
     setSelectedId(newField.id);
   };
 
-  const updateField = (updated: FormField) => {
-    setFields((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
+  const updateField = (updated: ExtendedFormField) => {
+    const pageConfig = PAGE_SIZES[pageSize];
+    const MARGIN = 10;
+    
+    const validated = {
+      ...updated,
+      x: Math.max(MARGIN, Math.min(updated.x, pageConfig.width - MARGIN - updated.width)),
+      y: Math.max(MARGIN, Math.min(updated.y, pageConfig.height - MARGIN - updated.height)),
+      width: Math.min(updated.width, pageConfig.width - 2 * MARGIN),
+      height: Math.min(updated.height, pageConfig.height - 2 * MARGIN),
+    };
+
+    setFields((prev) => prev.map((f) => (f.id === validated.id ? validated : f)));
   };
 
   const deleteField = () => {
     if (selectedId) {
       setFields((prev) => prev.filter((f) => f.id !== selectedId));
-      setSelectedId(null);
-    }
-  };
-
-  const loadTemplate = (templateId: string) => {
-    const template = TEMPLATES.find((t) => t.id === templateId);
-    if (template) {
-      setFields(template.fields);
-      setFormName(template.name);
       setSelectedId(null);
     }
   };
@@ -176,7 +159,7 @@ export default function FormBuilder() {
       return;
     }
     try {
-      const pdfBytes = await generateFillablePdf(fields, formName);
+      const pdfBytes = await generateFillablePdf(fields as any, formName);
       const bytes = new Uint8Array(pdfBytes);
       const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
       const blob = new Blob([buffer], { type: "application/pdf" });
@@ -192,6 +175,66 @@ export default function FormBuilder() {
     }
   };
 
+  const handleDragStart = (type: FormField["type"]) => {
+    setDragType(type);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    (e.currentTarget as HTMLElement).style.backgroundColor = "#f0f0f0";
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    (e.currentTarget as HTMLElement).style.backgroundColor = "#ffffff";
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    (e.currentTarget as HTMLElement).style.backgroundColor = "#ffffff";
+    
+    if (!dragType || !canvasRef.current) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const canvasX = e.clientX - rect.left + canvasRef.current.scrollLeft;
+    const canvasY = e.clientY - rect.top + canvasRef.current.scrollTop;
+
+    let newField: ExtendedFormField;
+    if (dragType === "select" || dragType === "radio") {
+      newField = {
+        id: Date.now().toString(),
+        type: dragType,
+        label: `New ${dragType} field`,
+        required: false,
+        x: Math.max(10, Math.min(canvasX - 150, pageConfig.width - 310)),
+        y: Math.max(10, Math.min(canvasY - 60, pageConfig.height - 130)),
+        width: 300,
+        height: 120,
+        options: ["Option 1", "Option 2"],
+        bgColor: "#ffffff",
+        lineColor: "#000000",
+        textColor: "#000000",
+      };
+    } else {
+      newField = {
+        id: Date.now().toString(),
+        type: dragType,
+        label: `New ${dragType} field`,
+        required: false,
+        x: Math.max(10, Math.min(canvasX - 150, pageConfig.width - 310)),
+        y: Math.max(10, Math.min(canvasY - 20, pageConfig.height - 60)),
+        width: dragType === "textarea" ? 400 : 300,
+        height: dragType === "textarea" ? 100 : dragType === "signature" ? 80 : 40,
+        bgColor: "#ffffff",
+        lineColor: "#000000",
+        textColor: "#000000",
+      };
+    }
+
+    setFields((prev) => [...prev, newField]);
+    setSelectedId(newField.id);
+    setDragType(null);
+  };
+
   return (
     <div className={styles.builderWrapper}>
       {/* Toolbar */}
@@ -202,8 +245,21 @@ export default function FormBuilder() {
             value={formName}
             onChange={(e) => setFormName(e.target.value)}
             className={styles.toolBtn}
+            placeholder="Form Name"
             style={{ minWidth: "200px" }}
           />
+          <select 
+            value={pageSize} 
+            onChange={(e) => setPageSize(e.target.value as keyof typeof PAGE_SIZES)}
+            className={styles.toolBtn}
+            style={{ minWidth: "120px" }}
+          >
+            {Object.keys(PAGE_SIZES).map((size) => (
+              <option key={size} value={size}>
+                📄 {size}
+              </option>
+            ))}
+          </select>
         </div>
         <div className={styles.toolbarRight}>
           <button className={styles.toolBtn} onClick={clearForm}>
@@ -211,7 +267,7 @@ export default function FormBuilder() {
           </button>
           <label className={styles.toolBtn}>
             📂 Load
-            <input id="load-form-file" type="file" accept=".json" onChange={loadForm} style={{ display: "none" }} />
+            <input type="file" accept=".json" onChange={loadForm} style={{ display: "none" }} />
           </label>
           <button className={styles.toolBtn} onClick={saveForm}>
             💾 Save
@@ -224,86 +280,57 @@ export default function FormBuilder() {
 
       {/* Form Builder Grid */}
       <div className={styles.formBuilder}>
-        {/* Left Sidebar - Templates & Fields */}
+        {/* Left Sidebar - Fields */}
         <div className={styles.sidebar}>
           <div className={styles.sidebarHeader}>
-            <h2>📋 Templates</h2>
-            <p>Start with a template</p>
+            <h2>🎨 Fields</h2>
+            <p>Drag to canvas</p>
           </div>
           <div className={styles.sidebarContent}>
-            <div className={styles.templatesSection}>
-              <div className={styles.templateGrid}>
-                {TEMPLATES.map((template) => (
-                  <div
-                    key={template.id}
-                    className={styles.templateCard}
-                    onClick={() => loadTemplate(template.id)}
-                  >
-                    <h4>{template.name}</h4>
-                    <p>{template.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.sidebarHeader} style={{ marginTop: "20px" }}>
-              <h2>🎨 Fields</h2>
-              <p>Drag to canvas</p>
-            </div>
             <div className={styles.fieldPalette}>
-              <button className={styles.fieldBtn} onClick={() => addField("text")}>
-                <div className={styles.fieldIcon}>📝</div>
-                <div className={styles.fieldInfo}>
-                  <h4>Text Input</h4>
-                  <p>Single line text</p>
+              {FIELD_TYPES.map((field) => (
+                <div
+                  key={field.type}
+                  className={styles.fieldBtn}
+                  draggable
+                  onDragStart={() => handleDragStart(field.type as FormField["type"])}
+                  onClick={() => addField(field.type as FormField["type"])}
+                  title="Click to add or drag to canvas"
+                >
+                  <div className={styles.fieldIcon}>{field.icon}</div>
+                  <div className={styles.fieldInfo}>
+                    <h4>{field.name}</h4>
+                    <p>{field.desc}</p>
+                  </div>
                 </div>
-              </button>
-              <button className={styles.fieldBtn} onClick={() => addField("textarea")}>
-                <div className={styles.fieldIcon}>📄</div>
-                <div className={styles.fieldInfo}>
-                  <h4>Text Area</h4>
-                  <p>Multi-line text</p>
-                </div>
-              </button>
-              <button className={styles.fieldBtn} onClick={() => addField("checkbox")}>
-                <div className={styles.fieldIcon}>☑️</div>
-                <div className={styles.fieldInfo}>
-                  <h4>Checkbox</h4>
-                  <p>Yes/No option</p>
-                </div>
-              </button>
-              <button className={styles.fieldBtn} onClick={() => addField("radio")}>
-                <div className={styles.fieldIcon}>🔘</div>
-                <div className={styles.fieldInfo}>
-                  <h4>Radio Group</h4>
-                  <p>Select one option</p>
-                </div>
-              </button>
-              <button className={styles.fieldBtn} onClick={() => addField("select")}>
-                <div className={styles.fieldIcon}>📋</div>
-                <div className={styles.fieldInfo}>
-                  <h4>Dropdown</h4>
-                  <p>Select from list</p>
-                </div>
-              </button>
-              <button className={styles.fieldBtn} onClick={() => addField("signature")}>
-                <div className={styles.fieldIcon}>✍️</div>
-                <div className={styles.fieldInfo}>
-                  <h4>Signature</h4>
-                  <p>Sign here</p>
-                </div>
-              </button>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Center - Canvas */}
-        <div className={styles.canvas}>
-          <div className={styles.canvasPage}>
+        <div 
+          className={styles.canvas} 
+          ref={canvasRef}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
+          <div 
+            className={styles.canvasPage}
+            style={{
+              width: `${pageConfig.width}px`,
+              height: `${pageConfig.height}px`,
+              position: 'relative',
+              backgroundColor: '#fff',
+              border: '2px solid #ddd',
+              boxShadow: '0 0 20px rgba(0,0,0,0.1)',
+            }}
+          >
             {fields.length === 0 ? (
               <div className={styles.emptyState}>
                 <h3>👆 Start Building</h3>
-                <p>Select a template or add fields from the left sidebar</p>
+                <p>Click or drag fields from left sidebar</p>
               </div>
             ) : (
               fields.map((field) => (
@@ -315,6 +342,9 @@ export default function FormBuilder() {
                     top: `${field.y}px`,
                     width: `${field.width}px`,
                     height: `${field.height}px`,
+                    backgroundColor: field.bgColor || "#ffffff",
+                    borderColor: field.lineColor || "#000000",
+                    color: field.textColor || "#000000",
                   }}
                   onClick={() => setSelectedId(field.id)}
                   onMouseDown={(e) => {
@@ -340,27 +370,27 @@ export default function FormBuilder() {
                   <button className={styles.deleteBtn} onClick={(e) => { e.stopPropagation(); deleteField(); }}>
                     ✕
                   </button>
-                  <div className={styles.fieldLabel}>
+                  <div className={styles.fieldLabel} style={{ color: field.textColor || "#000000" }}>
                     {field.label}
                     {field.required && <span className={styles.required}>*</span>}
                   </div>
                   <div className={styles.fieldPreview}>
-                    {field.type === "text" && <input type="text" placeholder="Text input" style={{ width: "100%", padding: "4px" }} disabled />}
-                    {field.type === "textarea" && <textarea placeholder="Text area" style={{ width: "100%", height: "60px", padding: "4px" }} disabled />}
+                    {field.type === "text" && <input type="text" placeholder="Text" disabled />}
+                    {field.type === "textarea" && <textarea placeholder="Text area" disabled />}
                     {field.type === "checkbox" && <input type="checkbox" disabled />}
-                    {field.type === "radio" && field.options?.map((opt, i) => (
-                      <div key={i} style={{ fontSize: "0.85rem" }}>
+                    {field.type === "radio" && field.options?.map((opt: string, i: number) => (
+                      <div key={i} style={{ fontSize: "0.8rem" }}>
                         <input type="radio" disabled /> {opt}
                       </div>
                     ))}
                     {field.type === "select" && (
-                      <select style={{ width: "100%", padding: "4px" }} disabled>
+                      <select disabled>
                         {field.options?.map((opt, i) => <option key={i}>{opt}</option>)}
                       </select>
                     )}
                     {field.type === "signature" && (
-                      <div style={{ border: "1px solid #ccc", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#999" }}>
-                        Sign here
+                      <div style={{ border: "1px dashed #ccc", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#999" }}>
+                        ✓ Sign here
                       </div>
                     )}
                   </div>
@@ -398,17 +428,17 @@ export default function FormBuilder() {
           {!selectedField ? (
             <div className={styles.propertiesEmpty}>
               <h3>⚙️ Properties</h3>
-              <p>Select a field to edit its properties</p>
+              <p>Select a field to edit</p>
             </div>
           ) : (
             <div className={styles.propertiesContent}>
               <div className={styles.sidebarHeader}>
-                <h2>⚙️ Field Properties</h2>
+                <h2>⚙️ Properties</h2>
                 <p>{selectedField.type} field</p>
               </div>
 
               <div className={styles.propSection}>
-                <h3>Basic</h3>
+                <h3>Basic Info</h3>
                 <div className={styles.formGroup}>
                   <label>Label</label>
                   <input
@@ -420,10 +450,75 @@ export default function FormBuilder() {
                 <div className={styles.checkbox}>
                   <input
                     type="checkbox"
+                    id="required-check"
                     checked={selectedField.required}
                     onChange={(e) => updateField({ ...selectedField, required: e.target.checked })}
                   />
-                  <label>Required field</label>
+                  <label htmlFor="required-check">Required field</label>
+                </div>
+              </div>
+
+              <div className={styles.propSection}>
+                <h3>Styling</h3>
+                <div className={styles.colorRow}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="bg-color">Background</label>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <input 
+                        id="bg-color"
+                        type="color" 
+                        value={selectedField.bgColor || "#ffffff"}
+                        onChange={(e) => updateField({ ...selectedField, bgColor: e.target.value })}
+                        style={{ width: '50px', height: '35px', cursor: 'pointer' }}
+                      />
+                      <input 
+                        type="text" 
+                        value={selectedField.bgColor || "#ffffff"}
+                        onChange={(e) => updateField({ ...selectedField, bgColor: e.target.value })}
+                        style={{ flex: 1 }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.colorRow}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="line-color">Border</label>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <input 
+                        id="line-color"
+                        type="color" 
+                        value={selectedField.lineColor || "#000000"}
+                        onChange={(e) => updateField({ ...selectedField, lineColor: e.target.value })}
+                        style={{ width: '50px', height: '35px', cursor: 'pointer' }}
+                      />
+                      <input 
+                        type="text" 
+                        value={selectedField.lineColor || "#000000"}
+                        onChange={(e) => updateField({ ...selectedField, lineColor: e.target.value })}
+                        style={{ flex: 1 }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.colorRow}>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="text-color">Text</label>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <input 
+                        id="text-color"
+                        type="color" 
+                        value={selectedField.textColor || "#000000"}
+                        onChange={(e) => updateField({ ...selectedField, textColor: e.target.value })}
+                        style={{ width: '50px', height: '35px', cursor: 'pointer' }}
+                      />
+                      <input 
+                        type="text" 
+                        value={selectedField.textColor || "#000000"}
+                        onChange={(e) => updateField({ ...selectedField, textColor: e.target.value })}
+                        style={{ flex: 1 }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -432,21 +527,41 @@ export default function FormBuilder() {
                 <div className={styles.gridRow}>
                   <div className={styles.formGroup}>
                     <label htmlFor="field-x">X</label>
-                    <input id="field-x" type="number" value={selectedField.x} onChange={(e) => updateField({ ...selectedField, x: Number(e.target.value) })} />
+                    <input 
+                      id="field-x"
+                      type="number" 
+                      value={selectedField.x} 
+                      onChange={(e) => updateField({ ...selectedField, x: Number(e.target.value) })} 
+                    />
                   </div>
                   <div className={styles.formGroup}>
                     <label htmlFor="field-y">Y</label>
-                    <input id="field-y" type="number" value={selectedField.y} onChange={(e) => updateField({ ...selectedField, y: Number(e.target.value) })} />
+                    <input 
+                      id="field-y"
+                      type="number" 
+                      value={selectedField.y} 
+                      onChange={(e) => updateField({ ...selectedField, y: Number(e.target.value) })} 
+                    />
                   </div>
                 </div>
                 <div className={styles.gridRow}>
                   <div className={styles.formGroup}>
                     <label htmlFor="field-width">Width</label>
-                    <input id="field-width" type="number" value={selectedField.width} onChange={(e) => updateField({ ...selectedField, width: Number(e.target.value) })} />
+                    <input 
+                      id="field-width"
+                      type="number" 
+                      value={selectedField.width} 
+                      onChange={(e) => updateField({ ...selectedField, width: Number(e.target.value) })} 
+                    />
                   </div>
                   <div className={styles.formGroup}>
                     <label htmlFor="field-height">Height</label>
-                    <input id="field-height" type="number" value={selectedField.height} onChange={(e) => updateField({ ...selectedField, height: Number(e.target.value) })} />
+                    <input 
+                      id="field-height"
+                      type="number" 
+                      value={selectedField.height} 
+                      onChange={(e) => updateField({ ...selectedField, height: Number(e.target.value) })} 
+                    />
                   </div>
                 </div>
               </div>

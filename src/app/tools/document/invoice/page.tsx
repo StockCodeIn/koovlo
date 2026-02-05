@@ -45,6 +45,8 @@ interface InvoiceData {
   paymentTerms: string;
   bankDetails: string;
   signature: string;
+  signatureType: 'image' | 'text';
+  signatureText: string;
   signatureDate: string;
   
   // Styling
@@ -75,6 +77,8 @@ export default function InvoiceGeneratorPage() {
     paymentTerms: 'Payment due within 30 days',
     bankDetails: '',
     signature: '',
+    signatureType: 'text',
+    signatureText: '',
     signatureDate: '',
     template: 'modern',
     accentColor: '#2563eb'
@@ -197,58 +201,36 @@ export default function InvoiceGeneratorPage() {
       const jsPDF = (await import('jspdf')).default;
 
       const element = previewRef.current;
-      
-      // Create canvas with proper dimensions
+
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 1.5,
         backgroundColor: '#ffffff',
-        logging: false,
-        allowTaint: true,
         useCORS: true,
-        windowWidth: element.offsetWidth,
-        windowHeight: element.offsetHeight,
-        onclone: (clonedDocument) => {
-          const clonedElement = clonedDocument.querySelector('[class*="preview"]') as HTMLElement;
-          if (clonedElement) {
-            clonedElement.style.transform = 'none';
-            clonedElement.style.maxHeight = 'none';
-            clonedElement.style.overflow = 'visible';
-          }
-        }
+        windowWidth: 794
       });
 
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      
-      // Calculate image dimensions
-      const imgWidth = pageWidth - 10; // 5mm margin on each side
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
       const imgData = canvas.toDataURL('image/png');
-      
-      let yPosition = 5; // 5mm top margin
-      let remainingHeight = imgHeight;
-      
-      // Add first page
-      pdf.addImage(imgData, 'PNG', 5, yPosition, imgWidth, imgHeight);
-      remainingHeight -= (pageHeight - 10); // 10mm total margin
-      
-      // Add subsequent pages if needed
-      let pageNum = 1;
-      while (remainingHeight > 0) {
-        pageNum++;
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = 210;
+      const pdfHeight = 297;
+
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pdfHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
         pdf.addPage();
-        yPosition -= (pageHeight - 10);
-        pdf.addImage(imgData, 'PNG', 5, yPosition, imgWidth, imgHeight);
-        remainingHeight -= (pageHeight - 10);
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pdfHeight;
       }
-      
+
       pdf.save(`invoice-${invoiceData.invoiceNumber}.pdf`);
     } catch (error) {
       console.error('PDF Generation Error:', error);
@@ -396,7 +378,7 @@ export default function InvoiceGeneratorPage() {
                   type="text"
                   value={invoiceData.invoiceNumber}
                   onChange={(e) => setInvoiceData({ ...invoiceData, invoiceNumber: e.target.value })}
-                  placeholder="INV-001"
+                  placeholder="001"
                 />
               </div>
               <div className={styles.formGroup}>
@@ -497,8 +479,9 @@ export default function InvoiceGeneratorPage() {
                   <div className={styles.itemNumber}>{index + 1}</div>
                   <div className={styles.itemFields}>
                     <div className={styles.formGroup}>
-                      <label>Description *</label>
+                        <label htmlFor={`item-desc-${item.id}`}>Description *</label>
                       <input
+                          id={`item-desc-${item.id}`}
                         type="text"
                         value={item.description}
                         onChange={(e) => updateItem(item.id, 'description', e.target.value)}
@@ -507,8 +490,9 @@ export default function InvoiceGeneratorPage() {
                     </div>
                     <div className={styles.formRow}>
                       <div className={styles.formGroup}>
-                        <label>Quantity</label>
+                          <label htmlFor={`item-qty-${item.id}`}>Quantity</label>
                         <input
+                            id={`item-qty-${item.id}`}
                           type="number"
                           min="0"
                           step="0.01"
@@ -517,8 +501,9 @@ export default function InvoiceGeneratorPage() {
                         />
                       </div>
                       <div className={styles.formGroup}>
-                        <label>Rate</label>
+                          <label htmlFor={`item-rate-${item.id}`}>Rate</label>
                         <input
+                            id={`item-rate-${item.id}`}
                           type="number"
                           min="0"
                           step="0.01"
@@ -527,8 +512,9 @@ export default function InvoiceGeneratorPage() {
                         />
                       </div>
                       <div className={styles.formGroup}>
-                        <label>Amount</label>
+                          <label htmlFor={`item-amount-${item.id}`}>Amount</label>
                         <input
+                            id={`item-amount-${item.id}`}
                           type="text"
                           value={`${invoiceData.currency}${item.amount.toFixed(2)}`}
                           readOnly
@@ -556,8 +542,9 @@ export default function InvoiceGeneratorPage() {
             <h2>Tax & Discount</h2>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label>Tax Rate (%)</label>
+                <label htmlFor="tax-rate">Tax Rate (%)</label>
                 <input
+                  id="tax-rate"
                   type="number"
                   min="0"
                   max="100"
@@ -567,8 +554,9 @@ export default function InvoiceGeneratorPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Discount Type</label>
+                <label htmlFor="discount-type">Discount Type</label>
                 <select
+                  id="discount-type"
                   value={invoiceData.discountType}
                   onChange={(e) => setInvoiceData({ ...invoiceData, discountType: e.target.value as 'percentage' | 'fixed' })}
                 >
@@ -577,8 +565,9 @@ export default function InvoiceGeneratorPage() {
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label>Discount Value</label>
+                <label htmlFor="discount-value">Discount Value</label>
                 <input
+                  id="discount-value"
                   type="number"
                   min="0"
                   step="0.01"
@@ -593,28 +582,70 @@ export default function InvoiceGeneratorPage() {
           <section className={styles.section}>
             <h2>Authorized Signature</h2>
             <div className={styles.formGroup}>
-              <label>Upload Signature</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleSignatureUpload}
-                className={styles.fileInput}
-              />
-              {invoiceData.signature && (
-                <div className={styles.signaturePreview}>
-                  <img src={invoiceData.signature} alt="Signature" />
-                  <button onClick={() => setInvoiceData({ ...invoiceData, signature: '' })}>Remove</button>
-                </div>
-              )}
+              <label htmlFor="signature-type">Signature Type</label>
+              <select
+                id="signature-type"
+                value={invoiceData.signatureType}
+                onChange={(e) => setInvoiceData({ 
+                  ...invoiceData, 
+                  signatureType: e.target.value as 'image' | 'text',
+                  signature: '',
+                  signatureText: '',
+                  signatureDate: new Date().toISOString()
+                })}
+              >
+                <option value="text">Type Signature</option>
+                <option value="image">Upload Image</option>
+              </select>
             </div>
+            
+            {invoiceData.signatureType === 'image' ? (
+              <div className={styles.formGroup}>
+                <label htmlFor="signature-upload">Upload Signature Image</label>
+                <input
+                  id="signature-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleSignatureUpload}
+                  className={styles.fileInput}
+                />
+                {invoiceData.signature && (
+                  <div className={styles.signaturePreview}>
+                    <img src={invoiceData.signature} alt="Signature" />
+                    <button onClick={() => setInvoiceData({ ...invoiceData, signature: '' })}>Remove</button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className={styles.formGroup}>
+                <label htmlFor="signature-text">Type Your Name</label>
+                <input
+                  id="signature-text"
+                  type="text"
+                  value={invoiceData.signatureText}
+                  onChange={(e) => setInvoiceData({ 
+                    ...invoiceData, 
+                    signatureText: e.target.value,
+                    signatureDate: new Date().toISOString()
+                  })}
+                  placeholder="Your Full Name"
+                />
+                {invoiceData.signatureText && (
+                  <div className={styles.signatureTextPreview}>
+                    <span className={styles.handwritingFont}>{invoiceData.signatureText}</span>
+                  </div>
+                )}
+              </div>
+            )}
           </section>
 
           {/* Additional Info */}
           <section className={styles.section}>
             <h2>Additional Information</h2>
             <div className={styles.formGroup}>
-              <label>Payment Terms</label>
+              <label htmlFor="payment-terms">Payment Terms</label>
               <textarea
+                id="payment-terms"
                 value={invoiceData.paymentTerms}
                 onChange={(e) => setInvoiceData({ ...invoiceData, paymentTerms: e.target.value })}
                 placeholder="Payment due within 30 days"
@@ -622,8 +653,9 @@ export default function InvoiceGeneratorPage() {
               />
             </div>
             <div className={styles.formGroup}>
-              <label>Bank Details</label>
+              <label htmlFor="bank-details">Bank Details</label>
               <textarea
+                id="bank-details"
                 value={invoiceData.bankDetails}
                 onChange={(e) => setInvoiceData({ ...invoiceData, bankDetails: e.target.value })}
                 placeholder="Bank Name: XYZ Bank&#10;Account Number: 1234567890&#10;Routing Number: 987654321"
@@ -631,8 +663,9 @@ export default function InvoiceGeneratorPage() {
               />
             </div>
             <div className={styles.formGroup}>
-              <label>Notes</label>
+              <label htmlFor="notes">Notes</label>
               <textarea
+                id="notes"
                 value={invoiceData.notes}
                 onChange={(e) => setInvoiceData({ ...invoiceData, notes: e.target.value })}
                 placeholder="Thank you for your business!"
@@ -662,7 +695,7 @@ export default function InvoiceGeneratorPage() {
           </div>
           <div 
             ref={previewRef} 
-            className={`${styles.preview} ${styles[invoiceData.template]}`}
+            className={`${styles.preview} ${styles.pdfPreview} ${styles[invoiceData.template]}`}
             style={{ '--accent-color': invoiceData.accentColor } as React.CSSProperties}
           >
             {/* Invoice Header */}
@@ -678,6 +711,7 @@ export default function InvoiceGeneratorPage() {
               </div>
               <div className={styles.invoiceInfo}>
                 <h2 className={styles.invoiceTitle}>INVOICE</h2>
+                {/* <span className={`${styles.statusBadge} ${styles.unpaid}`}>UNPAID</span> */}
                 <div className={styles.invoiceMeta}>
                   <div>
                     <span className={styles.label}>Invoice #:</span>
@@ -774,11 +808,15 @@ export default function InvoiceGeneratorPage() {
                   <p>{invoiceData.notes}</p>
                 </div>
               )}
-              {invoiceData.signature && (
+              {(invoiceData.signature || invoiceData.signatureText) && (
                 <div className={styles.footerSection}>
                   <h4>Authorized Signature</h4>
                   <div className={styles.signatureDisplay}>
-                    <img src={invoiceData.signature} alt="Signature" />
+                    {invoiceData.signatureType === 'image' && invoiceData.signature ? (
+                      <img src={invoiceData.signature} alt="Signature" />
+                    ) : (
+                      <span className={styles.handwritingSignature}>{invoiceData.signatureText}</span>
+                    )}
                     <div className={styles.signatureLine}></div>
                     {invoiceData.signatureDate && (
                       <p className={styles.signatureDate}>
@@ -788,6 +826,9 @@ export default function InvoiceGeneratorPage() {
                   </div>
                 </div>
               )}
+            </div>
+            <div className={styles.legalNote}>
+              This is a computer generated invoice and does not require physical signature.
             </div>
           </div>
         </div>

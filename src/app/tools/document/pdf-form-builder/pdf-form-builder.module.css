@@ -34,7 +34,7 @@
 /* Form Builder Styles */
 .formBuilder {
   display: grid;
-  grid-template-columns: 280px 1fr 320px;
+  grid-template-columns: 250px 1fr 300px;
   height: 100%;
   gap: 0;
 }
@@ -221,17 +221,38 @@
   background: #f1f5f9;
   position: relative;
   overflow: auto;
-  padding: 40px;
+  padding: 30px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex: 1;
+}
+
+.canvas::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.canvas::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.canvas::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 5px;
+}
+
+.canvas::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .canvasPage {
-  width: 595px;
-  min-height: 842px;
   background: white;
-  margin: 0 auto;
+  margin: 0;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   position: relative;
-  padding: 40px;
+  padding: 0;
+  flex-shrink: 0;
 }
 
 .emptyState {
@@ -456,6 +477,12 @@
   margin-top: 8px;
 }
 
+.colorRow {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .formBuilder {
@@ -481,11 +508,40 @@
     justify-content: center;
   }
 
-  .sidebar,
-  .propertiesPanel {
+  .sidebar {
     display: block;
     border: none;
     border-bottom: 1px solid #e2e8f0;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  /* Properties panel - make it a bottom sheet */
+  .propertiesPanel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 2px solid #e2e8f0;
+    max-height: 50vh;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .propertiesEmpty {
+    padding: 20px;
+    text-align: center;
+  }
+
+  .propertiesEmpty h3 {
+    font-size: 0.9rem;
+    margin: 0 0 5px 0;
+  }
+
+  .propertiesEmpty p {
+    font-size: 0.8rem;
   }
 
   .sidebarHeader {
@@ -496,29 +552,62 @@
     padding: 12px;
   }
 
-  .templateGrid {
-    grid-template-columns: 1fr;
+  .fieldPalette {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
   }
 
-  .fieldPalette {
-    grid-template-columns: 1fr;
+  .fieldBtn {
+    padding: 8px;
+    gap: 6px;
+    min-height: 50px;
+  }
+
+  .fieldIcon {
+    width: 24px;
+    height: 24px;
+    font-size: 1rem;
+  }
+
+  .fieldInfo {
+    display: none;
   }
 
   .canvas {
     padding: 16px;
+    padding-bottom: 280px; /* Space for properties panel */
   }
 
   .canvasPage {
     width: 100%;
-    min-height: 640px;
-    padding: 20px;
+    max-width: 100%;
+    box-shadow: none;
   }
 
   .canvasField {
-    min-width: 140px;
+    min-width: 80px;
   }
 
   .propertiesContent {
-    padding: 16px;
+    padding: 12px;
+    font-size: 0.85rem;
+  }
+
+  .gridRow {
+    grid-template-columns: 1fr;
+  }
+
+  .formGroup label {
+    font-size: 0.8rem;
+  }
+
+  .formGroup input,
+  .formGroup select {
+    font-size: 0.85rem;
+  }
+
+  .propSection h3 {
+    font-size: 0.8rem;
   }
 }

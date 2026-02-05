@@ -1,7 +1,11 @@
+/* Import Google Fonts for handwriting signatures */
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Allura&display=swap');
+
 .container {
   max-width: 1800px;
   margin: 0 auto;
   padding: 20px;
+  overflow-x: hidden;
 }
 
 .header {
@@ -25,6 +29,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 30px;
   align-items: start;
+  max-width: 100%;
 }
 
 /* Form Panel */
@@ -35,6 +40,8 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   max-height: 85vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 .section {
@@ -126,6 +133,8 @@
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .formGroup input:focus,
@@ -205,6 +214,7 @@
   border-radius: 10px;
   border: 2px solid #e2e8f0;
   position: relative;
+  flex-wrap: wrap;
 }
 
 .itemNumber {
@@ -222,6 +232,7 @@
 
 .itemFields {
   flex: 1;
+  min-width: 0;
 }
 
 .removeBtn {
@@ -312,6 +323,8 @@
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .previewHeader {
@@ -332,7 +345,11 @@
   min-height: 800px;
   max-height: 70vh;
   overflow-y: auto;
+  overflow-x: auto;
   font-size: 12px;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Invoice Styles */
@@ -373,6 +390,32 @@
   color: var(--accent-color, #3b82f6);
   margin-bottom: 4px;
   font-weight: 700;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 6px;
+}
+
+/* .statusBadge.unpaid {
+  background: #fef3c7;
+  color: #92400e;
+} */
+
+/* .statusBadge.paid {
+  background: #d1fae5;
+  color: #065f46;
+} */
+
+.statusBadge.due {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
 .invoiceMeta div {
@@ -428,6 +471,8 @@
   border-collapse: collapse;
   margin: 10px 0;
   font-size: 0.7rem;
+  max-width: 100%;
+  table-layout: fixed;
 }
 
 .itemsTable thead {
@@ -456,6 +501,8 @@
   padding: 4px 5px;
   border-bottom: 0.5px solid #e2e8f0;
   font-size: 0.7rem;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .itemsTable td:last-child {
@@ -531,6 +578,67 @@
   font-size: 0.7rem;
 }
 
+.legalNote {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 0.5px solid #e2e8f0;
+  text-align: center;
+  font-size: 0.6rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+/* Handwriting Signature Styles */
+.handwritingFont {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #1e293b;
+  display: inline-block;
+  margin-top: 8px;
+}
+
+.handwritingSignature {
+  font-family: 'Great Vibes', cursive;
+  font-size: 2rem;
+  font-weight: 400;
+  color: #1e40af;
+  display: inline-block;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  position: relative;
+}
+
+.handwritingSignature::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 2px,
+    rgba(226, 232, 240, 0.3) 2px,
+    rgba(226, 232, 240, 0.3) 4px
+  );
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+.signatureTextPreview {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 2px dashed #cbd5e1;
+  text-align: center;
+}
+
 /* Signature Styles */
 .signaturePreview,
 .signatureDisplay {
@@ -552,27 +660,35 @@
 
 .signatureDisplay {
   flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
+  align-items: flex-end;
+  gap: 4px;
+  margin-left: auto;
+  max-width: 250px;
 }
 
 .signatureDisplay img {
-  max-width: 110px;
-  max-height: 40px;
+  max-width: 150px;
+  max-height: 50px;
   object-fit: contain;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .signatureLine {
-  width: 110px;
-  border-top: 0.7px solid #64748b;
-  margin-top: 1px;
+  width: 100%;
+  border-top: 1px solid #94a3b8;
+  margin-top: 4px;
 }
 
 .signatureDate {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: #64748b;
   margin: 0;
   font-style: italic;
+  text-align: right;
 }
 
 .signaturePreview button {
@@ -587,6 +703,59 @@
 
 .signaturePreview button:hover {
   background: #dc2626;
+}
+
+/* ===== PDF SAFE LAYOUT ===== */
+.pdfPreview {
+  width: 794px;              /* A4 width @96dpi */
+  min-height: auto;
+  max-height: none;
+  overflow: visible !important;
+  font-size: 11px;           /* Compact font */
+  line-height: 1.25;
+  padding: 24px;             /* Tighter padding */
+  box-sizing: border-box;
+}
+
+.pdfPreview .invoiceHeader {
+  align-items: flex-start;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+}
+
+.pdfPreview .billTo {
+  margin-bottom: 6px;
+  padding: 6px 10px;
+}
+
+.pdfPreview .itemsTable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.pdfPreview .itemsTable th,
+.pdfPreview .itemsTable td {
+  padding: 3px 4px;          /* Compact rows */
+}
+
+.pdfPreview .itemsTable tr {
+  page-break-inside: avoid;  /* Don't break rows */
+}
+
+.pdfPreview .totals {
+  margin-top: 6px;
+  padding: 6px 10px;
+}
+
+.pdfPreview .invoiceFooter {
+  margin-top: 8px;
+  padding-top: 6px;
+  page-break-inside: avoid;  /* Keep footer together */
+}
+
+.pdfPreview img {
+  max-width: 100%;
+  display: block;
 }
 
 /* Template Variants */
@@ -686,8 +855,16 @@
     padding: 20px;
   }
 
+  .previewPanel {
+    padding: 12px;
+  }
+
   .preview {
     padding: 30px 20px;
+    max-width: 100%;
+    overflow-x: auto;
+    min-height: auto;
+    font-size: 11px;
   }
 
   .invoiceHeader {
@@ -717,5 +894,12 @@
 
   .formRow {
     grid-template-columns: 1fr;
+  }
+
+  .itemsTable {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: 0.65rem;
   }
 }
