@@ -8,6 +8,25 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logoImg {
+  width: 34px;
+  height: 34px;
+}
+
+.logoText {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff; /* navbar blue ke upar white */
+  letter-spacing: 0.3px;
+}
+
 
 .container {
   display: flex;
@@ -18,11 +37,11 @@
   padding: 14px 24px;
 }
 
-.logo {
+/* .logo {
   font-size: 1.5rem;
   font-weight: 700;
   color: #fff;
-}
+} */
 
 .nav {
   display: flex;
@@ -53,6 +72,16 @@
     font-size: 1.5rem;
     color: #fff;
   }
+ 
+   .logoText {
+    font-size: 1.2rem;
+  }
+
+  .logoImg {
+    width: 30px;
+    height: 30px;
+  }
+
 
   .nav {
     display: none;

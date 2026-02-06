@@ -10,7 +10,16 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <Link href="/" className={styles.logo}>Koovlo</Link>
+        {/* <Link href="/" className={styles.logo}>Koovlo</Link> */}
+        <Link href="/" className={styles.logo}>
+          <img
+            src="/brand/logo.svg"
+            alt="Koovlo logo"
+            className={styles.logoImg}
+          />
+           <span className={styles.logoText}>Koovlo</span>
+        </Link>
+
 
         <button
           className={styles.menuButton}

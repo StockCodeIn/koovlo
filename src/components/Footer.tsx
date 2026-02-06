@@ -13,9 +13,17 @@ export default function Footer() {
       <div className={styles.container}>
         {/* Brand Info */}
         <div className={styles.brand}>
-          <h3>Koovlo</h3>
+          <div className={styles.brandHeader}>
+            <img
+              src="/brand/logo.svg"
+              alt="Koovlo logo"
+              className={styles.footerLogo}
+            />
+
+            <h3>Koovlo</h3>
+          </div>
           <p>
-            Free online tools for PDF editing, image processing, education calculators, and more. 
+            Free online tools for PDF editing, image processing, education calculators, and more.
             All tools work in your browser for maximum privacy and speed.
           </p>
         </div>

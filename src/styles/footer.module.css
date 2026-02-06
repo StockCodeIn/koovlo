@@ -21,10 +21,23 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.brandHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footerLogo {
+  width: 28px;
+  height: 28px;
+}
+
+
+
 .brand h3 {
   font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 12px;
+  font-weight: 600;
+  color: #ffffff;
 }
 
 .brand p {
@@ -118,7 +131,7 @@
     grid-template-columns: 1fr 1fr;
     gap: 35px;
   }
-  
+
   .brand {
     grid-column: 1 / -1;
     text-align: center;
@@ -159,7 +172,7 @@
 
   .form button {
     width: 100%;
-    
+
   }
 
   .container {
@@ -175,7 +188,15 @@
 
   .brand h3 {
     font-size: 1.2rem;
-    margin-bottom: 8px;
+  }
+
+  .footerLogo {
+    width: 20px;
+    height: 20px;
+  }
+
+  .brandHeader {
+    gap: 6px;
   }
 
   .brand p {

@@ -3,9 +3,19 @@ import { MetadataRoute } from 'next'
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://koovlo.com'
 
-  const tools = [
+  // Static pages
+  const staticPages = [
+    { url: '/', priority: 1.0, changeFrequency: 'daily' as const },
+    { url: '/about', priority: 0.8, changeFrequency: 'monthly' as const },
+    { url: '/contact', priority: 0.8, changeFrequency: 'monthly' as const },
+    { url: '/privacy', priority: 0.5, changeFrequency: 'yearly' as const },
+    { url: '/terms', priority: 0.5, changeFrequency: 'yearly' as const },
+    { url: '/tools', priority: 0.9, changeFrequency: 'weekly' as const },
+  ]
+
+  // PDF Tools
+  const pdfTools = [
     '/tools/pdf/merge',
-    '/tools/pdf/split',
     '/tools/pdf/compress',
     '/tools/pdf/rotate',
     '/tools/pdf/reorder',
@@ -17,114 +27,80 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/tools/pdf/page-number',
     '/tools/pdf/grayscale',
     '/tools/pdf/metadata',
-    '/tools/pdf/analyzer',
     '/tools/pdf/sign',
+    '/tools/pdf/crop',
+    '/tools/pdf/extract-pages',
+    '/tools/pdf/duplicate-pages',
+    '/tools/pdf/page-range-split',
+    '/tools/pdf/change-page-size',
+  ]
+
+  // Image Tools
+  const imageTools = [
     '/tools/image/resize',
     '/tools/image/compress',
-    '/tools/image/crop',
-    '/tools/image/rotate',
-    '/tools/image/flip',
     '/tools/image/convert',
-    '/tools/image/quality',
-    '/tools/image/webp',
-    '/tools/image/blur',
-    '/tools/image/grayscale',
-    '/tools/image/brightness',
-    '/tools/image/saturation',
-    '/tools/image/sepia',
-    '/tools/image/invert',
-    '/tools/image/add-text',
     '/tools/image/add-watermark',
-    '/tools/image/annotate',
-    '/tools/image/border',
-    '/tools/image/to-base64',
-    '/tools/image/from-base64',
-    '/tools/image/dimensions',
-    '/tools/image/bulk-resize',
-    '/tools/image/bulk-convert',
-    '/tools/image/bulk-compress',
-    '/tools/image/bg-remove',
+    '/tools/image/strip-metadata',
+  ]
+
+  // Education Tools
+  const educationTools = [
     '/tools/education/percentage',
     '/tools/education/cgpa',
     '/tools/education/gpa',
-    '/tools/education/marks-percentage',
     '/tools/education/grade',
     '/tools/education/attendance',
     '/tools/education/rank',
-    '/tools/education/word-counter',
-    '/tools/education/reading-time',
-    '/tools/education/text-summarizer',
     '/tools/education/flashcard',
     '/tools/education/quiz-generator',
     '/tools/education/notes-organizer',
-    '/tools/education/scientific-calc',
-    '/tools/education/unit-converter',
-    '/tools/education/fraction-calc',
-    '/tools/education/average',
-    '/tools/education/speed-distance-time',
-    '/tools/education/interest',
-    '/tools/education/timer',
-    '/tools/education/answer-sheet',
-    '/tools/education/omr-sheet',
     '/tools/education/revision-planner',
-    '/tools/education/checklist',
+  ]
+
+  // Document Tools
+  const documentTools = [
     '/tools/document/resume-builder',
-    '/tools/document/cv-builder',
     '/tools/document/invoice',
-    '/tools/document/bill',
-    '/tools/document/quotation',
-    '/tools/document/business-card',
-    '/tools/document/letterhead',
-    '/tools/document/certificate',
-    '/tools/document/id-card',
-    '/tools/document/experience-letter',
-    '/tools/document/offer-letter',
-    '/tools/document/bonafide',
-    '/tools/document/salary-slip',
-    '/tools/document/report-cover',
+    '/tools/document/pdf-form-builder',
+  ]
+
+  // Text/Web Tools
+  const textWebTools = [
     '/tools/text-web/word-counter',
-    '/tools/text-web/char-counter',
     '/tools/text-web/case-converter',
-    '/tools/text-web/remove-spaces',
-    '/tools/text-web/text-sorter',
-    '/tools/text-web/text-replacer',
-    '/tools/text-web/text-to-speech',
-    '/tools/text-web/speech-to-text',
     '/tools/text-web/json-formatter',
-    '/tools/text-web/json-validator',
     '/tools/text-web/base64',
     '/tools/text-web/url-encode',
-    '/tools/text-web/html-minifier',
-    '/tools/text-web/css-minifier',
-    '/tools/text-web/js-minifier',
     '/tools/text-web/regex-tester',
     '/tools/text-web/lorem-ipsum',
-    '/tools/text-web/meta-generator',
-    '/tools/file/zip-creator',
-    '/tools/file/size-checker',
-    '/tools/file/bulk-renamer',
-    '/tools/file/text-to-pdf',
-    '/tools/file/pdf-to-text',
+    '/tools/text-web/text-summarizer',
+    '/tools/text-web/text-to-speech',
+  ]
+
+  // Combine all tools
+  const allTools = [
+    ...pdfTools,
+    ...imageTools,
+    ...educationTools,
+    ...documentTools,
+    ...textWebTools,
   ]
 
   return [
-    {
-      url: baseUrl,
+    // Static pages
+    ...staticPages.map(page => ({
+      url: `${baseUrl}${page.url}`,
       lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/tools`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    ...tools.map(tool => ({
+      changeFrequency: page.changeFrequency,
+      priority: page.priority,
+    })),
+    // Tools
+    ...allTools.map(tool => ({
       url: `${baseUrl}${tool}`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
-      priority: 0.6,
+      priority: 0.7,
     })),
   ]
 }
