@@ -1,9 +1,6 @@
 {
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "env": {
-    "NEXT_PUBLIC_GA_ID": "@GA_ID"
-  },
   "redirects": [
     {
       "source": "/docs/:path*",
