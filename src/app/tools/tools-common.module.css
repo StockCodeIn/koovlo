@@ -67,12 +67,16 @@
   display: grid;
   gap: 20px;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  min-height: 640px;
+  contain: layout;
 }
 
 .featureGrid {
   display: grid;
   gap: 16px;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  min-height: 180px;
+  contain: layout;
 }
 
 .featureCard {
@@ -104,6 +108,8 @@
   display: grid;
   gap: 14px;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  min-height: 260px;
+  contain: layout;
 }
 
 .faqCard {

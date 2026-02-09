@@ -1,4 +1,4 @@
-/* Optimize Google Fonts loading */
+/* Google Fonts with display=swap - fonts load async without blocking render */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap');
 
 /* src/app/globals.css */
@@ -9,8 +9,8 @@
   --brand-text: #1a1a1a;
   --brand-muted: #5f6368;
   --brand-radius: 12px;
-  --font-heading: "Poppins", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, sans-serif;
+  --font-heading: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --container-max: 1200px;
   --transition-fast: 0.25s ease;
   
@@ -56,6 +56,8 @@ main {
   max-width: var(--container-max);
   margin: auto;
   padding: 2rem 1rem;
+  min-height: 600px;
+  contain: layout style paint;
 }
 
 /* Focus visible for keyboard navigation */

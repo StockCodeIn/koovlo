@@ -3,9 +3,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ToolsNav from "@/components/ToolsNav";
 import { GoogleAnalytics } from "@/components/Analytics";
 import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import Script from "next/script";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.koovlo.com"),
@@ -116,15 +118,16 @@ export default function RootLayout({
         {/* Preload critical fonts and resources */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        
+        {/* Preload critical Poppins 700 font */}
+        <link rel="preload" as="font" href="https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLCz7Z1xlFd2JQEk.woff2" type="font/woff2" crossOrigin="anonymous" />
         
         {/* JSON-LD Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-
-        {/* Canonical URL */}
-        <link rel="canonical" href="https://www.koovlo.com" />
       </head>
       <body>
         {/* Google Analytics */}
@@ -133,6 +136,7 @@ export default function RootLayout({
         )}
         
         <Header />
+        <ToolsNav />
         <main>
           {children}
         </main>

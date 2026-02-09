@@ -24,11 +24,10 @@ export default function textWebLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-        <ToolsNav />
+   
     <section >
       <div>{children}</div>
     </section>
-    </>
+    
   );
 }

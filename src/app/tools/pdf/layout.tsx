@@ -20,6 +20,9 @@ export const metadata: Metadata = {
     siteName: "Koovlo",
     type: "website",
   },
+  alternates: {
+    canonical: "https://www.koovlo.com/tools/pdf",
+  },
 };
 
 export default function PdfLayout({
@@ -28,11 +31,10 @@ export default function PdfLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-        <ToolsNav />
+  
     <section>
       <div>{children}</div>
     </section>
-    </>
+    
   );
 }

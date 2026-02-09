@@ -98,7 +98,7 @@ export default function PdfToolsPage() {
         </div>
       </section>
 
-      <Suspense fallback={<div style={{ height: "400px" }} />}>
+      <Suspense fallback={<div style={{ minHeight: "320px" }} />}>
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
             <h2>Frequently Asked Questions</h2>

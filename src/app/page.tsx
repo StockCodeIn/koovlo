@@ -1,30 +1,24 @@
 // src/app/page.tsx
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import styles from "./page.module.css";
 
-// Lazy load ToolsNav (not critical for LCP)
-const ToolsNav = dynamic(() => import("@/components/ToolsNav"), {
-  loading: () => <div style={{ height: "60px" }} />,
-  ssr: true,
-});
+
 
 export default function HomePage() {
   return (
-    <>
-      <ToolsNav />
-      <main>
-        <section className={styles.hero}>
-          <h1>Free Online Tools for Everyday Tasks</h1>
-          <p>
-            Koovlo helps you edit PDFs, images, documents, and text — fast, free, and privacy‑friendly.
-          </p>
-          <div className={styles.heroCta}>
-            <Link href="/tools" className={styles.primaryCta}>Explore All Tools</Link>
-          </div>
-        </section>
+    <main>
+      
+      <section className={styles.hero}>
+        <h1>Free Online Tools for Everyday Tasks</h1>
+        <p>
+          Koovlo helps you edit PDFs, images, documents, and text — fast, free, and privacy‑friendly.
+        </p>
+        <div className={styles.heroCta}>
+          <Link href="/tools" className={styles.primaryCta}>Explore All Tools</Link>
+        </div>
+      </section>
 
-        <section className={styles.quickSection}>
+      <section className={styles.quickSection}>
           <h2>Important Tools</h2>
           <div className={styles.quickGrid}>
             <Link href="/tools/pdf/merge" className={styles.toolCard}>📄 PDF Merge</Link>
@@ -53,7 +47,7 @@ export default function HomePage() {
           </div>
         </section>
       </main>
-    </>
+    
   );
 }
 

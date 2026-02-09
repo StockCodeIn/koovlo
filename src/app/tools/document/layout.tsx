@@ -28,11 +28,10 @@ export default function DocumentLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-        <ToolsNav />
+    
     <section >
       <div>{children}</div>
     </section>
-    </>
+   
   );
 }

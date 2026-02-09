@@ -2,15 +2,8 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
-import dynamic from "next/dynamic";
 import ToolCard from "@/components/ToolCard";
 import styles from "./tools.module.css";
-
-// Lazy load ToolsNav (not critical for LCP)
-const ToolsNav = dynamic(() => import("@/components/ToolsNav"), {
-  loading: () => <div style={{ height: "60px" }} />,
-  ssr: true,
-});
 
 const faqs = [
   {
@@ -146,9 +139,7 @@ export default function AllTools() {
   }, [filteredTools]);
 
   return (
-    <>
-      <ToolsNav />
-      <main className={styles.main}>
+    <main className={styles.main}>
         <section className={styles.heroSection}>
           <h1>All Tools</h1>
           <p>Explore our complete collection of productivity tools</p>
@@ -344,6 +335,6 @@ export default function AllTools() {
           </div>
         </section>
       </main>
-    </>
   );
 }
+
