@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Free Education Tools – Koovlo",
     description:
       "Smart, free education tools for students — calculate grades, CGPA, attendance, and more in seconds.",
-    url: "https://koovlo.com/tools/education",
+    url: "https://www.koovlo.com/tools/education",
     siteName: "Koovlo",
     type: "website",
   },

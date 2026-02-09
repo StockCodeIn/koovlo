@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Create beautiful, professional invoices with customizable templates. Download as PDF instantly.",
     type: "website",
-    url: "https://koovlo.com/tools/document/invoice",
+    url: "https://www.koovlo.com/tools/document/invoice",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/document/invoice",
+    canonical: "https://www.koovlo.com/tools/document/invoice",
   },
 };
 

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Add custom watermarks to PDFs. Choose text or image watermarks with adjustable position and opacity.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/watermark",
+    url: "https://www.koovlo.com/tools/pdf/watermark",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/watermark",
+    canonical: "https://www.koovlo.com/tools/pdf/watermark",
   },
 };
 

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Test and debug regular expressions instantly. Match patterns, highlight results, and use regex flags for flexible pattern testing.",
     type: "website",
-    url: "https://koovlo.com/tools/text-web/regex-tester",
+    url: "https://www.koovlo.com/tools/text-web/regex-tester",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/text-web/regex-tester",
+    canonical: "https://www.koovlo.com/tools/text-web/regex-tester",
   },
 };
 

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Organize study notes by category and tags. Search, pin favorites, color-code notes, and switch between list and grid views. Perfect note management.",
     type: "website",
-    url: "https://koovlo.com/tools/education/notes-organizer",
+    url: "https://www.koovlo.com/tools/education/notes-organizer",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/education/notes-organizer",
+    canonical: "https://www.koovlo.com/tools/education/notes-organizer",
   },
 };
 

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Track student attendance with daily records. Calculate attendance percentage, set targets, and manage class rosters. Support for multiple absence types.",
     type: "website",
-    url: "https://koovlo.com/tools/education/attendance",
+    url: "https://www.koovlo.com/tools/education/attendance",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/education/attendance",
+    canonical: "https://www.koovlo.com/tools/education/attendance",
   },
 };
 

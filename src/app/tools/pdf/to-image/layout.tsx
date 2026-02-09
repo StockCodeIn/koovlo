@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Convert PDF pages to high-quality images. Choose PNG or JPG format and download instantly.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/to-image",
+    url: "https://www.koovlo.com/tools/pdf/to-image",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/to-image",
+    canonical: "https://www.koovlo.com/tools/pdf/to-image",
   },
 };
 

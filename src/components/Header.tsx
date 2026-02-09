@@ -1,6 +1,7 @@
 // src/components/Header.tsx
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import styles from "@/styles/header.module.css";
 
@@ -10,12 +11,14 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        {/* <Link href="/" className={styles.logo}>Koovlo</Link> */}
         <Link href="/" className={styles.logo}>
-          <img
+          <Image
             src="/brand/logo.svg"
             alt="Koovlo logo"
             className={styles.logoImg}
+            width={32}
+            height={32}
+            priority
           />
            <span className={styles.logoText}>Koovlo</span>
         </Link>

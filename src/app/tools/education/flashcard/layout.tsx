@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Create, organize, and study flashcards with spaced repetition. Categorize by subject, track progress, and use timed study sessions. Perfect for exam prep.",
     type: "website",
-    url: "https://koovlo.com/tools/education/flashcard",
+    url: "https://www.koovlo.com/tools/education/flashcard",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/education/flashcard",
+    canonical: "https://www.koovlo.com/tools/education/flashcard",
   },
 };
 

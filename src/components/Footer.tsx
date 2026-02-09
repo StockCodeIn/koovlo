@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import styles from "@/styles/footer.module.css";
 
 export default function Footer() {
@@ -14,10 +15,12 @@ export default function Footer() {
         {/* Brand Info */}
         <div className={styles.brand}>
           <div className={styles.brandHeader}>
-            <img
+            <Image
               src="/brand/logo.svg"
               alt="Koovlo logo"
               className={styles.footerLogo}
+              width={32}
+              height={32}
             />
 
             <h3>Koovlo</h3>

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Calculate CGPA across multiple semesters instantly. Support for 4.0 and 10.0 grade scales. Track semester-wise GPA and cumulative performance.",
     type: "website",
-    url: "https://koovlo.com/tools/education/cgpa",
+    url: "https://www.koovlo.com/tools/education/cgpa",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/education/cgpa",
+    canonical: "https://www.koovlo.com/tools/education/cgpa",
   },
 };
 

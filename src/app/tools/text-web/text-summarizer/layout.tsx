@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Summarize long text instantly with extractive and bullet-point modes. Get key sentences, adjust compression ratio, and track summary history.",
     type: "website",
-    url: "https://koovlo.com/tools/text-web/text-summarizer",
+    url: "https://www.koovlo.com/tools/text-web/text-summarizer",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/text-web/text-summarizer",
+    canonical: "https://www.koovlo.com/tools/text-web/text-summarizer",
   },
 };
 

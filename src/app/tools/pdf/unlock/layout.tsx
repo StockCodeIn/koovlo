@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Remove password protection from PDFs instantly. Unlock secured files for editing and printing.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/unlock",
+    url: "https://www.koovlo.com/tools/pdf/unlock",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/unlock",
+    canonical: "https://www.koovlo.com/tools/pdf/unlock",
   },
 };
 

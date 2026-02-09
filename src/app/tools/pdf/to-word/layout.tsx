@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Convert PDF documents to editable Word files instantly. Extract text and formatting easily.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/to-word",
+    url: "https://www.koovlo.com/tools/pdf/to-word",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/to-word",
+    canonical: "https://www.koovlo.com/tools/pdf/to-word",
   },
 };
 

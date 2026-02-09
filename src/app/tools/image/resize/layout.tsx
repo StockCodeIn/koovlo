@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Resize images instantly with multiple modes: exact dimensions, percentage, or presets (thumbnail to 4K). Maintain aspect ratio and choose output format.",
     type: "website",
-    url: "https://koovlo.com/tools/image/resize",
+    url: "https://www.koovlo.com/tools/image/resize",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/image/resize",
+    canonical: "https://www.koovlo.com/tools/image/resize",
   },
 };
 

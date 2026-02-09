@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Create effective study plans by subject and topic. Track hours needed, monitor progress, analyze performance, and manage exam preparation timeline.",
     type: "website",
-    url: "https://koovlo.com/tools/education/revision-planner",
+    url: "https://www.koovlo.com/tools/education/revision-planner",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/education/revision-planner",
+    canonical: "https://www.koovlo.com/tools/education/revision-planner",
   },
 };
 

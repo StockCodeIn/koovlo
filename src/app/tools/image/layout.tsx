@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Free Image Tools – Koovlo",
     description:
       "Edit, compress and convert images instantly with Koovlo's free and privacy-friendly tools.",
-    url: "https://koovlo.com/tools/image",
+    url: "https://www.koovlo.com/tools/image",
     siteName: "Koovlo",
     type: "website",
   },

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Add digital signatures, initials, dates, and text to PDFs. Drag to position and customize instantly.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/sign",
+    url: "https://www.koovlo.com/tools/pdf/sign",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/sign",
+    canonical: "https://www.koovlo.com/tools/pdf/sign",
   },
 };
 

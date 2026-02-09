@@ -1,7 +1,13 @@
 // src/app/page.tsx
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import styles from "./page.module.css";
-import ToolsNav from "@/components/ToolsNav";
+
+// Lazy load ToolsNav (not critical for LCP)
+const ToolsNav = dynamic(() => import("@/components/ToolsNav"), {
+  loading: () => <div style={{ height: "60px" }} />,
+  ssr: true,
+});
 
 export default function HomePage() {
   return (

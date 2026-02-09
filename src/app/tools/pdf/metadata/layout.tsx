@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "View and edit PDF metadata - title, author, subject, keywords, and technical properties instantly.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/metadata",
+    url: "https://www.koovlo.com/tools/pdf/metadata",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/metadata",
+    canonical: "https://www.koovlo.com/tools/pdf/metadata",
   },
 };
 

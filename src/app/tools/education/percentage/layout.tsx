@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Calculate percentages instantly. Simple percentage, subject-wise, weighted calculations, and CGPA to percentage conversion. Get instant results.",
     type: "website",
-    url: "https://koovlo.com/tools/education/percentage",
+    url: "https://www.koovlo.com/tools/education/percentage",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/education/percentage",
+    canonical: "https://www.koovlo.com/tools/education/percentage",
   },
 };
 

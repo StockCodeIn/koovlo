@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Calculate student rankings based on scores. View statistics (highest, lowest, average, median), track performance history, and analyze trends.",
     type: "website",
-    url: "https://koovlo.com/tools/education/rank",
+    url: "https://www.koovlo.com/tools/education/rank",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/education/rank",
+    canonical: "https://www.koovlo.com/tools/education/rank",
   },
 };
 

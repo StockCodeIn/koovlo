@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Convert colored PDFs to grayscale instantly. Perfect for printing and reducing file sizes.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/grayscale",
+    url: "https://www.koovlo.com/tools/pdf/grayscale",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/grayscale",
+    canonical: "https://www.koovlo.com/tools/pdf/grayscale",
   },
 };
 

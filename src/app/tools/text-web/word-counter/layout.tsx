@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Count words, characters, lines, sentences, and paragraphs instantly. Get reading time, word statistics, and analyze text density. Supports history tracking.",
     type: "website",
-    url: "https://koovlo.com/tools/text-web/word-counter",
+    url: "https://www.koovlo.com/tools/text-web/word-counter",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/text-web/word-counter",
+    canonical: "https://www.koovlo.com/tools/text-web/word-counter",
   },
 };
 

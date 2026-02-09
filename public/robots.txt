@@ -1,9 +1,14 @@
+# Koovlo - Free Online Tools
 # Allow all search engines to crawl the site
 User-agent: *
 Allow: /
 
-# Disallow API routes
+# Disallow API routes from indexing
 Disallow: /api/
 
 # Sitemap location
 Sitemap: https://www.koovlo.com/sitemap.xml
+
+# Crawl delay recommendations
+Crawl-delay: 1
+

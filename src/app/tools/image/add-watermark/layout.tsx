@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Add text or image watermarks to photos with customizable position, opacity, color, and font size. Protect images with brand watermarks instantly.",
     type: "website",
-    url: "https://koovlo.com/tools/image/add-watermark",
+    url: "https://www.koovlo.com/tools/image/add-watermark",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/image/add-watermark",
+    canonical: "https://www.koovlo.com/tools/image/add-watermark",
   },
 };
 

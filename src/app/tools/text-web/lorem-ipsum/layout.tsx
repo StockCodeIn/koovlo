@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Generate dummy text instantly with customizable paragraphs and word count. Perfect for design mockups and content placeholders.",
     type: "website",
-    url: "https://koovlo.com/tools/text-web/lorem-ipsum",
+    url: "https://www.koovlo.com/tools/text-web/lorem-ipsum",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/text-web/lorem-ipsum",
+    canonical: "https://www.koovlo.com/tools/text-web/lorem-ipsum",
   },
 };
 

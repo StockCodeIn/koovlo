@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Compress PDFs with multiple compression levels. Reduce file size instantly without quality loss. Works offline, fully private.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/compress",
+    url: "https://www.koovlo.com/tools/pdf/compress",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/compress",
+    canonical: "https://www.koovlo.com/tools/pdf/compress",
   },
 };
 

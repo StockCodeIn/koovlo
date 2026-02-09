@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import styles from "./compress.module.css";
 import ToolInfo from "@/components/ToolInfo";
 
@@ -21,6 +21,16 @@ export default function ImageCompress() {
   const [maxWidth, setMaxWidth] = useState<number | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Cleanup URLs on unmount
+  useEffect(() => {
+    return () => {
+      images.forEach((img) => {
+        if (img.preview) URL.revokeObjectURL(img.preview);
+        if (img.compressedBlob) URL.revokeObjectURL(URL.createObjectURL(img.compressedBlob));
+      });
+    };
+  }, []);
 
   const handleFiles = (files: FileList | null) => {
     if (!files) return;

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Generate quizzes with multiple choice, true-false, and short answer questions. Set time limits, track scores, and analyze performance across attempts.",
     type: "website",
-    url: "https://koovlo.com/tools/education/quiz-generator",
+    url: "https://www.koovlo.com/tools/education/quiz-generator",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/education/quiz-generator",
+    canonical: "https://www.koovlo.com/tools/education/quiz-generator",
   },
 };
 

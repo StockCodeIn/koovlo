@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Duplicate specific pages within your PDF. Create multiple copies of selected pages for templates and forms.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/duplicate-pages",
+    url: "https://www.koovlo.com/tools/pdf/duplicate-pages",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/duplicate-pages",
+    canonical: "https://www.koovlo.com/tools/pdf/duplicate-pages",
   },
 };
 

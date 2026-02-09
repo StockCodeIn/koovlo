@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Encode and decode Base64 strings instantly. Convert text to Base64 and vice versa. Perfect for data encoding and API integration.",
     type: "website",
-    url: "https://koovlo.com/tools/text-web/base64",
+    url: "https://www.koovlo.com/tools/text-web/base64",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/text-web/base64",
+    canonical: "https://www.koovlo.com/tools/text-web/base64",
   },
 };
 

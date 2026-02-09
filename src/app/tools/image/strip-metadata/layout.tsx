@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Remove EXIF data, GPS, and metadata from images instantly for privacy. Clean photos before sharing. Fast, secure browser-based metadata stripper.",
     type: "website",
-    url: "https://koovlo.com/tools/image/strip-metadata",
+    url: "https://www.koovlo.com/tools/image/strip-metadata",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/image/strip-metadata",
+    canonical: "https://www.koovlo.com/tools/image/strip-metadata",
   },
 };
 

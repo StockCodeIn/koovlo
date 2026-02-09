@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Compress images instantly with adjustable quality and format options (JPEG, WebP). Reduce file size for web without quality loss. Batch processing available.",
     type: "website",
-    url: "https://koovlo.com/tools/image/compress",
+    url: "https://www.koovlo.com/tools/image/compress",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/image/compress",
+    canonical: "https://www.koovlo.com/tools/image/compress",
   },
 };
 

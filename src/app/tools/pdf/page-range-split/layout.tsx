@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Split PDF into multiple files using custom page ranges. Organize documents into chapters instantly.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/page-range-split",
+    url: "https://www.koovlo.com/tools/pdf/page-range-split",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/page-range-split",
+    canonical: "https://www.koovlo.com/tools/pdf/page-range-split",
   },
 };
 

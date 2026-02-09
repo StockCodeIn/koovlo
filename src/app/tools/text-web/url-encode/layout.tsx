@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Encode and decode URLs instantly with customizable options. Convert special characters and manage URL parameters easily.",
     type: "website",
-    url: "https://koovlo.com/tools/text-web/url-encode",
+    url: "https://www.koovlo.com/tools/text-web/url-encode",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/text-web/url-encode",
+    canonical: "https://www.koovlo.com/tools/text-web/url-encode",
   },
 };
 

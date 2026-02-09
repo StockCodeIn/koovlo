@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Create professional fillable PDF forms with drag-and-drop editor. Add fields, signatures, and more.",
     type: "website",
-    url: "https://koovlo.com/tools/document/pdf-form-builder",
+    url: "https://www.koovlo.com/tools/document/pdf-form-builder",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/document/pdf-form-builder",
+    canonical: "https://www.koovlo.com/tools/document/pdf-form-builder",
   },
 };
 

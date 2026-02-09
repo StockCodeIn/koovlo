@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Free Document Tools – Koovlo",
     description:
         "Create and customize various documents easily with Koovlo’s document generation tools.",
-    url: "https://koovlo.com/tools/document",
+    url: "https://www.koovlo.com/tools/document",
     siteName: "Koovlo",
     type: "website",
   },

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Reorder PDF pages visually with drag-and-drop. Delete pages and reorganize documents instantly.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/reorder",
+    url: "https://www.koovlo.com/tools/pdf/reorder",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/reorder",
+    canonical: "https://www.koovlo.com/tools/pdf/reorder",
   },
 };
 

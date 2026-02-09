@@ -1,3 +1,6 @@
+/* Optimize Google Fonts loading */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
 /* src/app/globals.css */
 :root {
   --brand-primary: #382588;
@@ -10,6 +13,31 @@
   --font-body: "Inter", system-ui, sans-serif;
   --container-max: 1200px;
   --transition-fast: 0.25s ease;
+  
+  /* Accessibility */
+  color-scheme: light;
+}
+
+/* Performance: Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Accessibility: High contrast mode */
+@media (prefers-contrast: more) {
+  :root {
+    --brand-primary: #1a0f5c;
+    --brand-text: #000000;
+  }
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html,
@@ -21,12 +49,35 @@ body {
   color: var(--brand-text);
   line-height: 1.6;
   scroll-behavior: smooth;
+  min-height: 100vh;
 }
 
 main {
   max-width: var(--container-max);
   margin: auto;
   padding: 2rem 1rem;
+}
+
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling for links */
+a {
+  transition: color var(--transition-fast);
+}
+
+/* Button defaults */
+button {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* Responsive Design */
@@ -51,6 +102,16 @@ main {
   }
   h2 {
     font-size: 1.2rem;
+  }
+  
+  /* Touch target minimum size for mobile */
+  button,
+  a,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 

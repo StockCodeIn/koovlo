@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Convert marks to grades instantly with weighted subjects, multiple grading scales, and exam history tracking. Save and analyze performance data.",
     type: "website",
-    url: "https://koovlo.com/tools/education/grade",
+    url: "https://www.koovlo.com/tools/education/grade",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/education/grade",
+    canonical: "https://www.koovlo.com/tools/education/grade",
   },
 };
 

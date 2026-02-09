@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Calculate GPA instantly with multiple grade scales. Add courses with credits, use bulk input, and track target GPA. Supports preset curricula.",
     type: "website",
-    url: "https://koovlo.com/tools/education/gpa",
+    url: "https://www.koovlo.com/tools/education/gpa",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/education/gpa",
+    canonical: "https://www.koovlo.com/tools/education/gpa",
   },
 };
 

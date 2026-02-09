@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Format, validate, and minify JSON code instantly. Customize indentation, view error messages, and track formatting history.",
     type: "website",
-    url: "https://koovlo.com/tools/text-web/json-formatter",
+    url: "https://www.koovlo.com/tools/text-web/json-formatter",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/text-web/json-formatter",
+    canonical: "https://www.koovlo.com/tools/text-web/json-formatter",
   },
 };
 

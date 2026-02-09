@@ -1,10 +1,16 @@
 // src/app/tools/page.tsx
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import dynamic from "next/dynamic";
 import ToolCard from "@/components/ToolCard";
 import styles from "./tools.module.css";
-import ToolsNav from "@/components/ToolsNav";
+
+// Lazy load ToolsNav (not critical for LCP)
+const ToolsNav = dynamic(() => import("@/components/ToolsNav"), {
+  loading: () => <div style={{ height: "60px" }} />,
+  ssr: true,
+});
 
 const faqs = [
   {
@@ -35,9 +41,18 @@ interface Tool {
 
 export default function AllTools() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+
+  // Debounce search input (300ms delay)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const allTools: Tool[] = [
-    // PDF Tools
     { title: "PDF Merge", desc: "Combine multiple PDFs into one document", link: "/tools/pdf/merge", icon: "📎", category: "PDF" },
     { title: "Extract PDF Pages", desc: "Extract specific pages by number or range", link: "/tools/pdf/extract-pages", icon: "✂️", category: "PDF" },
     { title: "Split PDF by Page Range", desc: "Split PDF by custom page ranges into multiple files", link: "/tools/pdf/page-range-split", icon: "📄", category: "PDF" },
@@ -93,16 +108,16 @@ export default function AllTools() {
   ];
 
   const filteredTools = useMemo(() => {
-    if (!searchQuery.trim()) return allTools;
+    if (!debouncedQuery.trim()) return allTools;
     
-    const query = searchQuery.toLowerCase();
+    const query = debouncedQuery.toLowerCase();
     return allTools.filter(
       (tool) =>
         tool.title.toLowerCase().includes(query) ||
         tool.desc.toLowerCase().includes(query) ||
         tool.category.toLowerCase().includes(query)
     );
-  }, [searchQuery]);
+  }, [debouncedQuery]);
 
   const toolsByCategory = useMemo(() => {
     const categories = {

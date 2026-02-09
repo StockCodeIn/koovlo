@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Text and Web Tools - Koovlo",
     description:
         "A collection of free online text and web tools including word counter, case converter, text to speech, JSON formatter, and more.",
-    url: "https://koovlo.com/tools/text-web",
+    url: "https://www.koovlo.com/tools/text-web",
     siteName: "Koovlo",
     type: "website",
   },

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Convert multiple images to PDF instantly. Combine JPG and PNG images into one document.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/to-pdf",
+    url: "https://www.koovlo.com/tools/pdf/to-pdf",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/to-pdf",
+    canonical: "https://www.koovlo.com/tools/pdf/to-pdf",
   },
 };
 

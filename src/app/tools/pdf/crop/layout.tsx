@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Crop PDF pages by removing margins or using custom coordinates. Clean up documents instantly.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/crop",
+    url: "https://www.koovlo.com/tools/pdf/crop",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/crop",
+    canonical: "https://www.koovlo.com/tools/pdf/crop",
   },
 };
 

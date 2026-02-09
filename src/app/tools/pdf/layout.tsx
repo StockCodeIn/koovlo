@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Free PDF Tools – Koovlo",
     description:
       "Use Koovlo's powerful free PDF utilities: merge, compress, split, and manage PDFs online.",
-    url: "https://koovlo.com/tools/pdf",
+    url: "https://www.koovlo.com/tools/pdf",
     siteName: "Koovlo",
     type: "website",
   },

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Rotate all PDF pages by 90°, 180°, or 270°. Fix orientation and download instantly.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/rotate",
+    url: "https://www.koovlo.com/tools/pdf/rotate",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/rotate",
+    canonical: "https://www.koovlo.com/tools/pdf/rotate",
   },
 };
 

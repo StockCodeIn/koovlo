@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Convert text to speech instantly with multiple voice options, languages, and adjustable rate/pitch. Perfect for accessibility and content creators.",
     type: "website",
-    url: "https://koovlo.com/tools/text-web/text-to-speech",
+    url: "https://www.koovlo.com/tools/text-web/text-to-speech",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/text-web/text-to-speech",
+    canonical: "https://www.koovlo.com/tools/text-web/text-to-speech",
   },
 };
 

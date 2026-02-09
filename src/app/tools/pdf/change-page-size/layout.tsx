@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     description:
       "Easily change PDF page sizes from A4, A3, Letter to custom dimensions. Works instantly in your browser.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/change-page-size",
+    url: "https://www.koovlo.com/tools/pdf/change-page-size",
   },
   twitter: {
     card: "summary_large_image",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/change-page-size",
+    canonical: "https://www.koovlo.com/tools/pdf/change-page-size",
   },
 };
 

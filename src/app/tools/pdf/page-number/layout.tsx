@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Add customizable page numbers to PDF documents. Choose position, font size, and color instantly.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/page-number",
+    url: "https://www.koovlo.com/tools/pdf/page-number",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/page-number",
+    canonical: "https://www.koovlo.com/tools/pdf/page-number",
   },
 };
 

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Build ATS-friendly resumes and CVs with professional templates. Customize and download as PDF instantly.",
     type: "website",
-    url: "https://koovlo.com/tools/document/resume-builder",
+    url: "https://www.koovlo.com/tools/document/resume-builder",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/document/resume-builder",
+    canonical: "https://www.koovlo.com/tools/document/resume-builder",
   },
 };
 

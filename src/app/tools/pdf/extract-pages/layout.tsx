@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Extract specific pages from PDF files by page numbers or ranges. Create a new PDF with selected pages instantly.",
     type: "website",
-    url: "https://koovlo.com/tools/pdf/extract-pages",
+    url: "https://www.koovlo.com/tools/pdf/extract-pages",
   },
   twitter: {
     card: "summary_large_image",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/pdf/extract-pages",
+    canonical: "https://www.koovlo.com/tools/pdf/extract-pages",
   },
 };
 

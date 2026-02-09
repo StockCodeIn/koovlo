@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Convert images between formats (PNG, JPG, WebP) instantly with quality control. Adjust dimensions while converting. Fast, secure, browser-based conversion.",
     type: "website",
-    url: "https://koovlo.com/tools/image/convert",
+    url: "https://www.koovlo.com/tools/image/convert",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/image/convert",
+    canonical: "https://www.koovlo.com/tools/image/convert",
   },
 };
 

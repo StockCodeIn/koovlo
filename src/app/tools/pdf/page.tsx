@@ -1,4 +1,5 @@
 // src/app/tools/pdf/page.tsx
+import { Suspense } from "react";
 import ToolCard from "@/components/ToolCard";
 import styles from "../tools-common.module.css";
 
@@ -97,20 +98,22 @@ export default function PdfToolsPage() {
         </div>
       </section>
 
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <h2>Frequently Asked Questions</h2>
-          <p>Quick answers to common questions.</p>
-        </div>
-        <div className={styles.faqGrid}>
-          {faqs.map((item) => (
-            <div key={item.q} className={styles.faqCard}>
-              <h3>{item.q}</h3>
-              <p>{item.a}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <Suspense fallback={<div style={{ height: "400px" }} />}>
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <h2>Frequently Asked Questions</h2>
+            <p>Quick answers to common questions.</p>
+          </div>
+          <div className={styles.faqGrid}>
+            {faqs.map((item) => (
+              <div key={item.q} className={styles.faqCard}>
+                <h3>{item.q}</h3>
+                <p>{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </Suspense>
     </main>
   );
 }

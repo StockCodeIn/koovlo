@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     description:
       "Convert text between uppercase, lowercase, title case, camelCase, snake_case, and kebab-case instantly. Supports multiple case formats.",
     type: "website",
-    url: "https://koovlo.com/tools/text-web/case-converter",
+    url: "https://www.koovlo.com/tools/text-web/case-converter",
   },
   twitter: {
     card: "summary_large_image",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://koovlo.com/tools/text-web/case-converter",
+    canonical: "https://www.koovlo.com/tools/text-web/case-converter",
   },
 };
 
