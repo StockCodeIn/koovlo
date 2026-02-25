@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://koovlo.com'
+  const baseUrl = 'https://www.koovlo.com'
 
   // Static pages
   const staticPages = [
@@ -11,6 +11,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: '/privacy', priority: 0.5, changeFrequency: 'yearly' as const },
     { url: '/terms', priority: 0.5, changeFrequency: 'yearly' as const },
     { url: '/tools', priority: 0.9, changeFrequency: 'weekly' as const },
+    { url: '/tools/pdf', priority: 0.8, changeFrequency: 'weekly' as const },
+    { url: '/tools/image', priority: 0.8, changeFrequency: 'weekly' as const },
+    { url: '/tools/education', priority: 0.8, changeFrequency: 'weekly' as const },
+    { url: '/tools/document', priority: 0.8, changeFrequency: 'weekly' as const },
+    { url: '/tools/text-web', priority: 0.8, changeFrequency: 'weekly' as const },
+    // '/tools/web' removed (mini-site builder deprecated)
   ]
 
   // PDF Tools
@@ -85,6 +91,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...educationTools,
     ...documentTools,
     ...textWebTools,
+    // mini-site-builder removed
   ]
 
   return [

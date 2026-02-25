@@ -149,6 +149,7 @@ const toolsMetadata: Record<string, ToolMetadataConfig> = {
     keywords: ['text to speech', 'text to audio', 'TTS converter', 'speech synthesis'],
     icon: '🔊',
   },
+
 };
 
 export function generateToolMetadata(toolKey: string, baseUrl = 'https://www.koovlo.com'): Metadata {

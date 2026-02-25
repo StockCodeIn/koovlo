@@ -98,7 +98,8 @@ export default function AllTools() {
     { title: "Regex Tester", desc: "Test and debug regular expressions instantly", link: "/tools/text-web/regex-tester", icon: "🔍", category: "Text/Web" },
     { title: "Lorem Ipsum Generator", desc: "Generate dummy text for mockups and designs", link: "/tools/text-web/lorem-ipsum", icon: "📄", category: "Text/Web" },
     { title: "Text Summarizer", desc: "Summarize long text with multiple modes", link: "/tools/text-web/text-summarizer", icon: "📝", category: "Text/Web" },
-  ];
+
+    ];
 
   const filteredTools = useMemo(() => {
     if (!debouncedQuery.trim()) return allTools;
@@ -132,7 +133,7 @@ export default function AllTools() {
         categories["Document Tools"].push(tool);
       } else if (tool.category === "Text/Web") {
         categories["Text/Web Tools"].push(tool);
-      }
+      } 
     });
 
     return categories;

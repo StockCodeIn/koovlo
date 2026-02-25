@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "@/styles/toolsnav.module.css";
@@ -13,21 +14,29 @@ const categories = [
 ];
 
 export default function ToolsNav() {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
 
   return (
     <nav className={styles.navbar}>
       <div className={styles.scrollWrap}>
         {categories.map((cat) => {
-          const active = pathname.startsWith(cat.path);
+          const isActive =
+            cat.path === "/tools"
+              ? pathname === "/tools"
+              : pathname.startsWith(cat.path);
+
           return (
             <Link
-              key={cat.name}
+              key={cat.path}
               href={cat.path}
-              className={`${styles.link} ${active ? styles.active : ""}`}
+              className={`${styles.link} ${
+                isActive ? styles.active : ""
+              }`}
+              aria-label={`${cat.name} tools`}
+              aria-current={isActive ? "page" : undefined}
             >
               <span className={styles.icon}>{cat.emoji}</span>
-              {cat.name}
+              <span className={styles.label}>{cat.name}</span>
             </Link>
           );
         })}
