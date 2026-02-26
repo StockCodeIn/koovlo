@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "@/styles/toolsnav.module.css";
@@ -16,6 +17,66 @@ const categories = [
 export default function ToolsNav() {
   const pathname = usePathname() || "";
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // Delay a little longer so layout and fonts settle before scrolling.
+    const id = setTimeout(() => {
+      try {
+        window.scrollTo({ top: 0, behavior: "auto" });
+      } catch (e) {
+        window.scrollTo(0, 0);
+      }
+      // Remove focus from the nav link (prevents browser from scrolling focused element)
+      try {
+        const active = document.activeElement as HTMLElement | null;
+        if (active && (active.tagName === "A" || active.getAttribute("role") === "link")) {
+          active.blur();
+        }
+
+        // Move focus to main content to avoid focus-driven jump. Use preventScroll when possible.
+        const main = document.querySelector("main") as HTMLElement | null;
+        if (main) {
+          const hadTab = main.hasAttribute("tabindex");
+          const prev = main.getAttribute("tabindex");
+          main.setAttribute("tabindex", "-1");
+          try {
+            main.focus({ preventScroll: true } as FocusOptions);
+          } catch (e) {
+            main.focus();
+          }
+          if (!hadTab) {
+            if (prev === null) main.removeAttribute("tabindex");
+            else main.setAttribute("tabindex", prev);
+          }
+        }
+      } catch (e) {
+        // ignore focus-related errors
+      }
+    }, 200);
+
+    return () => clearTimeout(id);
+  }, [pathname]);
+
+  // Prevent automatic browser scroll restoration which can conflict with our manual scroll.
+  useEffect(() => {
+    if (typeof window === "undefined" || !('scrollRestoration' in window.history)) return;
+    const prev = window.history.scrollRestoration;
+    try {
+      window.history.scrollRestoration = 'manual';
+    } catch (e) {
+      // ignore in environments that disallow setting this
+    }
+
+    return () => {
+      try {
+        window.history.scrollRestoration = prev;
+      } catch (e) {
+        // ignore
+      }
+    };
+  }, []);
+
   return (
     <nav className={styles.navbar}>
       <div className={styles.scrollWrap}>
@@ -29,6 +90,7 @@ export default function ToolsNav() {
             <Link
               key={cat.path}
               href={cat.path}
+              scroll={false}
               className={`${styles.link} ${
                 isActive ? styles.active : ""
               }`}

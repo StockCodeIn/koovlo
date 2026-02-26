@@ -12,9 +12,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* prevent height changes due to wrapping */
   gap: 10px;
   padding: 10px 14px;
+}
+
+@media (max-width: 768px) {
+  .scrollWrap {
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 6px 6px;
+    justify-content: center;
+  }
 }
 
 
@@ -25,12 +34,22 @@
   gap: 6px;
   padding: 8px 16px;
   font-size: 0.9rem;
+  font-weight: 600;              /* keep weight constant to avoid reflow */
+  white-space: nowrap;           /* don't break text */
   border-radius: 30px;
   background: #f3f4f6;
   text-decoration: none;
   color: #555;
   transition: 0.2s ease;
   text-align: center;        /* extra safety */
+  box-sizing: border-box;          /* include border in size */
+  border: 1px solid transparent;   /* reserve space for active border */
+  outline: none;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
 }
 
 .icon {

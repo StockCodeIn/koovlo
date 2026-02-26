@@ -1,13 +1,14 @@
 // src/app/tools/image/page.tsx
 import ToolCard from "@/components/ToolCard";
 import styles from "../tools-common.module.css";
+import Link from "next/link";
 
 const tools = [
-    { title: "Resize Image", desc: "Resize images with presets and aspect ratio control", link: "/tools/image/resize", icon: "📏", category: "Image" },
-    { title: "Compress Image", desc: "Reduce image size with quality and format control", link: "/tools/image/compress", icon: "📦", category: "Image" },
-    { title: "Convert Image", desc: "Convert between PNG, JPG, and WebP formats", link: "/tools/image/convert", icon: "🔄", category: "Image" },
-    { title: "Add Watermark", desc: "Add text and image watermarks to photos", link: "/tools/image/add-watermark", icon: "💧", category: "Image" },
-    { title: "Strip Metadata", desc: "Remove EXIF data and metadata from images", link: "/tools/image/strip-metadata", icon: "🧹", category: "Image" },
+  { title: "Resize Image", desc: "Resize images with presets and aspect ratio control", link: "/tools/image/resize", icon: "📏", category: "Image" },
+  { title: "Compress Image", desc: "Reduce image size with quality and format control", link: "/tools/image/compress", icon: "📦", category: "Image" },
+  { title: "Convert Image", desc: "Convert between PNG, JPG, and WebP formats", link: "/tools/image/convert", icon: "🔄", category: "Image" },
+  { title: "Add Watermark", desc: "Add text and image watermarks to photos", link: "/tools/image/add-watermark", icon: "💧", category: "Image" },
+  { title: "Strip Metadata", desc: "Remove EXIF data and metadata from images", link: "/tools/image/strip-metadata", icon: "🧹", category: "Image" },
 ];
 
 const faqs = [
@@ -34,17 +35,17 @@ export default function ImageToolsPage() {
     <main className={styles.container}>
       <section className={styles.hero}>
         <h1 className={styles.pageTitle}>
-          <span className={styles.icon}>🖼️</span>
-          <span className={styles.textGradient}>Image Tools</span>
+          {/* <span className={styles.icon}>🖼️</span> */}
+          <span className={styles.textGradient}>Free Online Image Tools – Resize, Compress & Convert Images</span>
         </h1>
         <p className={styles.subText}>
-          Simple, powerful, and secure image utilities that run directly in your browser — fast, private, and mobile-friendly.
+          Resize, compress, convert and optimize images online with privacy-focused tools that work directly in your browser — fast, secure and mobile friendly.
         </p>
       </section>
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2>Popular Image Tools</h2>
+          <h2>All Image Tools</h2>
           <p>Resize, compress, convert, and protect your images in seconds.</p>
         </div>
         <div className={styles.grid}>
@@ -59,6 +60,10 @@ export default function ImageToolsPage() {
           ))}
         </div>
       </section>
+      
+      <div style={{ textAlign: "center", marginTop: "20px" }}>
+        <Link href="/tools">View All Tools →</Link>
+      </div>
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
@@ -98,6 +103,23 @@ export default function ImageToolsPage() {
           ))}
         </div>
       </section>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqs.map((item) => ({
+              "@type": "Question",
+              name: item.q,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: item.a,
+              },
+            })),
+          }),
+        }}
+      />
     </main>
   );
 }

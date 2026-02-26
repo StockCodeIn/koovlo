@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import ToolsNav from "@/components/ToolsNav";
 
 export const metadata: Metadata = {
   title: "Free Image Tools – Koovlo",
   description:
-    "Fast and secure online image tools by Koovlo. Compress, resize, convert, and edit images instantly — all within your browser.",
+    "Use Koovlo's free online image tools to resize, compress, convert and optimize images instantly. Supports JPG, PNG and WebP formats. Fast, secure and mobile friendly.",
   keywords: [
     "image compress",
     "image resize",
@@ -12,6 +11,9 @@ export const metadata: Metadata = {
     "background remover",
     "Koovlo image tools",
   ],
+  alternates: {
+    canonical: "https://www.koovlo.com/tools/image",
+  },
   openGraph: {
     title: "Free Image Tools – Koovlo",
     description:
@@ -27,13 +29,5 @@ export default function ImageLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    
-    <section>
-      
-
-      <div >{children}</div>
-    </section>
-   
-  );
+  return <>{children}</>;
 }

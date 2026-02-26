@@ -35,7 +35,7 @@ export default function HomePage() {
     <>
       {/* HERO */}
       <section className={styles.hero}>
-        <h1>All-in-One Free Online Tools Platform</h1>
+        <h1>Free Online PDF, Image & Web Tools – Fast & Secure</h1>
         <p>
           50+ powerful tools for PDF editing, image processing, resume creation,
           education calculators, and web utilities — fast, secure and completely free.
@@ -63,6 +63,10 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      <div className={styles.viewAll}>
+  <Link href="/tools">View All Tools →</Link>
+</div>
 
       {/* CATEGORY SECTION */}
       <section className={styles.categories}>

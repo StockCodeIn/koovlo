@@ -1,6 +1,6 @@
 .hero {
   text-align: center;
-  padding: 40px 20px 20px;
+  padding: 60px 20px 30px;
   background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%);
 }
 
@@ -45,12 +45,6 @@
   transform: translateY(-3px);
 }
 
-/* .secondaryBtn {
-  background: #fff;
-  border: 1px solid #ddd;
-  padding: 14px 28px;
-  border-radius: 999px;
-} */
 
 .stats {
   margin-top: 50px;
@@ -82,11 +76,12 @@
   margin: 40px auto;
 }
 
+
 .toolCard {
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #f0f0f0;
   border-radius: 12px;
-  padding: 14px 10px;
+  padding: 14px 8px;
   transition: 0.2s ease;
   text-align: center;
   font-size: 0.85rem;
@@ -97,8 +92,9 @@
 }
 
 .toolCard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+  border-color: #e4e7ff;
 }
 
 .toolCard h3 {
@@ -131,16 +127,28 @@
 
 .categoryCard {
   background: #fff;
-  border: 1px solid #ddd;
-  padding: 18px;
-  border-radius: 14px;
+  border: 1px solid #eee;
+  padding: 14px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
   transition: 0.2s ease;
 }
 
 .categoryCard:hover {
-  background: #f3f6ff;
+  background: #f6f8ff;
+  border-color: #d9deff;
+}
+.viewAll {
+  margin-top: 20px;
+  text-align: center;
 }
 
+.viewAll a {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #382588;
+}
 .trust {
   margin: 80px 0;
   text-align: center;
@@ -172,7 +180,7 @@
 /* MOBILE OPTIMIZATION */
 @media (max-width: 600px) {
   .hero {
-    padding: 50px 16px;
+    padding: 40px 14px 20px;
   }
   .primaryBtn {
     padding: 6px 24px;

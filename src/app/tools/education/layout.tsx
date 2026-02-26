@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import ToolsNav from "@/components/ToolsNav";
 
 export const metadata: Metadata = {
   title: "Free Education Tools – Koovlo",
   description:
-    "Calculate percentages, CGPA, grades, and exam scores instantly with Koovlo’s education tools. Fast, accurate, and student-friendly.",
+    "Use Koovlo's free online education tools to calculate GPA, CGPA, percentage, grades, attendance and exam scores instantly. Accurate formulas, fast results and mobile friendly.",
   keywords: [
     "percentage calculator",
     "CGPA calculator",
@@ -12,6 +11,9 @@ export const metadata: Metadata = {
     "study planner",
     "Koovlo education tools",
   ],
+  alternates: {
+    canonical: "https://www.koovlo.com/tools/education",
+  },
   openGraph: {
     title: "Free Education Tools – Koovlo",
     description:
@@ -27,11 +29,5 @@ export default function EducationLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-   
-    <section>
-      <div>{children}</div>
-    </section>
-    
-  );
+  return <>{children}</>;
 }

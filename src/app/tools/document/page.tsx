@@ -32,17 +32,17 @@ export default function DocumentToolsPage() {
         <main className={styles.container}>
             <section className={styles.hero}>
                 <h1 className={styles.pageTitle}>
-                    <span className={styles.icon}>📋</span>
-                    <span className={styles.textGradient}>Document Tools</span>
+                    {/* <span className={styles.icon}>📋</span> */}
+                    <span className={styles.textGradient}>Free Online Document Tools – Resume Builder & Invoice Generator</span>
                 </h1>
                 <p className={styles.subText}>
-                    Create professional documents in minutes. Pick a tool below to build resumes, invoices, and fillable PDF forms — fast, free, and mobile-friendly.
+                    Create professional resumes, CVs, invoices and fillable PDF forms online. Fast, secure and mobile-friendly document tools with instant PDF export.
                 </p>
             </section>
 
             <section className={styles.section}>
                 <div className={styles.sectionHeader}>
-                    <h2>Popular Document Tools</h2>
+                    <h2>All Document Tools</h2>
                     <p>Choose a tool and start creating instantly.</p>
                 </div>
                 <div className={styles.grid}>
@@ -96,6 +96,23 @@ export default function DocumentToolsPage() {
                     ))}
                 </div>
             </section>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "FAQPage",
+                        mainEntity: faqs.map((item) => ({
+                            "@type": "Question",
+                            name: item.q,
+                            acceptedAnswer: {
+                                "@type": "Answer",
+                                text: item.a,
+                            },
+                        })),
+                    }),
+                }}
+            />
         </main>
     );
 }

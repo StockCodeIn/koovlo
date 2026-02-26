@@ -1,5 +1,5 @@
+// src/app/tools/pdf/layout.tsx
 import type { Metadata } from "next";
-import ToolsNav from "@/components/ToolsNav";
 
 export const metadata: Metadata = {
   title: "Free PDF Tools – Koovlo",
@@ -30,11 +30,5 @@ export default function PdfLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-  
-    <section>
-      <div>{children}</div>
-    </section>
-    
-  );
+  return <>{children}</>;
 }

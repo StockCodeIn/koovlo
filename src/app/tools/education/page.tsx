@@ -3,16 +3,16 @@ import ToolCard from "@/components/ToolCard";
 import styles from "../tools-common.module.css";
 
 const tools = [
-    { title: "GPA Calculator", desc: "Calculate GPA with credits and multiple grade scales", link: "/tools/education/gpa", icon: "📊", category: "Education" },
-    { title: "CGPA Calculator", desc: "Calculate CGPA across semesters with grade tracking", link: "/tools/education/cgpa", icon: "📈", category: "Education" },
-    { title: "Grade Calculator", desc: "Convert marks to grades with weighted subjects", link: "/tools/education/grade", icon: "📝", category: "Education" },
-    { title: "Percentage Calculator", desc: "Calculate percentages and CGPA conversions instantly", link: "/tools/education/percentage", icon: "🔢", category: "Education" },
-    { title: "Attendance Tracker", desc: "Track and calculate attendance percentage daily", link: "/tools/education/attendance", icon: "📅", category: "Education" },
-    { title: "Flashcard Creator", desc: "Create and study with categorized flashcards", link: "/tools/education/flashcard", icon: "🎴", category: "Education" },
-    { title: "Quiz Generator", desc: "Create custom quizzes with multiple question types", link: "/tools/education/quiz-generator", icon: "❓", category: "Education" },
-    { title: "Notes Organizer", desc: "Organize notes by category, tags, and colors", link: "/tools/education/notes-organizer", icon: "📓", category: "Education" },
-    { title: "Revision Planner", desc: "Plan study schedule and track exam preparation", link: "/tools/education/revision-planner", icon: "📅", category: "Education" },
-    { title: "Rank Calculator", desc: "Calculate rankings and score statistics instantly", link: "/tools/education/rank", icon: "🏆", category: "Education" },
+  { title: "GPA Calculator", desc: "Calculate GPA with credits and multiple grade scales", link: "/tools/education/gpa", icon: "📊", category: "Education" },
+  { title: "CGPA Calculator", desc: "Calculate CGPA across semesters with grade tracking", link: "/tools/education/cgpa", icon: "📈", category: "Education" },
+  { title: "Grade Calculator", desc: "Convert marks to grades with weighted subjects", link: "/tools/education/grade", icon: "📝", category: "Education" },
+  { title: "Percentage Calculator", desc: "Calculate percentages and CGPA conversions instantly", link: "/tools/education/percentage", icon: "🔢", category: "Education" },
+  { title: "Attendance Tracker", desc: "Track and calculate attendance percentage daily", link: "/tools/education/attendance", icon: "📅", category: "Education" },
+  { title: "Flashcard Creator", desc: "Create and study with categorized flashcards", link: "/tools/education/flashcard", icon: "🎴", category: "Education" },
+  { title: "Quiz Generator", desc: "Create custom quizzes with multiple question types", link: "/tools/education/quiz-generator", icon: "❓", category: "Education" },
+  { title: "Notes Organizer", desc: "Organize notes by category, tags, and colors", link: "/tools/education/notes-organizer", icon: "📓", category: "Education" },
+  { title: "Revision Planner", desc: "Plan study schedule and track exam preparation", link: "/tools/education/revision-planner", icon: "📅", category: "Education" },
+  { title: "Rank Calculator", desc: "Calculate rankings and score statistics instantly", link: "/tools/education/rank", icon: "🏆", category: "Education" },
 ];
 
 const faqs = [
@@ -39,17 +39,17 @@ export default function EducationToolsPage() {
     <main className={styles.container}>
       <section className={styles.hero}>
         <h1 className={styles.pageTitle}>
-          <span className={styles.icon}>🎓</span>
-          <span className={styles.textGradient}>Education Tools</span>
+          {/* <span className={styles.icon}>🎓</span> */}
+          <span className={styles.textGradient}>Free Online Education Tools – GPA, CGPA & Grade Calculators</span>
         </h1>
         <p className={styles.subText}>
-          Smart calculators and study utilities for students and teachers — fast, accurate, and mobile-friendly.
+          Calculate GPA, CGPA, percentage, grades, attendance and exam scores instantly using accurate academic formulas — fast, reliable and mobile-friendly.
         </p>
       </section>
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2>Popular Education Tools</h2>
+          <h2>All Education Tools</h2>
           <p>Pick a tool and get results instantly.</p>
         </div>
         <div className={styles.grid}>
@@ -103,6 +103,23 @@ export default function EducationToolsPage() {
           ))}
         </div>
       </section>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqs.map((item) => ({
+              "@type": "Question",
+              name: item.q,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: item.a,
+              },
+            })),
+          }),
+        }}
+      />
     </main>
   );
 }

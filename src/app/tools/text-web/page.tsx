@@ -38,17 +38,17 @@ export default function TextWebToolsPage() {
         <main className={styles.container}>
             <section className={styles.hero}>
                 <h1 className={styles.pageTitle}>
-                    <span className={styles.icon}>📝</span>
-                    <span className={styles.textGradient}>Text & Web Tools</span>
+                    {/* <span className={styles.icon}>📝</span> */}
+                    <span className={styles.textGradient}>Free Online Text & Web Tools – Word Counter, JSON Formatter & More</span>
                 </h1>
                 <p className={styles.subText}>
-                    Fast and secure text utilities for writers, developers, and marketers — simple, accurate, and mobile-friendly.
+                    Free online text and developer utilities including word counter, case converter, JSON formatter, Base64 encoder, URL encoder, text to speech and more — fast, secure and mobile-friendly.
                 </p>
             </section>
 
             <section className={styles.section}>
                 <div className={styles.sectionHeader}>
-                    <h2>Popular Text & Web Tools</h2>
+                    <h2>All Text & Web Tools</h2>
                     <p>Choose a tool and get results instantly.</p>
                 </div>
                 <div className={styles.grid}>
@@ -102,6 +102,23 @@ export default function TextWebToolsPage() {
                     ))}
                 </div>
             </section>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "FAQPage",
+                        mainEntity: faqs.map((item) => ({
+                            "@type": "Question",
+                            name: item.q,
+                            acceptedAnswer: {
+                                "@type": "Answer",
+                                text: item.a,
+                            },
+                        })),
+                    }),
+                }}
+            />
         </main>
     );
 }
