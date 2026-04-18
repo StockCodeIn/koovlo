@@ -1,24 +1,59 @@
-'use client';
+﻿"use client";
 
-import { useState, useEffect } from 'react';
-import styles from './urlencode.module.css';
-import ToolInfo from '@/components/ToolInfo';
+import { useEffect, useMemo, useState } from "react";
+import styles from "./urlencode.module.css";
+import ToolInfo from "@/components/ToolInfo";
 
 interface HistoryItem {
   id: string;
   inputPreview: string;
   outputPreview: string;
-  mode: 'encode' | 'decode';
+  mode: "encode" | "decode";
   timestamp: number;
   inputSize: number;
   outputSize: number;
 }
 
+interface StoredState {
+  inputText?: string;
+  outputText?: string;
+  history?: HistoryItem[];
+}
+
+const STORAGE_KEY = "url-encoder-data";
+const createId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+const getInitialState = (): StoredState => {
+  if (typeof window === "undefined") {
+    return { inputText: "", outputText: "", history: [] };
+  }
+
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (!saved) {
+      return { inputText: "", outputText: "", history: [] };
+    }
+
+    const parsed = JSON.parse(saved) as StoredState;
+    return {
+      inputText: parsed.inputText || "",
+      outputText: parsed.outputText || "",
+      history: parsed.history || [],
+    };
+  } catch (error) {
+    console.error("Error loading URL encoder data:", error);
+    return { inputText: "", outputText: "", history: [] };
+  }
+};
+
+const getByteSize = (value: string) => new Blob([value]).size;
+
 export default function UrlEncodePage() {
-  const [inputText, setInputText] = useState('');
-  const [outputText, setOutputText] = useState('');
-  const [mode, setMode] = useState<'encode' | 'decode'>('encode');
-  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const initialState = getInitialState();
+  const [inputText, setInputText] = useState(initialState.inputText || "");
+  const [outputText, setOutputText] = useState(initialState.outputText || "");
+  const [mode, setMode] = useState<"encode" | "decode">("encode");
+  const [history, setHistory] = useState<HistoryItem[]>(initialState.history || []);
   const [options, setOptions] = useState({
     encodeSpaces: true,
     encodeSpecialChars: true,
@@ -26,30 +61,39 @@ export default function UrlEncodePage() {
   });
 
   useEffect(() => {
-    const saved = localStorage.getItem('url-encoder-data');
-    if (saved) {
-      const { inputText: savedInput, outputText: savedOutput, history: savedHistory } = JSON.parse(saved);
-      setInputText(savedInput || '');
-      setOutputText(savedOutput || '');
-      setHistory(savedHistory || []);
-    }
-  }, []);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ inputText, outputText, history }));
+  }, [history, inputText, outputText]);
 
-  useEffect(() => {
-    localStorage.setItem('url-encoder-data', JSON.stringify({ inputText, outputText, history }));
-  }, [inputText, outputText, history]);
+  const analytics = useMemo(() => {
+    const totalEncodes = history.filter((item) => item.mode === "encode").length;
+    const totalDecodes = history.filter((item) => item.mode === "decode").length;
+    const totalOperations = history.length;
+    const avgSizeChange = history.length
+      ? Math.round(
+          (history.reduce((sum, item) => {
+            if (item.inputSize === 0) return sum;
+            return sum + ((item.outputSize - item.inputSize) / item.inputSize) * 100;
+          }, 0) /
+            history.length) *
+            10
+        ) / 10
+      : 0;
+
+    return { totalEncodes, totalDecodes, totalOperations, avgSizeChange };
+  }, [history]);
 
   const handleProcess = () => {
     if (!inputText) return;
-    let result = '';
 
-    if (mode === 'encode') {
+    let result = "";
+
+    if (mode === "encode") {
       result = encodeURIComponent(inputText);
       if (!options.encodeSpaces) {
-        result = result.replace(/%20/g, ' ');
+        result = result.replace(/%20/g, " ");
       }
       if (!options.encodeSpecialChars) {
-        result = result.replace(/%21/g, '!').replace(/%27/g, "'").replace(/%28/g, '(').replace(/%29/g, ')');
+        result = result.replace(/%21/g, "!").replace(/%27/g, "'").replace(/%28/g, "(").replace(/%29/g, ")");
       }
       if (options.encodeUnicode) {
         result = encodeURI(result);
@@ -57,50 +101,51 @@ export default function UrlEncodePage() {
     } else {
       try {
         result = decodeURIComponent(inputText);
-      } catch (error) {
-        alert('Invalid URL encoding. Please check your input.');
+      } catch {
+        alert("Invalid URL encoding. Please check your input.");
         return;
       }
     }
 
-    const newItem: HistoryItem = {
-      id: Date.now().toString(),
+    const nextItem: HistoryItem = {
+      id: createId(),
       inputPreview: inputText.slice(0, 100),
       outputPreview: result.slice(0, 100),
-      mode: mode,
+      mode,
       timestamp: Date.now(),
-      inputSize: new Blob([inputText]).size,
-      outputSize: new Blob([result]).size
+      inputSize: getByteSize(inputText),
+      outputSize: getByteSize(result),
     };
-    setHistory(prev => [newItem, ...prev].slice(0, 50));
+
+    setHistory((previous) => [nextItem, ...previous].slice(0, 50));
     setOutputText(result);
   };
 
   const handleClear = () => {
-    setInputText('');
-    setOutputText('');
+    setInputText("");
+    setOutputText("");
   };
 
   const loadSampleData = () => {
-    if (mode === 'encode') {
-      setInputText('Hello World! This is a test URL with spaces & special chars: café@example.com?query=value#fragment');
+    if (mode === "encode") {
+      setInputText("Hello World! This is a test URL with spaces and special chars: cafe@example.com?query=value#fragment");
     } else {
-      setInputText('Hello%20World%21%20This%20is%20a%20test%20URL%20with%20spaces%20%26%20special%20chars%3A%20caf%C3%A9%40example.com%3Fquery%3Dvalue%23fragment');
+      setInputText("Hello%20World%21%20This%20is%20a%20test%20URL%20with%20spaces%20and%20special%20chars%3A%20cafe%40example.com%3Fquery%3Dvalue%23fragment");
     }
   };
 
   const swapTexts = () => {
     setInputText(outputText);
     setOutputText(inputText);
-    setMode(mode === 'encode' ? 'decode' : 'encode');
+    setMode((currentMode) => (currentMode === "encode" ? "decode" : "encode"));
   };
 
   const deleteHistoryItem = (id: string) => {
-    setHistory(prev => prev.filter(item => item.id !== id));
+    setHistory((previous) => previous.filter((item) => item.id !== id));
   };
 
   const clearHistory = () => {
-    if (confirm('Clear all history?')) {
+    if (confirm("Clear all history?")) {
       setHistory([]);
     }
   };
@@ -111,91 +156,69 @@ export default function UrlEncodePage() {
     setMode(item.mode);
   };
 
-  const getAnalytics = () => {
-    const totalEncodes = history.filter(h => h.mode === 'encode').length;
-    const totalDecodes = history.filter(h => h.mode === 'decode').length;
-    const totalOperations = history.length;
-    const avgSizeChange = history.length > 0
-      ? Math.round((history.reduce((sum, item) => sum + ((item.outputSize - item.inputSize) / item.inputSize * 100), 0) / history.length) * 10) / 10
-      : 0;
-    return { totalEncodes, totalDecodes, totalOperations, avgSizeChange };
-  };
-
-  const analytics = getAnalytics();
-
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(outputText);
-      alert('Output copied to clipboard!');
-    } catch (err) {
-      console.error('Failed to copy: ', err);
+      alert("Output copied to clipboard.");
+    } catch (error) {
+      console.error("Failed to copy:", error);
     }
   };
 
   const downloadOutput = () => {
-    const blob = new Blob([outputText], { type: 'text/plain' });
+    if (!outputText) return;
+
+    const blob = new Blob([outputText], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = mode === 'encode' ? 'encoded-url.txt' : 'decoded-url.txt';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = mode === "encode" ? "encoded-url.txt" : "decoded-url.txt";
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
     URL.revokeObjectURL(url);
   };
 
   return (
     <div className={styles.container}>
       <h1 className={styles.pageTitle}>
-        <span className={styles.icon}>🔗</span>
-        <span className={styles.textGradient}>URL Encoder/Decoder</span>
+        <span className={styles.icon}>URL</span>
+        <span className={styles.textGradient}>URL Encoder and Decoder</span>
       </h1>
-      <p className={styles.subtitle}>Encode and decode URLs with smart tracking and analytics.</p>
+      <p className={styles.subtitle}>Encode and decode URL strings with browser-side processing and saved history.</p>
 
       <div className={styles.tool}>
         <div className={styles.modeSection}>
           <h3>Mode</h3>
           <div className={styles.modeButtons}>
-            <button
-              onClick={() => setMode('encode')}
-              className={`${styles.modeBtn} ${mode === 'encode' ? styles.active : ''}`}
-            >
-              🔗 Encode URL
-            </button>
-            <button
-              onClick={() => setMode('decode')}
-              className={`${styles.modeBtn} ${mode === 'decode' ? styles.active : ''}`}
-            >
-              🔓 Decode URL
-            </button>
+            <button onClick={() => setMode("encode")} className={`${styles.modeBtn} ${mode === "encode" ? styles.active : ""}`}>Encode URL</button>
+            <button onClick={() => setMode("decode")} className={`${styles.modeBtn} ${mode === "decode" ? styles.active : ""}`}>Decode URL</button>
           </div>
         </div>
 
         <div className={styles.inputSection}>
           <div className={styles.inputHeader}>
-            <h3>Input {mode === 'encode' ? 'Text' : 'URL'}</h3>
-            <button onClick={loadSampleData} className={styles.sampleBtn}>
-              📝 Load Sample
-            </button>
+            <h3>Input {mode === "encode" ? "Text" : "URL"}</h3>
+            <button onClick={loadSampleData} className={styles.sampleBtn}>Load Sample</button>
           </div>
           <textarea
             id="url-input"
             name="url-input"
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder={mode === 'encode' ? 'Enter text to encode...' : 'Enter URL to decode...'}
+            onChange={(event) => setInputText(event.target.value)}
+            placeholder={mode === "encode" ? "Enter text to encode..." : "Enter URL to decode..."}
             className={styles.textarea}
           />
         </div>
 
         <div className={styles.optionsSection}>
-          <h3>🛠️ Encoding Options</h3>
+          <h3>Encoding Options</h3>
           <div className={styles.optionsGrid}>
             <label className={styles.checkboxOption}>
               <input
                 type="checkbox"
                 checked={options.encodeSpaces}
-                onChange={(e) => setOptions(prev => ({ ...prev, encodeSpaces: e.target.checked }))}
+                onChange={(event) => setOptions((previous) => ({ ...previous, encodeSpaces: event.target.checked }))}
                 className={styles.checkbox}
               />
               <div className={styles.checkboxText}>
@@ -208,12 +231,12 @@ export default function UrlEncodePage() {
               <input
                 type="checkbox"
                 checked={options.encodeSpecialChars}
-                onChange={(e) => setOptions(prev => ({ ...prev, encodeSpecialChars: e.target.checked }))}
+                onChange={(event) => setOptions((previous) => ({ ...previous, encodeSpecialChars: event.target.checked }))}
                 className={styles.checkbox}
               />
               <div className={styles.checkboxText}>
                 <strong>Encode Special Chars</strong>
-                <small>Encode ! &apos; ( ) etc.</small>
+                <small>Encode punctuation like ! &apos; ( )</small>
               </div>
             </label>
 
@@ -221,7 +244,7 @@ export default function UrlEncodePage() {
               <input
                 type="checkbox"
                 checked={options.encodeUnicode}
-                onChange={(e) => setOptions(prev => ({ ...prev, encodeUnicode: e.target.checked }))}
+                onChange={(event) => setOptions((previous) => ({ ...previous, encodeUnicode: event.target.checked }))}
                 className={styles.checkbox}
               />
               <div className={styles.checkboxText}>
@@ -233,41 +256,25 @@ export default function UrlEncodePage() {
         </div>
 
         <div className={styles.actions}>
-          <button onClick={handleProcess} className={styles.processBtn} disabled={!inputText}>
-            {mode === 'encode' ? '🔗 Encode URL' : '🔓 Decode URL'}
-          </button>
-          <button onClick={swapTexts} className={styles.swapBtn} disabled={!inputText || !outputText}>
-            🔄 Swap
-          </button>
-          <button onClick={handleClear} className={styles.clearBtn}>
-            🗑️ Clear All
-          </button>
+          <button onClick={handleProcess} className={styles.processBtn} disabled={!inputText}>{mode === "encode" ? "Encode URL" : "Decode URL"}</button>
+          <button onClick={swapTexts} className={styles.swapBtn} disabled={!inputText || !outputText}>Swap</button>
+          <button onClick={handleClear} className={styles.clearBtn}>Clear All</button>
         </div>
 
         {outputText && (
           <div className={styles.outputSection}>
             <h3>Output</h3>
-            <textarea
-              id="url-output"
-              name="url-output"
-              value={outputText}
-              readOnly
-              className={styles.textarea}
-            />
+            <textarea id="url-output" name="url-output" value={outputText} readOnly className={styles.textarea} />
             <div className={styles.outputActions}>
-              <button onClick={copyToClipboard} className={styles.copyBtn}>
-                📋 Copy Output
-              </button>
-              <button onClick={downloadOutput} className={styles.downloadBtn}>
-                📥 Download
-              </button>
+              <button onClick={copyToClipboard} className={styles.copyBtn}>Copy Output</button>
+              <button onClick={downloadOutput} className={styles.downloadBtn}>Download</button>
             </div>
           </div>
         )}
 
         {history.length > 0 && (
           <div className={styles.smartDashboard}>
-            <h3>📊 Analytics</h3>
+            <h3>Analytics</h3>
             <div className={styles.analyticsGrid}>
               <div className={styles.statCard}>
                 <span className={styles.statValue}>{analytics.totalOperations}</span>
@@ -292,45 +299,23 @@ export default function UrlEncodePage() {
         {history.length > 0 && (
           <div className={styles.historySection}>
             <div className={styles.historyHeader}>
-              <h3>📜 History</h3>
-              <button onClick={clearHistory} className={styles.clearBtn}>
-                🗑️ Clear History
-              </button>
+              <h3>History</h3>
+              <button onClick={clearHistory} className={styles.clearBtn}>Clear History</button>
             </div>
             <div className={styles.historyList}>
               {history.map((item) => (
                 <div key={item.id} className={styles.historyItem}>
                   <div className={styles.historyText}>
                     <div className={styles.historyMeta}>
-                      <span className={styles.historyMode}>
-                        {item.mode === 'encode' ? '🔗 Encode' : '🔓 Decode'}
-                      </span>
-                      <span className={styles.historyTime}>
-                        {new Date(item.timestamp).toLocaleTimeString()}
-                      </span>
-                      <span className={styles.historySize}>
-                        {item.inputSize}B → {item.outputSize}B
-                      </span>
+                      <span className={styles.historyMode}>{item.mode === "encode" ? "Encode" : "Decode"}</span>
+                      <span className={styles.historyTime}>{new Date(item.timestamp).toLocaleTimeString()}</span>
+                      <span className={styles.historySize}>{item.inputSize}B to {item.outputSize}B</span>
                     </div>
-                    <div className={styles.historyContent}>
-                      {item.inputPreview.slice(0, 80)}{item.inputPreview.length > 80 ? '...' : ''}
-                    </div>
+                    <div className={styles.historyContent}>{item.inputPreview.slice(0, 80)}{item.inputPreview.length > 80 ? "..." : ""}</div>
                   </div>
                   <div className={styles.historyActions}>
-                    <button
-                      onClick={() => loadFromHistory(item)}
-                      className={styles.historyBtn}
-                      title="Load this"
-                    >
-                      🔄
-                    </button>
-                    <button
-                      onClick={() => deleteHistoryItem(item.id)}
-                      className={styles.historyBtn}
-                      title="Delete"
-                    >
-                      🗑️
-                    </button>
+                    <button onClick={() => loadFromHistory(item)} className={styles.historyBtn} title="Load this">Load</button>
+                    <button onClick={() => deleteHistoryItem(item.id)} className={styles.historyBtn} title="Delete">Delete</button>
                   </div>
                 </div>
               ))}
@@ -340,20 +325,20 @@ export default function UrlEncodePage() {
       </div>
 
       <ToolInfo
-        howItWorks="1. Choose encode or decode mode<br>2. Enter your text or URL<br>3. Adjust options for encoding (spaces, special chars, unicode)<br>4. Click the button to process<br>5. Copy output or download as file<br>6. View history and analytics of operations"
+        howItWorks="Choose encode or decode mode<br>Enter your text or URL<br>Adjust encoding options if needed<br>Click the action button to process the value<br>Copy the output or download it as a text file"
         faqs={[
-          { title: "What is URL encoding?", content: "URL encoding converts special characters into a format that can be safely transmitted over the internet using the % symbol followed by hexadecimal digits." },
-          { title: "When to use URL encoding?", content: "Use when passing parameters in URLs, API requests, or form data that contain special characters like spaces, & symbols, etc." },
-          { title: "What do the options mean?", content: "Encode Spaces converts spaces to %20. Encode Special Chars converts !()' etc. Encode Unicode encodes non-ASCII characters." },
-          { title: "Is there a file size limit?", content: "No, but very large URLs may cause issues with some servers (typically limit is 2000-4000 characters)." }
+          { title: 'What is URL encoding?', content: 'URL encoding converts reserved or unsafe characters into a web-safe format using percent-based codes.' },
+          { title: 'When should I encode a URL?', content: 'Encode values when adding user input to query strings, API requests, or links that include spaces and symbols.' },
+          { title: 'What does decode do?', content: 'Decode reverses percent-encoded values back into readable text.' },
+          { title: 'Does this upload data?', content: 'No. The tool processes your text in the browser and stores only local history on your device.' },
         ]}
         tips={[
-          "Always use URL encoding when building query parameters with user input.",
-          "Most programming languages have built-in URL encoding functions.",
-          "URL encoding increases data size, typically by 2-3x for special characters.",
-          "Use 'Swap' to quickly test encoding and decoding of the same text."
+          'Encode query parameters before appending them to URLs in forms or scripts.',
+          'Decoding helps debug links copied from logs, emails, or browser redirects.',
+          'Use Swap to quickly test the reverse transformation on the same value.',
         ]}
       />
     </div>
   );
 }
+

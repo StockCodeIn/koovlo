@@ -1,4 +1,3 @@
-// src/components/ToolCard.tsx
 import Link from "next/link";
 import styles from "@/styles/toolcard.module.css";
 
@@ -9,12 +8,17 @@ type ToolCardProps = {
   icon?: string;
 };
 
-export default function ToolCard({ title, desc, link, icon = "🧩" }: ToolCardProps) {
+export default function ToolCard({
+  title,
+  desc,
+  link,
+  icon = "\uD83E\uDDE9",
+}: ToolCardProps) {
   return (
     <Link href={link} className={styles.card}>
       <div className={styles.iconWrapper}>
         <div className={styles.icon}>{icon}</div>
-        <div className={styles.arrow}>→</div>
+        <div className={styles.arrow}>-&gt;</div>
       </div>
       <div className={styles.textBox}>
         <h3>{title}</h3>

@@ -1,30 +1,25 @@
-'use client'
+﻿"use client";
 
-import { useEffect } from 'react'
-import styles from './error.module.css'
+import Link from "next/link";
+import { useEffect } from "react";
+import styles from "./error.module.css";
 
 export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error('Error boundary caught:', error)
-  }, [error])
+    console.error("Error boundary caught:", error);
+  }, [error]);
 
   return (
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.iconWrapper}>
-          <svg
-            className={styles.icon}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
+          <svg className={styles.icon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -33,7 +28,7 @@ export default function Error({
             />
           </svg>
         </div>
-        <h1 className={styles.title}>Something went wrong!</h1>
+        <h1 className={styles.title}>Something went wrong</h1>
         <p className={styles.description}>
           We&apos;re sorry for the inconvenience. An unexpected error has occurred.
         </p>
@@ -43,14 +38,14 @@ export default function Error({
           </div>
         )}
         <div className={styles.actions}>
-          <button onClick={reset} className={styles.primaryButton}>
+          <button type="button" onClick={reset} className={styles.primaryButton}>
             Try Again
           </button>
-          <a href="/" className={styles.secondaryButton}>
+          <Link href="/" className={styles.secondaryButton}>
             Go Home
-          </a>
+          </Link>
         </div>
       </div>
     </div>
-  )
+  );
 }

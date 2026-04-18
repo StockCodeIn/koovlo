@@ -3,6 +3,9 @@
 
 import { useState, useRef } from "react";
 import { PDFDocument } from "pdf-lib";
+import FaqSchema from "@/components/FaqSchema";
+import RichSeoContent from "@/components/RichSeoContent";
+import { getRelatedTools } from "@/lib/siteData";
 import styles from "./compress.module.css";
 
 const formatFileSize = (bytes: number): string => {
@@ -12,6 +15,41 @@ const formatFileSize = (bytes: number): string => {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
+
+const faqItems = [
+  {
+    question: "How much can I compress a PDF file?",
+    answer:
+      "Compression depends on your PDF structure and content type. PDFs with forms, annotations, and metadata compress better. Scanned documents may already be optimized and compress less. High compression level can typically reduce file size by 20-50% depending on the original.",
+  },
+  {
+    question: "What's the difference between compression levels?",
+    answer:
+      "Low compression is fastest and removes basic overhead. Medium balances speed and size reduction by removing forms and unused data. High compression is most aggressive, optimizing PDF structure for maximum size reduction but takes slightly longer.",
+  },
+  {
+    question: "Will compression reduce PDF quality?",
+    answer:
+      "Text and vector graphics remain sharp because compression removes structure overhead, not content. Image quality depends on the original PDF. Most users won't notice quality loss, but always backup your original file.",
+  },
+  {
+    question: "Can I compress password-protected PDFs?",
+    answer:
+      "Compression works best on unprotected PDFs. If your PDF has restrictions, you may need to unlock it first using our PDF unlock tool, then compress the unprotected version.",
+  },
+  {
+    question: "Why should I compress PDFs?",
+    answer:
+      "Smaller PDFs are faster to download, easier to email, take less storage space, and load quicker in applications. Compression is especially useful for sharing large reports, brochures, or batches of documents.",
+  },
+  {
+    question: "Is my PDF safe during compression?",
+    answer:
+      "Yes. All compression processing happens in your browser—your files never leave your device. We don't store or upload anything to a server.",
+  },
+];
+
+const relatedTools = getRelatedTools("/tools/pdf/compress");
 
 export default function PdfCompress() {
   const [file, setFile] = useState<File | null>(null);
@@ -287,6 +325,32 @@ export default function PdfCompress() {
           </ul>
         </div>
       </section>
+
+      <RichSeoContent
+        introTitle="When PDF compression makes sense"
+        introText={[
+          "PDF compression is useful when you need to reduce file size for email attachments, reduce storage overhead, or improve load times on websites. Not all PDFs compress equally—PDFs with forms, annotations, and metadata structure compress better, while scanned documents may already be fairly optimized.",
+          "This page explains the different compression levels, when to use each one, and why browser-side compression keeps your files safe. It also helps search engines understand that this page is about practical PDF workflows, not just generic file shrinking.",
+        ]}
+        steps={[
+          "Choose your PDF file using the file picker or drag it into the drop zone.",
+          "Select a compression level: Low (fastest), Medium (balanced), or High (maximum reduction).",
+          "Click 'Compress PDF' to start the process. The progress bar shows your file being optimized.",
+          "Download the compressed PDF once complete and compare the file size to your original.",
+          "If the result doesn't meet your needs, try a higher compression level or use complementary tools.",
+        ]}
+        benefits={[
+          "Reduces file size by 20-50% depending on PDF content and compression level.",
+          "Useful for email attachments, cloud storage, and sharing large document batches.",
+          "Preserves text sharpness and vector graphics—only removes structural overhead.",
+          "Works offline with browser-side processing, so your files stay private.",
+          "Supports three compression levels to balance speed and file size reduction.",
+        ]}
+        faqItems={faqItems}
+        relatedTools={relatedTools}
+      />
+
+      <FaqSchema items={faqItems} />
     </main>
   );
 }

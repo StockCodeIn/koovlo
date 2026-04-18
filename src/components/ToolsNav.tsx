@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 import Link from "next/link";
@@ -24,7 +24,7 @@ export default function ToolsNav() {
     const id = setTimeout(() => {
       try {
         window.scrollTo({ top: 0, behavior: "auto" });
-      } catch (e) {
+      } catch {
         window.scrollTo(0, 0);
       }
       // Remove focus from the nav link (prevents browser from scrolling focused element)
@@ -42,7 +42,7 @@ export default function ToolsNav() {
           main.setAttribute("tabindex", "-1");
           try {
             main.focus({ preventScroll: true } as FocusOptions);
-          } catch (e) {
+          } catch {
             main.focus();
           }
           if (!hadTab) {
@@ -50,7 +50,7 @@ export default function ToolsNav() {
             else main.setAttribute("tabindex", prev);
           }
         }
-      } catch (e) {
+      } catch {
         // ignore focus-related errors
       }
     }, 200);
@@ -64,14 +64,14 @@ export default function ToolsNav() {
     const prev = window.history.scrollRestoration;
     try {
       window.history.scrollRestoration = 'manual';
-    } catch (e) {
+    } catch {
       // ignore in environments that disallow setting this
     }
 
     return () => {
       try {
         window.history.scrollRestoration = prev;
-      } catch (e) {
+      } catch {
         // ignore
       }
     };

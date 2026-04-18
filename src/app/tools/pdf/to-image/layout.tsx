@@ -1,30 +1,29 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Free PDF to Image Converter - Convert PDF to PNG, JPG Online",
+  title: "PDF to Image Converter - Convert PDF to PNG or JPG Online",
   description:
-    "Convert PDF pages to high-quality images (PNG, JPG). Extract all pages or specific pages as image files. Perfect for presentations, websites, and sharing. Works offline in your browser.",
+    "Convert PDF pages to PNG or JPG images online for websites, previews, presentations, and quick sharing. Fast browser-based PDF to image conversion.",
   keywords: [
-    "PDF to image",
-    "PDF to PNG",
-    "PDF to JPG",
-    "convert PDF to image",
-    "PDF image converter",
-    "free PDF tool",
-    "PDF to picture",
-    "extract PDF images",
+    "pdf to image",
+    "pdf to png",
+    "pdf to jpg",
+    "convert pdf to image",
+    "pdf image converter",
+    "browser based pdf converter",
   ],
   openGraph: {
-    title: "Free PDF to Image Converter - PNG, JPG",
+    title: "PDF to Image Converter - Convert PDF to PNG or JPG Online",
     description:
-      "Convert PDF pages to high-quality images. Choose PNG or JPG format and download instantly.",
+      "Convert PDF pages into PNG or JPG images with browser-based processing and practical output guidance.",
     type: "website",
     url: "https://www.koovlo.com/tools/pdf/to-image",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free PDF to Image Converter",
-    description: "Convert PDF to PNG or JPG images - high quality and fast.",
+    title: "PDF to Image Converter - Convert PDF to PNG or JPG Online",
+    description:
+      "Convert PDF pages into PNG or JPG images with browser-based processing and practical output guidance.",
   },
   robots: {
     index: true,
@@ -44,8 +43,8 @@ export const metadata: Metadata = {
 
 export default function ToImageLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return children;
 }

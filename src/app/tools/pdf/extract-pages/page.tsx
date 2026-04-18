@@ -3,8 +3,46 @@
 
 import { useState, useCallback } from "react";
 import { PDFDocument } from "pdf-lib";
+import FaqSchema from "@/components/FaqSchema";
+import RichSeoContent from "@/components/RichSeoContent";
+import { getRelatedTools } from "@/lib/siteData";
 import styles from "./split.module.css";
 import ToolInfo from "@/components/ToolInfo";
+
+const faqItems = [
+    {
+        question: "How do I extract specific pages from a PDF?",
+        answer:
+            "Upload your PDF, enter the page numbers or ranges you want to extract (e.g., '1,3,5-7'), and click Extract. The tool creates a new PDF with only those pages.",
+    },
+    {
+        question: "Can I extract non-consecutive pages?",
+        answer:
+            "Yes. Use commas to separate page numbers (e.g., '2,5,8') or use ranges with hyphens (e.g., '1-3,8-10'). Any combination of numbers and ranges works.",
+    },
+    {
+        question: "What if I enter a page number that doesn't exist?",
+        answer:
+            "The tool will show an error message. Check your PDF's total page count and try again with valid page numbers within that range.",
+    },
+    {
+        question: "Can I save individual pages as separate PDFs?",
+        answer:
+            "Yes. You can extract each page individually by specifying one page per extraction. Alternatively, use our page range split tool for batch page separation.",
+    },
+    {
+        question: "Why would I need to extract pages?",
+        answer:
+            "Extracting pages is useful for removing sensitive information, creating smaller files to share specific sections, reducing storage size, or organizing multi-part documents.",
+    },
+    {
+        question: "Does extracting pages affect the original PDF?",
+        answer:
+            "No. The original PDF remains unchanged. The extraction creates a new PDF with only the pages you selected.",
+    },
+];
+
+const relatedTools = getRelatedTools("/tools/pdf/extract-pages");
 
 export default function PdfExtractPagesPage() {
     const [file, setFile] = useState<File | null>(null);
@@ -227,6 +265,31 @@ export default function PdfExtractPagesPage() {
                 ]}
                 tips={["Page numbers start from 1. Invalid ranges are ignored.", "Extracted pages maintain original quality.", "Use for sharing specific information from large documents."]}
             />
+
+            <RichSeoContent
+                introTitle="Why extracting PDF pages is useful"
+                introText={[
+                    "Extracting pages from a PDF is a common need when you want to share only specific sections of a large document, remove sensitive information from the middle of a file, reduce storage by removing unnecessary pages, or split a multi-purpose document into focused pieces.",
+                    "This page explains how to extract pages flexibly using single numbers, ranges, or combinations, why this matters for document workflows, and how browser-based extraction keeps your documents private.",
+                ]}
+                steps={[
+                    "Upload your PDF using the file picker or drag it into the drop zone.",
+                    "Enter the pages you want to extract using numbers (e.g., '2,5') or ranges (e.g., '1-3,8-10').",
+                    "Click 'Extract Pages' to create a new PDF with only those pages in the order specified.",
+                    "Download the extracted PDF immediately. Your original file remains unchanged.",
+                ]}
+                benefits={[
+                    "Useful for removing sensitive pages, sharing specific sections, or reducing file size.",
+                    "Supports flexible page selection: single numbers, ranges, or any combination.",
+                    "Preserves page quality—extraction doesn't re-compress or alter the pages.",
+                    "Works offline with browser-side processing, so your documents stay private.",
+                    "Quick operation—even large PDFs extract in seconds.",
+                ]}
+                faqItems={faqItems}
+                relatedTools={relatedTools}
+            />
+
+            <FaqSchema items={faqItems} />
         </main>
     );
 }

@@ -1,8 +1,16 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
 import styles from "./to-pdf.module.css";
+
+type PageSize = "A4" | "Letter" | "auto";
+type PageOrientation = "portrait" | "landscape" | "auto";
+
+const PAGE_SIZES: Record<string, [number, number]> = {
+  A4: [595.28, 841.89],
+  Letter: [612, 792],
+};
 
 const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';
@@ -19,6 +27,9 @@ export default function ImageToPdfPage() {
   const [messageType, setMessageType] = useState<"success" | "error" | "info">("info");
   const [progress, setProgress] = useState(0);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [pageSize, setPageSize] = useState<PageSize>("A4");
+  const [pageOrientation, setPageOrientation] = useState<PageOrientation>("auto");
+  const [margin, setMargin] = useState(20);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = (selectedFiles: FileList | null) => {
@@ -112,15 +123,56 @@ export default function ImageToPdfPage() {
         } else if (file.type === "image/png") {
           img = await pdfDoc.embedPng(imageBytes);
         } else {
-          continue; // skip unsupported formats
+          continue;
         }
 
-        const page = pdfDoc.addPage([img.width, img.height]);
-        page.drawImage(img, {
+        const imgWidth = img.width;
+        const imgHeight = img.height;
+        const imgAspectRatio = imgWidth / imgHeight;
+
+        // Determine page size and orientation
+        let [baseWidth, baseHeight] = PAGE_SIZES[pageSize === "auto" ? "A4" : pageSize];
+        let orientation = pageOrientation;
+
+        if (orientation === "auto") {
+          orientation = imgAspectRatio > 1 ? "landscape" : "portrait";
+        }
+
+        if (orientation === "landscape") {
+          [baseWidth, baseHeight] = [baseHeight, baseWidth];
+        }
+
+        const availableWidth = baseWidth - margin * 2;
+        const availableHeight = baseHeight - margin * 2;
+
+        let drawWidth = availableWidth;
+        let drawHeight = (availableWidth / imgWidth) * imgHeight;
+
+        // If height exceeds available height, scale to fit height instead
+        if (drawHeight > availableHeight) {
+          drawHeight = availableHeight;
+          drawWidth = (availableHeight / imgHeight) * imgWidth;
+        }
+
+        // Center image on page
+        const x = margin + (availableWidth - drawWidth) / 2;
+        const y = baseHeight - margin - drawHeight - (availableHeight - drawHeight) / 2;
+
+        // Create page with white background
+        const page = pdfDoc.addPage([baseWidth, baseHeight]);
+        page.drawRectangle({
           x: 0,
           y: 0,
-          width: img.width,
-          height: img.height,
+          width: baseWidth,
+          height: baseHeight,
+          color: rgb(1, 1, 1),
+        });
+
+        page.drawImage(img, {
+          x,
+          y,
+          width: drawWidth,
+          height: drawHeight,
         });
       }
 
@@ -222,6 +274,52 @@ export default function ImageToPdfPage() {
               <p>Creating PDF...</p>
             </div>
           )}
+        </div>
+
+        <div className={styles.settingsSection}>
+          <div className={styles.settingGroup}>
+            <label htmlFor="page-size">Page Size:</label>
+            <select
+              id="page-size"
+              value={pageSize}
+              onChange={(e) => setPageSize(e.target.value as PageSize)}
+              disabled={loading}
+              className={styles.select}
+            >
+              <option value="A4">A4 (210×297 mm)</option>
+              <option value="Letter">Letter (8.5×11 in)</option>
+              <option value="auto">Auto-fit to image</option>
+            </select>
+          </div>
+
+          <div className={styles.settingGroup}>
+            <label htmlFor="orientation">Orientation:</label>
+            <select
+              id="orientation"
+              value={pageOrientation}
+              onChange={(e) => setPageOrientation(e.target.value as PageOrientation)}
+              disabled={loading}
+              className={styles.select}
+            >
+              <option value="auto">Auto-detect</option>
+              <option value="portrait">Portrait</option>
+              <option value="landscape">Landscape</option>
+            </select>
+          </div>
+
+          <div className={styles.settingGroup}>
+            <label htmlFor="margin">Margin: {margin}px</label>
+            <input
+              id="margin"
+              type="range"
+              min="0"
+              max="50"
+              value={margin}
+              onChange={(e) => setMargin(parseInt(e.target.value))}
+              disabled={loading}
+              className={styles.slider}
+            />
+          </div>
         </div>
 
         <div className={styles.actionSection}>

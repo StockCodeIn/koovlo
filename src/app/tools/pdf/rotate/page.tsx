@@ -2,7 +2,45 @@
 
 import { useState, useCallback } from "react";
 import { PDFDocument, degrees } from "pdf-lib";
+import FaqSchema from "@/components/FaqSchema";
+import RichSeoContent from "@/components/RichSeoContent";
+import { getRelatedTools } from "@/lib/siteData";
 import styles from "./rotate.module.css";
+
+const faqItems = [
+  {
+    question: "Why would I need to rotate a PDF?",
+    answer:
+      "PDFs sometimes get scanned or uploaded in the wrong orientation. Rotation is useful for fixing sideways pages, organizing multi-source documents, preparing PDFs for printing, or adjusting pages to match other content.",
+  },
+  {
+    question: "Can I rotate only specific pages?",
+    answer:
+      "This tool rotates all pages by the same amount. If you need to rotate individual pages differently, extract those pages first using our Extract Pages tool, rotate them, and then merge them back.",
+  },
+  {
+    question: "What rotation angles are available?",
+    answer:
+      "You can rotate by 90° (clockwise), 180° (upside down), or 270° (counterclockwise). All pages rotate together by the same amount.",
+  },
+  {
+    question: "Does rotation change the PDF quality?",
+    answer:
+      "No. Rotation is a lossless operation that only changes the page orientation metadata. Text, images, and graphics remain perfectly sharp.",
+  },
+  {
+    question: "Can I rotate password-protected PDFs?",
+    answer:
+      "This tool works best with unprotected PDFs. If your PDF has restrictions, you may need to unlock it first using our Unlock PDF tool.",
+  },
+  {
+    question: "Is my PDF safe during rotation?",
+    answer:
+      "Yes. All rotation processing happens in your browser. Your files never leave your device, and we don't store anything on our servers.",
+  },
+];
+
+const relatedTools = getRelatedTools("/tools/pdf/rotate");
 
 export default function PdfRotatePage() {
   const [file, setFile] = useState<File | null>(null);
@@ -209,6 +247,31 @@ export default function PdfRotatePage() {
           </ul>
         </div>
       </section>
+
+      <RichSeoContent
+        introTitle="When PDF rotation is actually useful"
+        introText={[
+          "PDF pages sometimes end up in the wrong orientation—whether from scanning, uploading, or combining multiple documents. While rotating a PDF might seem simple, finding a tool that preserves quality, works offline, and handles all pages consistently is surprisingly useful.",
+          "This page explains why browser-side rotation matters, which situations call for it, and how to rotate efficiently without losing quality. It also helps search engines understand that this page supports practical PDF workflows.",
+        ]}
+        steps={[
+          "Upload your PDF using the file picker or drag it into the drop zone.",
+          "Select your preferred rotation angle: 90° (clockwise), 180° (upside down), or 270° (counterclockwise).",
+          "Click 'Rotate PDF' to apply the rotation to all pages at once.",
+          "Download the rotated PDF immediately. All pages now face the correct direction.",
+        ]}
+        benefits={[
+          "Fixes pages scanned or uploaded in wrong orientations quickly.",
+          "Rotates all pages consistently at once—no need to adjust individual pages.",
+          "Preserves PDF quality—rotation is lossless, affecting only page orientation metadata.",
+          "Works offline with browser-side processing, keeping your documents private.",
+          "Useful for preparing PDFs for printing, display, or distribution.",
+        ]}
+        faqItems={faqItems}
+        relatedTools={relatedTools}
+      />
+
+      <FaqSchema items={faqItems} />
     </main>
   );
 }

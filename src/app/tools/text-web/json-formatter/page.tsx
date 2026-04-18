@@ -1,6 +1,6 @@
-'use client';
+﻿'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ToolInfo from '@/components/ToolInfo';
 import styles from './jsonformatter.module.css';
 
@@ -14,69 +14,97 @@ interface HistoryItem {
   outputSize: number;
 }
 
+interface StoredState {
+  inputText?: string;
+  outputText?: string;
+  history?: HistoryItem[];
+}
+
+const STORAGE_KEY = 'json-formatter-data';
+
+const createId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+const getInitialState = (): StoredState => {
+  if (typeof window === 'undefined') {
+    return { inputText: '', outputText: '', history: [] };
+  }
+
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (!saved) {
+      return { inputText: '', outputText: '', history: [] };
+    }
+
+    const parsed = JSON.parse(saved) as StoredState;
+    return {
+      inputText: parsed.inputText || '',
+      outputText: parsed.outputText || '',
+      history: parsed.history || [],
+    };
+  } catch (error) {
+    console.error('Error loading JSON formatter data:', error);
+    return { inputText: '', outputText: '', history: [] };
+  }
+};
+
+const getByteSize = (value: string) => new Blob([value]).size;
+
 export default function JSONFormatter() {
-  const [inputText, setInputText] = useState('');
-  const [outputText, setOutputText] = useState('');
+  const initialState = getInitialState();
+  const [inputText, setInputText] = useState(initialState.inputText || '');
+  const [outputText, setOutputText] = useState(initialState.outputText || '');
   const [error, setError] = useState('');
   const [indentSize, setIndentSize] = useState(2);
-  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [history, setHistory] = useState<HistoryItem[]>(initialState.history || []);
 
   useEffect(() => {
-    const saved = localStorage.getItem('json-formatter-data');
-    if (saved) {
-      const { inputText: savedInput, outputText: savedOutput, history: savedHistory } = JSON.parse(saved);
-      setInputText(savedInput || '');
-      setOutputText(savedOutput || '');
-      setHistory(savedHistory || []);
-    }
-  }, []);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ inputText, outputText, history }));
+  }, [history, inputText, outputText]);
 
-  useEffect(() => {
-    localStorage.setItem('json-formatter-data', JSON.stringify({ inputText, outputText, history }));
-  }, [inputText, outputText, history]);
+  const analytics = useMemo(() => {
+    const totalFormats = history.filter((item) => item.action === 'format').length;
+    const totalMinifies = history.filter((item) => item.action === 'minify').length;
+    const totalOperations = history.length;
+    const avgCompression = history.length
+      ? Math.round(
+          (history.reduce((sum, item) => {
+            if (item.inputSize === 0) return sum;
+            return sum + ((item.inputSize - item.outputSize) / item.inputSize) * 100;
+          }, 0) /
+            history.length) *
+            10
+        ) / 10
+      : 0;
 
-  const formatJSON = () => {
-    try {
-      const parsed = JSON.parse(inputText);
-      const formatted = JSON.stringify(parsed, null, indentSize);
-      setOutputText(formatted);
-      setError('');
-      
-      const newItem: HistoryItem = {
-        id: Date.now().toString(),
-        inputPreview: inputText.trim().slice(0, 100),
-        outputPreview: formatted.slice(0, 100),
-        action: 'format',
-        timestamp: Date.now(),
-        inputSize: new Blob([inputText]).size,
-        outputSize: new Blob([formatted]).size
-      };
-      setHistory(prev => [newItem, ...prev].slice(0, 50));
-    } catch (err) {
-      setError('Invalid JSON: ' + (err as Error).message);
-      setOutputText('');
-    }
+    return { totalFormats, totalMinifies, totalOperations, avgCompression };
+  }, [history]);
+
+  const saveHistoryItem = (result: string, action: 'format' | 'minify') => {
+    const nextItem: HistoryItem = {
+      id: createId(),
+      inputPreview: inputText.trim().slice(0, 100),
+      outputPreview: result.slice(0, 100),
+      action,
+      timestamp: Date.now(),
+      inputSize: getByteSize(inputText),
+      outputSize: getByteSize(result),
+    };
+
+    setHistory((previous) => [nextItem, ...previous].slice(0, 50));
   };
 
-  const minifyJSON = () => {
+  const processJSON = (action: 'format' | 'minify') => {
     try {
       const parsed = JSON.parse(inputText);
-      const minified = JSON.stringify(parsed);
-      setOutputText(minified);
+      const result = action === 'format'
+        ? JSON.stringify(parsed, null, indentSize)
+        : JSON.stringify(parsed);
+
+      setOutputText(result);
       setError('');
-      
-      const newItem: HistoryItem = {
-        id: Date.now().toString(),
-        inputPreview: inputText.trim().slice(0, 100),
-        outputPreview: minified.slice(0, 100),
-        action: 'minify',
-        timestamp: Date.now(),
-        inputSize: new Blob([inputText]).size,
-        outputSize: new Blob([minified]).size
-      };
-      setHistory(prev => [newItem, ...prev].slice(0, 50));
-    } catch (err) {
-      setError('Invalid JSON: ' + (err as Error).message);
+      saveHistoryItem(result, action);
+    } catch (caughtError) {
+      setError(`Invalid JSON: ${(caughtError as Error).message}`);
       setOutputText('');
     }
   };
@@ -85,18 +113,18 @@ export default function JSONFormatter() {
     try {
       JSON.parse(inputText);
       setError('');
-      alert('Valid JSON!');
-    } catch (err) {
-      setError('Invalid JSON: ' + (err as Error).message);
+      alert('Valid JSON.');
+    } catch (caughtError) {
+      setError(`Invalid JSON: ${(caughtError as Error).message}`);
     }
   };
 
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(outputText);
-      alert('Copied to clipboard!');
-    } catch (err) {
-      console.error('Failed to copy: ', err);
+      alert('Copied to clipboard.');
+    } catch (caughtError) {
+      console.error('Failed to copy:', caughtError);
     }
   };
 
@@ -107,28 +135,34 @@ export default function JSONFormatter() {
   };
 
   const loadSample = () => {
-    const sample = {
-      name: "John Doe",
-      age: 30,
-      email: "john@example.com",
-      address: {
-        street: "123 Main St",
-        city: "Anytown",
-        zipCode: "12345"
-      },
-      hobbies: ["reading", "coding", "gaming"],
-      active: true
-    };
-    setInputText(JSON.stringify(sample, null, 2));
+    setInputText(
+      JSON.stringify(
+        {
+          name: 'John Doe',
+          age: 30,
+          email: 'john@example.com',
+          address: {
+            street: '123 Main St',
+            city: 'Anytown',
+            zipCode: '12345',
+          },
+          hobbies: ['reading', 'coding', 'gaming'],
+          active: true,
+        },
+        null,
+        2
+      )
+    );
   };
 
   const swapTexts = () => {
     setInputText(outputText);
     setOutputText(inputText);
+    setError('');
   };
 
   const deleteHistoryItem = (id: string) => {
-    setHistory(prev => prev.filter(item => item.id !== id));
+    setHistory((previous) => previous.filter((item) => item.id !== id));
   };
 
   const clearHistory = () => {
@@ -140,52 +174,40 @@ export default function JSONFormatter() {
   const loadFromHistory = (item: HistoryItem) => {
     setInputText(item.inputPreview);
     setOutputText(item.outputPreview);
+    setError('');
   };
 
   const downloadJSON = () => {
     if (!outputText) return;
+
     const blob = new Blob([outputText], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'formatted.json';
-    a.click();
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'formatted.json';
+    anchor.click();
     URL.revokeObjectURL(url);
   };
-
-  const getAnalytics = () => {
-    const totalFormats = history.filter(h => h.action === 'format').length;
-    const totalMinifies = history.filter(h => h.action === 'minify').length;
-    const totalOperations = history.length;
-    const avgCompression = history.length > 0
-      ? Math.round((history.reduce((sum, item) => sum + ((item.inputSize - item.outputSize) / item.inputSize * 100), 0) / history.length) * 10) / 10
-      : 0;
-    return { totalFormats, totalMinifies, totalOperations, avgCompression };
-  };
-
-  const analytics = getAnalytics();
 
   return (
     <main className={styles.container}>
       <h1 className={styles.pageTitle}>
-        <span className={styles.icon}>📋</span>
+        <span className={styles.icon}>JSON</span>
         <span className={styles.textGradient}>JSON Formatter</span>
       </h1>
-      <p>Format, validate, and minify JSON data with smart tracking and analytics.</p>
+      <p>Format, validate, and minify JSON data with browser-side processing.</p>
 
       <div className={styles.formatter}>
         <div className={styles.inputSection}>
           <div className={styles.inputHeader}>
             <h2>Input JSON</h2>
-            <button onClick={loadSample} className={styles.sampleBtn}>
-              Load Sample
-            </button>
+            <button onClick={loadSample} className={styles.sampleBtn}>Load Sample</button>
           </div>
           <textarea
             id="json-input"
             name="json-input"
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={(event) => setInputText(event.target.value)}
             placeholder="Paste your JSON here..."
             className={styles.textarea}
           />
@@ -199,28 +221,20 @@ export default function JSONFormatter() {
               id="indent-size"
               name="indent-size"
               value={indentSize}
-              onChange={(e) => setIndentSize(Number(e.target.value))}
+              onChange={(event) => setIndentSize(Number(event.target.value))}
               className={styles.indentSelect}
             >
               <option value={2}>2 spaces</option>
               <option value={4}>4 spaces</option>
-              <option value={1}>1 tab</option>
+              <option value={1}>1 tab width</option>
             </select>
           </div>
 
           <div className={styles.buttonGroup}>
-            <button onClick={formatJSON} className={styles.actionBtn} disabled={!inputText.trim()}>
-              📝 Format JSON
-            </button>
-            <button onClick={minifyJSON} className={styles.actionBtn} disabled={!inputText.trim()}>
-              🗜️ Minify JSON
-            </button>
-            <button onClick={validateJSON} className={styles.actionBtn} disabled={!inputText.trim()}>
-              ✅ Validate JSON
-            </button>
-            <button onClick={swapTexts} className={styles.swapBtn} disabled={!inputText || !outputText}>
-              🔄 Swap
-            </button>
+            <button onClick={() => processJSON('format')} className={styles.actionBtn} disabled={!inputText.trim()}>Format JSON</button>
+            <button onClick={() => processJSON('minify')} className={styles.actionBtn} disabled={!inputText.trim()}>Minify JSON</button>
+            <button onClick={validateJSON} className={styles.actionBtn} disabled={!inputText.trim()}>Validate JSON</button>
+            <button onClick={swapTexts} className={styles.swapBtn} disabled={!inputText || !outputText}>Swap</button>
           </div>
         </div>
 
@@ -236,15 +250,9 @@ export default function JSONFormatter() {
             className={`${styles.textarea} ${error ? styles.errorTextarea : ''}`}
           />
           <div className={styles.outputActions}>
-            <button onClick={copyToClipboard} className={styles.actionBtn} disabled={!outputText}>
-              📋 Copy
-            </button>
-            <button onClick={downloadJSON} className={styles.actionBtn} disabled={!outputText}>
-              💾 Download
-            </button>
-            <button onClick={clearAll} className={styles.actionBtn}>
-              🗑️ Clear
-            </button>
+            <button onClick={copyToClipboard} className={styles.actionBtn} disabled={!outputText}>Copy</button>
+            <button onClick={downloadJSON} className={styles.actionBtn} disabled={!outputText}>Download</button>
+            <button onClick={clearAll} className={styles.actionBtn}>Clear</button>
           </div>
         </div>
       </div>
@@ -252,7 +260,7 @@ export default function JSONFormatter() {
       {history.length > 0 && (
         <>
           <div className={styles.smartDashboard}>
-            <h3>📊 Analytics</h3>
+            <h3>Analytics</h3>
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
                 <div className={styles.statValue}>{analytics.totalOperations}</div>
@@ -275,43 +283,25 @@ export default function JSONFormatter() {
 
           <div className={styles.historySection}>
             <div className={styles.historyHeader}>
-              <h3>📜 History</h3>
+              <h3>History</h3>
               <button onClick={clearHistory} className={styles.clearBtn}>Clear All</button>
             </div>
             <div className={styles.historyList}>
-              {history.map(item => (
+              {history.map((item) => (
                 <div key={item.id} className={styles.historyItem}>
                   <div className={styles.historyText}>
                     <div className={styles.historyMeta}>
-                      <span className={styles.historyAction}>
-                        {item.action === 'format' ? '📝 Format' : '🗜️ Minify'}
-                      </span>
-                      <span className={styles.historyTime}>
-                        {new Date(item.timestamp).toLocaleTimeString()}
-                      </span>
-                      <span className={styles.historySize}>
-                        {item.inputSize}B → {item.outputSize}B
-                      </span>
+                      <span className={styles.historyAction}>{item.action === 'format' ? 'Format' : 'Minify'}</span>
+                      <span className={styles.historyTime}>{new Date(item.timestamp).toLocaleTimeString()}</span>
+                      <span className={styles.historySize}>{item.inputSize}B to {item.outputSize}B</span>
                     </div>
                     <div className={styles.historyContent}>
                       {item.inputPreview.slice(0, 80)}{item.inputPreview.length > 80 ? '...' : ''}
                     </div>
                   </div>
                   <div className={styles.historyActions}>
-                    <button
-                      onClick={() => loadFromHistory(item)}
-                      className={styles.historyBtn}
-                      title="Load this"
-                    >
-                      🔄
-                    </button>
-                    <button
-                      onClick={() => deleteHistoryItem(item.id)}
-                      className={styles.historyBtn}
-                      title="Delete"
-                    >
-                      🗑️
-                    </button>
+                    <button onClick={() => loadFromHistory(item)} className={styles.historyBtn} title="Load this">Load</button>
+                    <button onClick={() => deleteHistoryItem(item.id)} className={styles.historyBtn} title="Delete">Delete</button>
                   </div>
                 </div>
               ))}
@@ -321,14 +311,18 @@ export default function JSONFormatter() {
       )}
 
       <ToolInfo
-        howItWorks="Paste or type your JSON in the input area<br>Choose indent size (2 spaces, 4 spaces, or tab)<br>Click 'Format JSON' to pretty-print with indentation<br>Click 'Minify JSON' to compress to single line<br>Click 'Validate JSON' to check syntax<br>Copy the result or clear to start over"
+        howItWorks="Paste or type your JSON in the input area<br>Choose indent size for formatted output<br>Use Format JSON, Minify JSON, or Validate JSON as needed<br>Copy or download the processed result"
         faqs={[
-          { title: "What is JSON?", content: "JavaScript Object Notation - a lightweight data format" },
-          { title: "Why format JSON?", content: "Makes it human-readable with proper indentation" },
-          { title: "Why minify JSON?", content: "Reduces file size for production use" },
-          { title: "What if JSON is invalid?", content: "Error message will show the specific issue" }
+          { title: 'What is JSON?', content: 'JSON stands for JavaScript Object Notation, a common text format for storing and exchanging structured data.' },
+          { title: 'Why format JSON?', content: 'Formatted JSON is easier to read, debug, and review in APIs or config files.' },
+          { title: 'Why minify JSON?', content: 'Minified JSON removes extra spacing to reduce file size for production use.' },
+          { title: 'What happens if my JSON is invalid?', content: 'The tool shows the parsing error so you can fix the syntax quickly.' },
         ]}
-        tips={["Use for API responses, configuration files, or data exchange", "2 spaces is most common for web development", "Minified JSON loads faster but is harder to read", "Always validate before using formatted JSON"]}
+        tips={[
+          'Use formatting while debugging API payloads and minifying before shipping assets.',
+          'Validation helps catch missing commas, unmatched braces, and quoted keys issues.',
+          'All processing happens in your browser, so your JSON stays local.',
+        ]}
       />
     </main>
   );

@@ -1,31 +1,29 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Free GPA Calculator - Calculate Grade Point Average Online",
+  title: "GPA Calculator - Calculate Semester and Cumulative GPA Online",
   description:
-    "Calculate GPA instantly with multiple grade scales. Add courses with credits, use bulk input, and track target GPA. Supports preset curricula.",
+    "Calculate GPA with credits, target planning, and a standard 4.0 scale. Use this free browser-based GPA calculator for semester or cumulative grade point averages.",
   keywords: [
-    "GPA calculator",
-    "calculate GPA",
+    "gpa calculator",
+    "semester gpa calculator",
+    "college gpa calculator",
+    "target gpa calculator",
     "grade point average",
-    "free GPA tool",
-    "GPA grade scale",
-    "cumulative GPA",
-    "college GPA calculator",
-    "course calculator",
+    "cumulative gpa",
   ],
   openGraph: {
-    title: "Free GPA Calculator - Calculate Grade Point Average Online",
+    title: "GPA Calculator - Calculate Semester and Cumulative GPA Online",
     description:
-      "Calculate GPA instantly with multiple grade scales. Add courses with credits, use bulk input, and track target GPA. Supports preset curricula.",
+      "Calculate current GPA, plan target grades, and understand credit-weighted averages with Koovlo.",
     type: "website",
     url: "https://www.koovlo.com/tools/education/gpa",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Free GPA Calculator - Calculate Grade Point Average Online",
+    title: "GPA Calculator - Calculate Semester and Cumulative GPA Online",
     description:
-      "Calculate GPA instantly with multiple grade scales. Add courses with credits, use bulk input, and track target GPA. Supports preset curricula.",
+      "Calculate current GPA, plan target grades, and understand credit-weighted averages with Koovlo.",
   },
   robots: {
     index: true,
@@ -45,8 +43,8 @@ export const metadata: Metadata = {
 
 export default function GPALayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return <>{children}</>;
 }

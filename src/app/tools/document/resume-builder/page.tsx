@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import jsPDF from "jspdf";
@@ -71,73 +71,107 @@ interface ResumeData {
   mode: string;
 }
 
+function createId() {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function createEmptyExperience(): Experience {
+  return {
+    id: createId(),
+    company: "",
+    position: "",
+    startDate: "",
+    endDate: "",
+    description: "",
+  };
+}
+
+function createEmptyEducation(): Education {
+  return {
+    id: createId(),
+    school: "",
+    degree: "",
+    field: "",
+    startDate: "",
+    endDate: "",
+    gpa: "",
+  };
+}
+
+function getInitialResumeData(): ResumeData {
+  const fallback: ResumeData = {
+    personalInfo: {
+      name: "",
+      email: "",
+      phone: "",
+      location: "",
+      linkedin: "",
+      website: "",
+    },
+    summary: "",
+    experience: [createEmptyExperience()],
+    education: [createEmptyEducation()],
+    publications: [],
+    certificates: [],
+    languages: [],
+    skills: [],
+    theme: "blue",
+    template: "classic",
+    fontStyle: "serif",
+    density: "standard",
+    mode: "resume",
+  };
+
+  if (typeof window === "undefined") {
+    return fallback;
+  }
+
+  try {
+    const saved = localStorage.getItem("resume-builder-data");
+    if (!saved) {
+      return fallback;
+    }
+
+    const data = JSON.parse(saved) as Partial<ResumeData>;
+    return {
+      personalInfo: data.personalInfo || fallback.personalInfo,
+      summary: data.summary || "",
+      experience: data.experience?.length ? data.experience : fallback.experience,
+      education: data.education?.length ? data.education : fallback.education,
+      publications: data.publications || [],
+      certificates: data.certificates || [],
+      languages: data.languages || [],
+      skills: data.skills || [],
+      theme: data.theme || "blue",
+      template: data.template || "classic",
+      fontStyle: data.fontStyle || "serif",
+      density: data.density || "standard",
+      mode: data.mode || "resume",
+    };
+  } catch {
+    return fallback;
+  }
+}
+
 export default function ResumeBuilder() {
+  const initialData = getInitialResumeData();
   const resumeRef = useRef<HTMLDivElement>(null);
-  const [mode, setMode] = useState('resume'); // 'resume' or 'cv'
-  const [theme, setTheme] = useState('blue');
-  const [template, setTemplate] = useState('classic');
-  const [fontStyle, setFontStyle] = useState('serif');
-  const [density, setDensity] = useState('standard');
-  const [skillInput, setSkillInput] = useState('');
-  
-  const [personalInfo, setPersonalInfo] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    location: '',
-    linkedin: '',
-    website: ''
-  });
-
-  const [summary, setSummary] = useState('');
-
-  const [experience, setExperience] = useState<Experience[]>([
-    {
-      id: Date.now().toString(),
-      company: '',
-      position: '',
-      startDate: '',
-      endDate: '',
-      description: ''
-    }
-  ]);
-
-  const [education, setEducation] = useState<Education[]>([
-    {
-      id: Date.now().toString(),
-      school: '',
-      degree: '',
-      field: '',
-      startDate: '',
-      endDate: '',
-      gpa: ''
-    }
-  ]);
-
-  const [publications, setPublications] = useState<Publication[]>([]);
-  const [certificates, setCertificates] = useState<Certificate[]>([]);
-  const [languages, setLanguages] = useState<Language[]>([]);
-  const [skills, setSkills] = useState<string[]>([]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('resume-builder-data');
-    if (saved) {
-      const data: ResumeData = JSON.parse(saved);
-      setPersonalInfo(data.personalInfo);
-      setSummary(data.summary);
-      setExperience(data.experience);
-      setEducation(data.education);
-      setPublications(data.publications || []);
-      setCertificates(data.certificates || []);
-      setLanguages(data.languages || []);
-      setSkills(data.skills);
-      setTheme(data.theme || 'blue');
-      setTemplate(data.template || 'classic');
-      setFontStyle(data.fontStyle || 'serif');
-      setDensity(data.density || 'standard');
-      setMode(data.mode || 'resume');
-    }
-  }, []);
+  const [mode, setMode] = useState(initialData.mode);
+  const [theme, setTheme] = useState(initialData.theme);
+  const [template, setTemplate] = useState(initialData.template);
+  const [fontStyle, setFontStyle] = useState(initialData.fontStyle);
+  const [density, setDensity] = useState(initialData.density);
+  const [skillInput, setSkillInput] = useState("");
+  const [personalInfo, setPersonalInfo] = useState(initialData.personalInfo);
+  const [summary, setSummary] = useState(initialData.summary);
+  const [experience, setExperience] = useState<Experience[]>(initialData.experience);
+  const [education, setEducation] = useState<Education[]>(initialData.education);
+  const [publications, setPublications] = useState<Publication[]>(initialData.publications);
+  const [certificates, setCertificates] = useState<Certificate[]>(initialData.certificates);
+  const [languages, setLanguages] = useState<Language[]>(initialData.languages);
+  const [skills, setSkills] = useState<string[]>(initialData.skills);
 
   useEffect(() => {
     const data: ResumeData = {
@@ -160,7 +194,7 @@ export default function ResumeBuilder() {
 
   const addExperience = () => {
     setExperience([...experience, {
-      id: Date.now().toString(),
+      id: createId(),
       company: '',
       position: '',
       startDate: '',
@@ -181,7 +215,7 @@ export default function ResumeBuilder() {
 
   const addEducation = () => {
     setEducation([...education, {
-      id: Date.now().toString(),
+      id: createId(),
       school: '',
       degree: '',
       field: '',
@@ -193,7 +227,7 @@ export default function ResumeBuilder() {
 
   const addPublication = () => {
     setPublications([...publications, {
-      id: Date.now().toString(),
+      id: createId(),
       title: '',
       authors: '',
       journal: '',
@@ -214,7 +248,7 @@ export default function ResumeBuilder() {
 
   const addCertificate = () => {
     setCertificates([...certificates, {
-      id: Date.now().toString(),
+      id: createId(),
       name: '',
       issuer: '',
       date: '',
@@ -234,7 +268,7 @@ export default function ResumeBuilder() {
 
   const addLanguage = () => {
     setLanguages([...languages, {
-      id: Date.now().toString(),
+      id: createId(),
       name: '',
       proficiency: 'Intermediate'
     }]);
@@ -322,10 +356,10 @@ export default function ResumeBuilder() {
       }
 
       pdf.save(`${personalInfo.name || (mode === 'resume' ? 'resume' : 'cv')}.pdf`);
-      alert(`✅ ${mode === 'resume' ? 'Resume' : 'CV'} downloaded successfully!`);
+      alert(`âœ… ${mode === 'resume' ? 'Resume' : 'CV'} downloaded successfully!`);
     } catch (error) {
       console.error('PDF generation error:', error);
-      alert('❌ Failed to generate PDF. Please try again.');
+      alert('âŒ Failed to generate PDF. Please try again.');
     }
   };
 
@@ -353,7 +387,7 @@ export default function ResumeBuilder() {
     a.download = `${personalInfo.name || (mode === 'resume' ? 'resume' : 'cv')}-data.json`;
     a.click();
     URL.revokeObjectURL(url);
-    alert('✅ Data saved!');
+    alert('âœ… Data saved!');
   };
 
   const loadResume = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -377,9 +411,9 @@ export default function ResumeBuilder() {
         setFontStyle(data.fontStyle || 'serif');
         setDensity(data.density || 'standard');
         setMode(data.mode || 'resume');
-        alert('✅ Data loaded!');
-      } catch (error) {
-        alert('❌ Invalid file format');
+        alert('âœ… Data loaded!');
+      } catch {
+        alert('âŒ Invalid file format');
       }
     };
     reader.readAsText(file);
@@ -388,7 +422,7 @@ export default function ResumeBuilder() {
   return (
     <div className={styles.container}>
       <h1 className={styles.pageTitle}>
-        <span className={styles.icon}>{mode === 'resume' ? '📄' : '📋'}</span>
+        <span className={styles.icon}>{mode === 'resume' ? 'ðŸ“„' : 'ðŸ“‹'}</span>
         <span className={styles.textGradient}>{mode === 'resume' ? 'Resume' : 'CV'} Builder</span>
       </h1>
       <p className={styles.subtitle}>
@@ -412,7 +446,7 @@ export default function ResumeBuilder() {
               transition: 'all 0.2s'
             }}
           >
-            📄 Resume (1-2 pages)
+            ðŸ“„ Resume (1-2 pages)
           </button>
           <button
             onClick={() => setMode('cv')}
@@ -427,18 +461,18 @@ export default function ResumeBuilder() {
               transition: 'all 0.2s'
             }}
           >
-            📋 CV (Comprehensive)
+            ðŸ“‹ CV (Comprehensive)
           </button>
         </div>
       </div>
 
       <div className={styles.mainContent}>
         <div className={styles.editorPanel}>
-          <h2>✏️ {mode === 'resume' ? 'Resume' : 'CV'} Editor</h2>
+          <h2>âœï¸ {mode === 'resume' ? 'Resume' : 'CV'} Editor</h2>
 
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
-              <h3>🎨 Template & Style</h3>
+              <h3>ðŸŽ¨ Template & Style</h3>
             </div>
             <div className={styles.formGroup}>
               <label>Choose Template</label>
@@ -508,7 +542,7 @@ export default function ResumeBuilder() {
 
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
-              <h3>👤 Personal Information</h3>
+              <h3>ðŸ‘¤ Personal Information</h3>
             </div>
             <div className={styles.formGroup}>
               <label>Full Name *</label>
@@ -578,7 +612,7 @@ export default function ResumeBuilder() {
 
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
-              <h3>📝 Professional Summary</h3>
+              <h3>ðŸ“ Professional Summary</h3>
             </div>
             <div className={styles.formGroup}>
               <textarea
@@ -596,7 +630,7 @@ export default function ResumeBuilder() {
 
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
-              <h3>💼 Work Experience</h3>
+              <h3>ðŸ’¼ Work Experience</h3>
               <button className={styles.addBtn} onClick={addExperience}>
                 + Add
               </button>
@@ -660,8 +694,8 @@ export default function ResumeBuilder() {
                     onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
                     placeholder={
                       mode === 'resume'
-                        ? '• Led development of key features\n• Improved performance by 40%\n• Mentored junior developers'
-                        : '• Led research on cutting-edge projects\n• Published 15+ peer-reviewed papers\n• Mentored graduate students'
+                        ? 'â€¢ Led development of key features\nâ€¢ Improved performance by 40%\nâ€¢ Mentored junior developers'
+                        : 'â€¢ Led research on cutting-edge projects\nâ€¢ Published 15+ peer-reviewed papers\nâ€¢ Mentored graduate students'
                     }
                   />
                 </div>
@@ -671,7 +705,7 @@ export default function ResumeBuilder() {
 
               <div className={styles.section}>
                 <div className={styles.sectionHeader}>
-                  <h3>🎓 Education</h3>
+                  <h3>ðŸŽ“ Education</h3>
                   <button className={styles.addBtn} onClick={addEducation} type="button">
                     + Add
                   </button>
@@ -756,7 +790,7 @@ export default function ResumeBuilder() {
                 <>
                   <div className={styles.section}>
                     <div className={styles.sectionHeader}>
-                      <h3>📚 Publications</h3>
+                      <h3>ðŸ“š Publications</h3>
                       <button className={styles.addBtn} onClick={addPublication} type="button">
                         + Add
                       </button>
@@ -829,7 +863,7 @@ export default function ResumeBuilder() {
 
                   <div className={styles.section}>
                     <div className={styles.sectionHeader}>
-                      <h3>🏆 Certifications & Awards</h3>
+                      <h3>ðŸ† Certifications & Awards</h3>
                       <button className={styles.addBtn} onClick={addCertificate} type="button">
                         + Add
                       </button>
@@ -891,7 +925,7 @@ export default function ResumeBuilder() {
 
                   <div className={styles.section}>
                     <div className={styles.sectionHeader}>
-                      <h3>🗣️ Languages</h3>
+                      <h3>ðŸ—£ï¸ Languages</h3>
                       <button className={styles.addBtn} onClick={addLanguage} type="button">
                         + Add
                       </button>
@@ -939,7 +973,7 @@ export default function ResumeBuilder() {
 
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
-              <h3>🛠️ Skills</h3>
+              <h3>ðŸ› ï¸ Skills</h3>
             </div>
             <div className={styles.formGroup}>
               <label>Add Skill</label>
@@ -972,7 +1006,7 @@ export default function ResumeBuilder() {
                       fontSize: '14px'
                     }}
                   >
-                    ×
+                    Ã—
                   </button>
                 </span>
               ))}
@@ -982,7 +1016,7 @@ export default function ResumeBuilder() {
 
         <div className={styles.previewPanel}>
           <div className={styles.previewHeader}>
-            <h2>👁️ Live Preview</h2>
+            <h2>ðŸ‘ï¸ Live Preview</h2>
             <div className={styles.themeSelector}>
               <button
                 className={`${styles.themeBtn} ${theme === 'blue' ? styles.active : ''}`}
@@ -1018,11 +1052,11 @@ export default function ResumeBuilder() {
             <div className={styles.resumeHeader}>
               <h1>{personalInfo.name || 'Your Name'}</h1>
               <div className={styles.contact}>
-                {personalInfo.email && <span>📧 {personalInfo.email}</span>}
-                {personalInfo.phone && <span>📱 {personalInfo.phone}</span>}
-                {personalInfo.location && <span>📍 {personalInfo.location}</span>}
-                {personalInfo.linkedin && <span>💼 {personalInfo.linkedin}</span>}
-                {personalInfo.website && <span>🌐 {personalInfo.website}</span>}
+                {personalInfo.email && <span>ðŸ“§ {personalInfo.email}</span>}
+                {personalInfo.phone && <span>ðŸ“± {personalInfo.phone}</span>}
+                {personalInfo.location && <span>ðŸ“ {personalInfo.location}</span>}
+                {personalInfo.linkedin && <span>ðŸ’¼ {personalInfo.linkedin}</span>}
+                {personalInfo.website && <span>ðŸŒ {personalInfo.website}</span>}
               </div>
             </div>
 
@@ -1043,7 +1077,7 @@ export default function ResumeBuilder() {
                       <div className={styles.meta}>
                         <strong>{exp.company || 'Company'}</strong>
                         {(exp.startDate || exp.endDate) && (
-                          <span> • {exp.startDate || 'Start'} - {exp.endDate || 'Present'}</span>
+                          <span> â€¢ {exp.startDate || 'Start'} - {exp.endDate || 'Present'}</span>
                         )}
                       </div>
                       {exp.description && <p style={{ whiteSpace: 'pre-line' }}>{exp.description}</p>}
@@ -1063,9 +1097,9 @@ export default function ResumeBuilder() {
                       <div className={styles.meta}>
                         <strong>{edu.school || 'School'}</strong>
                         {(edu.startDate || edu.endDate) && (
-                          <span> • {edu.startDate || 'Start'} - {edu.endDate || 'End'}</span>
+                          <span> â€¢ {edu.startDate || 'Start'} - {edu.endDate || 'End'}</span>
                         )}
-                        {edu.gpa && <span> • GPA: {edu.gpa}</span>}
+                        {edu.gpa && <span> â€¢ GPA: {edu.gpa}</span>}
                       </div>
                     </div>
                   ) : null
@@ -1082,9 +1116,9 @@ export default function ResumeBuilder() {
                       <h3>{pub.title || 'Publication Title'}</h3>
                       <div className={styles.meta}>
                         {pub.authors && <strong>{pub.authors}</strong>}
-                        {pub.journal && <span> • {pub.journal}</span>}
-                        {pub.year && <span> • {pub.year}</span>}
-                        {pub.doi && <span> • DOI: {pub.doi}</span>}
+                        {pub.journal && <span> â€¢ {pub.journal}</span>}
+                        {pub.year && <span> â€¢ {pub.year}</span>}
+                        {pub.doi && <span> â€¢ DOI: {pub.doi}</span>}
                       </div>
                     </div>
                   ) : null
@@ -1101,9 +1135,9 @@ export default function ResumeBuilder() {
                       <h3>{cert.name || 'Certificate'}</h3>
                       <div className={styles.meta}>
                         <strong>{cert.issuer || 'Issuer'}</strong>
-                        {cert.date && <span> • {cert.date}</span>}
+                        {cert.date && <span> â€¢ {cert.date}</span>}
                         {cert.credentialUrl && (
-                          <span> • <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer">View Credential</a></span>
+                          <span> â€¢ <a href={cert.credentialUrl} target="_blank" rel="noopener noreferrer">View Credential</a></span>
                         )}
                       </div>
                     </div>
@@ -1142,13 +1176,13 @@ export default function ResumeBuilder() {
 
           <div className={styles.actionBar}>
             <button className={styles.exportBtn} onClick={exportToPDF}>
-              📥 Download PDF
+              ðŸ“¥ Download PDF
             </button>
             <button className={styles.saveBtn} onClick={saveResume}>
-              💾 Save Data
+              ðŸ’¾ Save Data
             </button>
             <label htmlFor="load-resume" className={styles.loadBtn} style={{ textAlign: 'center', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              📂 Load Data
+              ðŸ“‚ Load Data
               <input
                 id="load-resume"
                 type="file"
@@ -1195,3 +1229,6 @@ export default function ResumeBuilder() {
     </div>
   );
 }
+
+
+

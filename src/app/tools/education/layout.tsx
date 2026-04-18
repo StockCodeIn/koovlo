@@ -1,23 +1,24 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Free Education Tools – Koovlo",
+  title: "Education Tools - GPA, CGPA, Grade and Attendance Calculators",
   description:
-    "Use Koovlo's free online education tools to calculate GPA, CGPA, percentage, grades, attendance and exam scores instantly. Accurate formulas, fast results and mobile friendly.",
+    "Free education tools for GPA, CGPA, percentages, grades, attendance, and revision workflows. Built for students with clear formulas and mobile-friendly inputs.",
   keywords: [
-    "percentage calculator",
-    "CGPA calculator",
-    "exam marks calculator",
-    "study planner",
-    "Koovlo education tools",
+    "gpa calculator",
+    "cgpa calculator",
+    "attendance calculator",
+    "grade calculator",
+    "student tools",
+    "education tools",
   ],
   alternates: {
     canonical: "https://www.koovlo.com/tools/education",
   },
   openGraph: {
-    title: "Free Education Tools – Koovlo",
+    title: "Education Tools - GPA, CGPA, Grade and Attendance Calculators",
     description:
-      "Smart, free education tools for students — calculate grades, CGPA, attendance, and more in seconds.",
+      "Student-friendly calculators and study tools for everyday academic tasks.",
     url: "https://www.koovlo.com/tools/education",
     siteName: "Koovlo",
     type: "website",
@@ -26,8 +27,8 @@ export const metadata: Metadata = {
 
 export default function EducationLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return <>{children}</>;
 }

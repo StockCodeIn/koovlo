@@ -1,165 +1,180 @@
-import { Metadata } from 'next';
+import { Metadata } from "next";
 
 interface ToolMetadataConfig {
   title: string;
   description: string;
   keywords: string[];
-  icon: string;
+  path: string;
 }
 
 const toolsMetadata: Record<string, ToolMetadataConfig> = {
-  // PDF Tools
-  'pdf-merge': {
-    title: 'PDF Merge – Combine Multiple PDFs Online Free',
-    description: 'Merge multiple PDF files into one document instantly. Free, fast, and secure PDF merger with no file size limits.',
-    keywords: ['merge PDF', 'combine PDF', 'pdf merger', 'merge files online'],
-    icon: '📎',
+  "pdf-merge": {
+    title: "PDF Merge - Combine Multiple PDF Files Online",
+    description:
+      "Merge multiple PDF files into one document instantly with a fast browser-based PDF merger.",
+    keywords: ["merge pdf", "combine pdf", "pdf merger", "merge files online"],
+    path: "/tools/pdf/merge",
   },
-  'pdf-compress': {
-    title: 'Compress PDF Online – Reduce File Size Free',
-    description: 'Compress PDF files online without losing quality. Choose compression level and reduce PDF size instantly.',
-    keywords: ['compress PDF', 'reduce PDF size', 'pdf compression', 'pdf optimizer'],
-    icon: '🗜️',
+  "pdf-compress": {
+    title: "Compress PDF Online - Reduce PDF File Size",
+    description:
+      "Compress PDF files online and reduce file size for email, uploads, and sharing.",
+    keywords: ["compress pdf", "reduce pdf size", "pdf compression", "pdf optimizer"],
+    path: "/tools/pdf/compress",
   },
-  'pdf-extract-pages': {
-    title: 'Extract PDF Pages – Extract Specific Pages Free',
-    description: 'Extract specific pages from PDF by page number. Create new PDFs from selected pages instantly.',
-    keywords: ['extract PDF pages', 'extract PDF', 'split pages'],
-    icon: '✂️',
+  "pdf-extract-pages": {
+    title: "Extract PDF Pages - Save Selected Pages Online",
+    description:
+      "Extract specific pages from a PDF and create a new document in seconds.",
+    keywords: ["extract pdf pages", "extract pdf", "split pages"],
+    path: "/tools/pdf/extract-pages",
   },
-  'pdf-to-word': {
-    title: 'PDF to Word – Convert PDF to DOCX Free Online',
-    description: 'Convert PDF to editable Word (DOCX) documents instantly. No signup required, fast and secure.',
-    keywords: ['PDF to Word', 'convert PDF to Word', 'PDF to DOCX', 'pdf converter'],
-    icon: '📝',
+  "pdf-to-word": {
+    title: "PDF to Word - Convert PDF to DOCX Online",
+    description:
+      "Convert PDF to editable Word DOCX documents online with a privacy-first workflow.",
+    keywords: ["pdf to word", "convert pdf to word", "pdf to docx", "pdf converter"],
+    path: "/tools/pdf/to-word",
   },
-  'pdf-to-image': {
-    title: 'PDF to Image – Convert PDF Pages to PNG/JPG',
-    description: 'Convert PDF pages to PNG or JPG images. Extract all pages or select specific pages.',
-    keywords: ['PDF to image', 'PDF to PNG', 'PDF to JPG', 'convert PDF'],
-    icon: '🖼️',
+  "pdf-to-image": {
+    title: "PDF to Image - Convert PDF Pages to PNG or JPG",
+    description:
+      "Convert PDF pages to PNG or JPG images online with adjustable quality settings.",
+    keywords: ["pdf to image", "pdf to png", "pdf to jpg", "convert pdf"],
+    path: "/tools/pdf/to-image",
   },
-  'pdf-watermark': {
-    title: 'Add Watermark to PDF – Text & Image Watermarks',
-    description: 'Add text or image watermarks to PDFs instantly. Customize position, opacity, and appearance.',
-    keywords: ['PDF watermark', 'add watermark', 'watermark PDF', 'protect PDF'],
-    icon: '💧',
+  "pdf-watermark": {
+    title: "Add Watermark to PDF - Text and Image Watermarks",
+    description:
+      "Add text or image watermarks to PDF files and customize their position and opacity.",
+    keywords: ["pdf watermark", "add watermark", "watermark pdf", "protect pdf"],
+    path: "/tools/pdf/watermark",
   },
-  'pdf-unlock': {
-    title: 'Unlock PDF – Remove PDF Password Protection',
-    description: 'Remove password protection from PDF files instantly. Unlock encrypted PDFs securely.',
-    keywords: ['unlock PDF', 'remove PDF password', 'remove protection'],
-    icon: '🔓',
+  "pdf-unlock": {
+    title: "Unlock PDF - Remove PDF Password Protection",
+    description:
+      "Unlock password-protected PDF files you are authorized to edit in your browser.",
+    keywords: ["unlock pdf", "remove pdf password", "remove protection"],
+    path: "/tools/pdf/unlock",
   },
-
-  // Image Tools
-  'image-compress': {
-    title: 'Compress Image – Reduce Image Size Online Free',
-    description: 'Compress images (PNG, JPG, WebP) without losing quality. Batch compress multiple images.',
-    keywords: ['compress image', 'image compressor', 'reduce image size', 'online image compression'],
-    icon: '📦',
+  "image-compress": {
+    title: "Compress Image - Reduce Image Size Online",
+    description:
+      "Compress PNG, JPG, and WebP images online without a complicated workflow.",
+    keywords: ["compress image", "image compressor", "reduce image size", "online image compression"],
+    path: "/tools/image/compress",
   },
-  'image-resize': {
-    title: 'Resize Image – Change Image Dimensions Free',
-    description: 'Resize images with presets or custom dimensions. Maintain aspect ratio. Support PNG, JPG, WebP.',
-    keywords: ['resize image', 'image resizer', 'change image size', 'crop image'],
-    icon: '📏',
+  "image-resize": {
+    title: "Resize Image - Change Image Dimensions Online",
+    description:
+      "Resize images with custom dimensions, presets, and aspect ratio controls.",
+    keywords: ["resize image", "image resizer", "change image size", "crop image"],
+    path: "/tools/image/resize",
   },
-  'image-convert': {
-    title: 'Convert Image Format – PNG, JPG, WebP Converter',
-    description: 'Convert images between PNG, JPG, and WebP formats instantly. No quality loss.',
-    keywords: ['convert image', 'image converter', 'PNG to JPG', 'convert PNG to JPG'],
-    icon: '🔄',
+  "image-convert": {
+    title: "Convert Image Format - PNG, JPG, and WebP Converter",
+    description:
+      "Convert images between PNG, JPG, and WebP formats directly in your browser.",
+    keywords: ["convert image", "image converter", "png to jpg", "convert png to jpg"],
+    path: "/tools/image/convert",
   },
-  'image-watermark': {
-    title: 'Add Watermark to Image – Text & Logo Watermarks',
-    description: 'Add text or image watermarks to photos. Protect your images with custom watermarks.',
-    keywords: ['watermark image', 'add watermark', 'image watermark', 'protect photos'],
-    icon: '💧',
+  "image-watermark": {
+    title: "Add Watermark to Image - Text and Logo Watermarks",
+    description:
+      "Add custom text or image watermarks to photos and graphics online.",
+    keywords: ["watermark image", "add watermark", "image watermark", "protect photos"],
+    path: "/tools/image/add-watermark",
   },
-
-  // Education Tools
-  'gpa-calculator': {
-    title: 'GPA Calculator – Calculate Your GPA Online',
-    description: 'Calculate GPA instantly with credits and multiple grade scales. Track academic performance.',
-    keywords: ['GPA calculator', 'calculate GPA', 'college GPA', 'grade calculator'],
-    icon: '📊',
+  "gpa-calculator": {
+    title: "GPA Calculator - Calculate Your Grade Point Average Online",
+    description:
+      "Calculate GPA instantly with credits, target grades, and a standard 4.0 scale.",
+    keywords: ["gpa calculator", "calculate gpa", "college gpa", "grade calculator"],
+    path: "/tools/education/gpa",
   },
-  'cgpa-calculator': {
-    title: 'CGPA Calculator – Calculate Cumulative GPA',
-    description: 'Calculate CGPA across multiple semesters. Cumulative GPA calculator with semester tracking.',
-    keywords: ['CGPA calculator', 'cumulative GPA', 'semester GPA'],
-    icon: '📈',
+  "cgpa-calculator": {
+    title: "CGPA Calculator - Calculate Cumulative GPA Online",
+    description:
+      "Calculate CGPA across semesters and track cumulative academic performance.",
+    keywords: ["cgpa calculator", "cumulative gpa", "semester gpa"],
+    path: "/tools/education/cgpa",
   },
-  'percentage-calculator': {
-    title: 'Percentage Calculator – Calculate Percentage & CGPA',
-    description: 'Calculate percentages from marks instantly. Convert GPA to percentage, CGPA conversions.',
-    keywords: ['percentage calculator', 'calculate percentage', 'percentage to GPA'],
-    icon: '🔢',
+  "percentage-calculator": {
+    title: "Percentage Calculator - Calculate Marks and Percentages",
+    description:
+      "Calculate percentages from marks and convert common academic scores online.",
+    keywords: ["percentage calculator", "calculate percentage", "percentage to gpa"],
+    path: "/tools/education/percentage",
   },
-  'attendance-tracker': {
-    title: 'Attendance Tracker – Calculate Attendance Percentage',
-    description: 'Track and calculate attendance percentage daily. Student and teacher attendance calculator.',
-    keywords: ['attendance tracker', 'attendance calculator', 'attendance percentage'],
-    icon: '📅',
+  "attendance-tracker": {
+    title: "Attendance Tracker - Calculate Attendance Percentage",
+    description:
+      "Track attendance and find out how many classes you need to attend or can miss.",
+    keywords: ["attendance tracker", "attendance calculator", "attendance percentage"],
+    path: "/tools/education/attendance",
   },
-
-  // Document Tools
-  'resume-builder': {
-    title: 'Resume Builder – Create Professional Resume Free',
-    description: 'Create ATS-friendly resumes with templates. Export to PDF. No signup required.',
-    keywords: ['resume builder', 'resume maker', 'CV builder', 'create resume online'],
-    icon: '📄',
+  "resume-builder": {
+    title: "Resume Builder - Create a Professional Resume Online",
+    description:
+      "Create ATS-friendly resumes online and export them as polished PDF files.",
+    keywords: ["resume builder", "resume maker", "cv builder", "create resume online"],
+    path: "/tools/document/resume-builder",
   },
-  'invoice-generator': {
-    title: 'Invoice Generator – Create Professional Invoices',
-    description: 'Create and download professional invoices instantly. Free invoice template with PDF export.',
-    keywords: ['invoice generator', 'invoice maker', 'create invoice', 'invoice template'],
-    icon: '🧾',
+  "invoice-generator": {
+    title: "Invoice Generator - Create Professional Invoices Online",
+    description:
+      "Create and download professional invoices instantly with tax and total support.",
+    keywords: ["invoice generator", "invoice maker", "create invoice", "invoice template"],
+    path: "/tools/document/invoice",
   },
-
-  // Text/Web Tools
-  'word-counter': {
-    title: 'Word Counter – Count Words & Characters Online',
-    description: 'Count words, characters, paragraphs, and reading time. Analyze text statistics instantly.',
-    keywords: ['word counter', 'character counter', 'word count tool'],
-    icon: '📊',
+  "word-counter": {
+    title: "Word Counter - Count Words and Characters Online",
+    description:
+      "Count words, characters, paragraphs, and reading time with instant stats.",
+    keywords: ["word counter", "character counter", "word count tool"],
+    path: "/tools/text-web/word-counter",
   },
-  'json-formatter': {
-    title: 'JSON Formatter – Format & Validate JSON Online',
-    description: 'Format, validate, and minify JSON instantly. Pretty print JSON with syntax highlighting.',
-    keywords: ['JSON formatter', 'JSON validator', 'format JSON', 'minify JSON'],
-    icon: '{ }',
+  "json-formatter": {
+    title: "JSON Formatter - Format and Validate JSON Online",
+    description:
+      "Format, validate, and minify JSON online with quick visual feedback.",
+    keywords: ["json formatter", "json validator", "format json", "minify json"],
+    path: "/tools/text-web/json-formatter",
   },
-  'base64-encoder': {
-    title: 'Base64 Encoder/Decoder – Encode & Decode Online',
-    description: 'Encode and decode Base64 strings instantly. Online Base64 conversion tool.',
-    keywords: ['base64 encoder', 'base64 decoder', 'encode base64', 'decode base64'],
-    icon: '🔐',
+  "base64-encoder": {
+    title: "Base64 Encoder and Decoder - Convert Base64 Online",
+    description:
+      "Encode and decode Base64 text instantly in your browser.",
+    keywords: ["base64 encoder", "base64 decoder", "encode base64", "decode base64"],
+    path: "/tools/text-web/base64",
   },
-  'case-converter': {
-    title: 'Case Converter – Convert Text Case Online',
-    description: 'Convert text to uppercase, lowercase, camelCase, snake_case, and more.',
-    keywords: ['case converter', 'text converter', 'uppercase', 'lowercase', 'camelcase'],
-    icon: '🔤',
+  "case-converter": {
+    title: "Case Converter - Convert Text Case Online",
+    description:
+      "Convert text to uppercase, lowercase, title case, camel case, and more.",
+    keywords: ["case converter", "text converter", "uppercase", "lowercase", "camelcase"],
+    path: "/tools/text-web/case-converter",
   },
-  'text-to-speech': {
-    title: 'Text to Speech – Convert Text to Audio Online',
-    description: 'Convert text to audio with natural voice. Multiple language and voice options.',
-    keywords: ['text to speech', 'text to audio', 'TTS converter', 'speech synthesis'],
-    icon: '🔊',
+  "text-to-speech": {
+    title: "Text to Speech - Convert Text to Audio Online",
+    description:
+      "Convert text to speech with browser voices and simple controls.",
+    keywords: ["text to speech", "text to audio", "tts converter", "speech synthesis"],
+    path: "/tools/text-web/text-to-speech",
   },
-
 };
 
-export function generateToolMetadata(toolKey: string, baseUrl = 'https://www.koovlo.com'): Metadata {
+export function generateToolMetadata(
+  toolKey: string,
+  baseUrl = "https://www.koovlo.com"
+): Metadata {
   const config = toolsMetadata[toolKey];
-  
+
   if (!config) {
     return {};
   }
 
-  const url = `${baseUrl}/tools/${toolKey}`;
+  const url = `${baseUrl}${config.path}`;
 
   return {
     title: config.title,
@@ -169,11 +184,11 @@ export function generateToolMetadata(toolKey: string, baseUrl = 'https://www.koo
       title: config.title,
       description: config.description,
       url,
-      type: 'website',
-      siteName: 'Koovlo',
+      type: "website",
+      siteName: "Koovlo",
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: config.title,
       description: config.description,
     },
@@ -183,25 +198,28 @@ export function generateToolMetadata(toolKey: string, baseUrl = 'https://www.koo
   };
 }
 
-export function getToolSchemaMarkup(toolKey: string, baseUrl = 'https://www.koovlo.com') {
+export function getToolSchemaMarkup(
+  toolKey: string,
+  baseUrl = "https://www.koovlo.com"
+) {
   const config = toolsMetadata[toolKey];
-  
+
   if (!config) {
     return null;
   }
 
   return {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    'name': config.title,
-    'description': config.description,
-    'url': `${baseUrl}/tools/${toolKey}`,
-    'applicationCategory': 'Utility',
-    'operatingSystem': 'Web',
-    'offers': {
-      '@type': 'Offer',
-      'price': '0',
-      'priceCurrency': 'USD',
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: config.title,
+    description: config.description,
+    url: `${baseUrl}${config.path}`,
+    applicationCategory: "UtilityApplication",
+    operatingSystem: "Web",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
     },
   };
 }

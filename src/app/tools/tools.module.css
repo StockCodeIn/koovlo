@@ -1,4 +1,5 @@
-.main {
+.main,
+.container {
   max-width: 1200px;
   margin: auto;
   padding: 40px 20px 80px;
@@ -11,39 +12,28 @@
 }
 
 .heroSection h1 {
-  font-size: 2.2rem;
+  font-size: 2.4rem;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  display: block;
-  padding: 4px 0;
-  width: fit-content;
-  margin-left: auto;
-  margin-right: auto;
+  display: inline-block;
 }
 
 .heroSection p {
-  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 24px;
   color: var(--brand-muted);
-  margin-top: 10px;
-  margin-bottom: 24px;
   font-size: 1.05rem;
+  line-height: 1.7;
 }
 
 .searchSection {
   margin-bottom: 30px;
 }
 
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 40px 20px 80px;
-}
-
-/* Search Box Styles */
 .searchBox {
   display: flex;
   align-items: center;
@@ -51,17 +41,16 @@
   background: white;
   border: 2px solid #e2e8f0;
   border-radius: 30px;
-  padding: 12px 20px;
-  max-width: 500px;
+  padding: 12px 18px;
+  max-width: 620px;
   margin: 20px auto 0;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .searchBox:focus-within {
   border-color: var(--brand-primary);
   box-shadow: 0 6px 20px rgba(56, 37, 136, 0.15);
-  transform: scale(1.02);
 }
 
 .searchIcon {
@@ -79,22 +68,17 @@
 }
 
 .searchInput::placeholder {
-  color: #999;
+  color: #94a3b8;
 }
 
 .clearBtn {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
+  background: #f8fafc;
+  border: 1px solid #dbe4f0;
+  border-radius: 999px;
+  font-size: 0.85rem;
   cursor: pointer;
-  color: #999;
-  transition: color 0.2s ease;
-  padding: 4px 8px;
-  margin-right: -8px;
-}
-
-.clearBtn:hover {
-  color: var(--brand-primary);
+  color: var(--brand-text);
+  padding: 6px 12px;
 }
 
 .resultCount {
@@ -102,18 +86,6 @@
   color: var(--brand-muted);
   font-size: 0.95rem;
   margin-top: 12px;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .count {
@@ -121,25 +93,6 @@
   font-weight: 600;
 }
 
-.mainTitle {
-  text-align: center;
-  font-size: 2.2rem;
-  font-weight: 700;
-  margin-bottom: 40px;
-  
-  /* Gradient Logic */
-  background: linear-gradient(90deg, var(--brand-primary), var(--brand-secondary));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  /* Extra Safety (Inhe add kar lene se text katega nahi) */
-  display: block; 
-  padding: 4px 0; /* Kabhi-kabhi gradient cut hone se bachata hai */
-  width: fit-content; /* Center align ke sath iska use dhyan se karein */
-  margin-left: auto;
-  margin-right: auto;
-}
 .section {
   margin-bottom: 60px;
 }
@@ -163,16 +116,9 @@
 .sectionHeader p {
   color: var(--brand-muted);
   font-size: 0.98rem;
-}
-
-.section h2 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: var(--brand-text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  max-width: 760px;
+  margin: 0 auto;
+  line-height: 1.7;
 }
 
 .grid {
@@ -181,13 +127,15 @@
   grid-template-columns: repeat(3, 1fr);
 }
 
-.featuresGrid {
+.featuresGrid,
+.faqGrid {
   display: grid;
   gap: 16px;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
-.featureCard {
+.featureCard,
+.faqCard {
   background: white;
   border: 1px solid #e2e8f0;
   border-radius: 14px;
@@ -201,42 +149,20 @@
   margin-bottom: 6px;
 }
 
-.featureCard h3 {
-  margin: 0 0 6px 0;
+.featureCard h3,
+.faqCard h3 {
+  margin: 0 0 6px;
   font-size: 1.05rem;
 }
 
-.featureCard p {
-  margin: 0;
-  color: var(--brand-muted);
-  font-size: 0.95rem;
-}
-
-.faqGrid {
-  display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
-.faqCard {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 16px;
-}
-
-.faqCard h3 {
-  margin: 0 0 6px 0;
-  font-size: 1rem;
-}
-
+.featureCard p,
 .faqCard p {
   margin: 0;
   color: var(--brand-muted);
   font-size: 0.95rem;
+  line-height: 1.6;
 }
 
-/* No Results State */
 .noResults {
   text-align: center;
   padding: 60px 20px;
@@ -268,16 +194,9 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(56, 37, 136, 0.25);
 }
 
-.resetBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(56, 37, 136, 0.35);
-}
-
-/* --- Card hover animation tweak --- */
 .grid :global(.card) {
   animation: fadeIn 0.5s ease;
 }
@@ -292,63 +211,36 @@
     transform: translateY(0);
   }
 }
+
 @media (max-width: 1024px) {
-  .grid { grid-template-columns: repeat(2, 1fr); }
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
-/* --- Mobile Optimization --- */
+
 @media (max-width: 600px) {
+  .main,
+  .container {
+    padding: 20px 14px 60px;
+  }
+
+  .heroSection h1 {
+    font-size: 1.9rem;
+  }
+
   .searchBox {
     max-width: 100%;
     margin: 16px auto 0;
     padding: 10px 16px;
   }
 
-  .searchInput {
-    font-size: 0.95rem;
-  }
-
-  .mainTitle {
-    font-size: 1.8rem;
-  }
-
-  .section h2 {
-    font-size: 1.1rem;
-  }
-
-  .container {
-    padding: 20px 14px 60px;
-  }
-
-  .grid {
-    gap: 14px;
-    .grid { grid-template-columns: 1fr; }
-  }
-
-  .subText {
-    font-size: 0.95rem;
-    margin-bottom: 16px;
+  .grid,
+  .featuresGrid,
+  .faqGrid {
+    grid-template-columns: 1fr;
   }
 
   .sectionHeader h2 {
     font-size: 1.15rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .mainTitle {
-    font-size: 1.5rem;
-  }
-
-  .section h2 {
-    font-size: 1rem;
-  }
-
-  .container {
-    padding: 15px 10px 40px;
-  }
-
-  .grid {
-    gap: 10px;
-    grid-template-columns: 1fr;
   }
 }

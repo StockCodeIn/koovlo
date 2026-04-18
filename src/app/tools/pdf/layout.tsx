@@ -1,21 +1,21 @@
-// src/app/tools/pdf/layout.tsx
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Free PDF Tools – Koovlo",
+  title: "PDF Tools - Merge, Compress, Convert, Sign and Edit PDFs",
   description:
-    "Fast, secure, and privacy-friendly PDF tools by Koovlo. Merge, compress, split, rotate, and manage PDFs instantly — all offline.",
+    "Use free browser-based PDF tools on Koovlo to merge, compress, split, convert, sign, and organize documents with a privacy-first workflow.",
   keywords: [
-    "PDF merge",
-    "PDF compress",
-    "PDF tools online",
-    "Free PDF editor",
-    "Koovlo PDF tools",
+    "pdf tools",
+    "merge pdf",
+    "compress pdf",
+    "convert pdf",
+    "sign pdf",
+    "browser based pdf tools",
   ],
   openGraph: {
-    title: "Free PDF Tools – Koovlo",
+    title: "PDF Tools - Merge, Compress, Convert, Sign and Edit PDFs",
     description:
-      "Use Koovlo's powerful free PDF utilities: merge, compress, split, and manage PDFs online.",
+      "Use Koovlo's PDF tools to work on documents faster with less friction and better privacy messaging.",
     url: "https://www.koovlo.com/tools/pdf",
     siteName: "Koovlo",
     type: "website",
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
 
 export default function PdfLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return <>{children}</>;
 }

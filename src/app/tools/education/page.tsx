@@ -1,36 +1,26 @@
-// src/app/tools/education/page.tsx
+import FaqSchema from "@/components/FaqSchema";
 import ToolCard from "@/components/ToolCard";
+import { getToolsByCategory } from "@/lib/siteData";
 import styles from "../tools-common.module.css";
 
-const tools = [
-  { title: "GPA Calculator", desc: "Calculate GPA with credits and multiple grade scales", link: "/tools/education/gpa", icon: "📊", category: "Education" },
-  { title: "CGPA Calculator", desc: "Calculate CGPA across semesters with grade tracking", link: "/tools/education/cgpa", icon: "📈", category: "Education" },
-  { title: "Grade Calculator", desc: "Convert marks to grades with weighted subjects", link: "/tools/education/grade", icon: "📝", category: "Education" },
-  { title: "Percentage Calculator", desc: "Calculate percentages and CGPA conversions instantly", link: "/tools/education/percentage", icon: "🔢", category: "Education" },
-  { title: "Attendance Tracker", desc: "Track and calculate attendance percentage daily", link: "/tools/education/attendance", icon: "📅", category: "Education" },
-  { title: "Flashcard Creator", desc: "Create and study with categorized flashcards", link: "/tools/education/flashcard", icon: "🎴", category: "Education" },
-  { title: "Quiz Generator", desc: "Create custom quizzes with multiple question types", link: "/tools/education/quiz-generator", icon: "❓", category: "Education" },
-  { title: "Notes Organizer", desc: "Organize notes by category, tags, and colors", link: "/tools/education/notes-organizer", icon: "📓", category: "Education" },
-  { title: "Revision Planner", desc: "Plan study schedule and track exam preparation", link: "/tools/education/revision-planner", icon: "📅", category: "Education" },
-  { title: "Rank Calculator", desc: "Calculate rankings and score statistics instantly", link: "/tools/education/rank", icon: "🏆", category: "Education" },
-];
+const tools = getToolsByCategory("education");
 
 const faqs = [
   {
-    q: "Are these education tools free?",
-    a: "Yes, all education tools are 100% free and work in your browser.",
+    question: "Are these education tools free?",
+    answer: "Yes. Every education tool on Koovlo is free to use in the browser.",
   },
   {
-    q: "Do I need to sign up?",
-    a: "No sign up required. Open any tool and start using it immediately.",
+    question: "Who are these tools for?",
+    answer: "They are useful for students, teachers, parents, and anyone working with grades, attendance, or revision planning.",
   },
   {
-    q: "Are these calculators accurate?",
-    a: "Yes. Calculations follow standard academic formulas with clear inputs.",
+    question: "Why can education tools rank faster than generic PDF terms?",
+    answer: "Education pages can target clearer long-tail intent like GPA, CGPA, semester grades, and attendance goals, which are less crowded than broad PDF keywords.",
   },
   {
-    q: "Can I use these tools on mobile?",
-    a: "Absolutely. All tools are optimized for phones and tablets.",
+    question: "Do the formulas follow standard rules?",
+    answer: "Yes. These calculators are built around common academic formulas and transparent inputs.",
   },
 ];
 
@@ -39,26 +29,26 @@ export default function EducationToolsPage() {
     <main className={styles.container}>
       <section className={styles.hero}>
         <h1 className={styles.pageTitle}>
-          {/* <span className={styles.icon}>🎓</span> */}
-          <span className={styles.textGradient}>Free Online Education Tools – GPA, CGPA & Grade Calculators</span>
+          <span className={styles.textGradient}>Free online education tools for GPA, CGPA, grades, attendance, and study planning</span>
         </h1>
         <p className={styles.subText}>
-          Calculate GPA, CGPA, percentage, grades, attendance and exam scores instantly using accurate academic formulas — fast, reliable and mobile-friendly.
+          Koovlo&apos;s education hub is one of the best opportunities for search growth because these tools solve specific student needs
+          and can support richer explanatory content than generic utility pages.
         </p>
       </section>
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2>All Education Tools</h2>
-          <p>Pick a tool and get results instantly.</p>
+          <h2>All education tools</h2>
+          <p>Choose the exact calculator or study helper you need and get results quickly.</p>
         </div>
         <div className={styles.grid}>
           {tools.map((tool) => (
             <ToolCard
-              key={tool.title}
+              key={tool.path}
               title={tool.title}
-              desc={tool.desc}
-              link={tool.link}
+              desc={tool.description}
+              link={tool.path}
               icon={tool.icon}
             />
           ))}
@@ -67,59 +57,44 @@ export default function EducationToolsPage() {
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2>Why students love Koovlo</h2>
-          <p>Built to save time, reduce errors, and study smarter.</p>
+          <h2>Why students can trust these tools</h2>
+          <p>The page now gives search engines more context about who the tools are for and why they are useful.</p>
         </div>
         <div className={styles.featureGrid}>
           <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>⚡</div>
-            <h3>Instant Results</h3>
-            <p>Get accurate calculations in seconds with clean inputs.</p>
+            <div className={styles.featureIcon}>✅</div>
+            <h3>Clear formulas</h3>
+            <p>Inputs are simple, outputs are readable, and the intent behind each calculator is easy to understand.</p>
           </div>
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>📱</div>
-            <h3>Mobile Ready</h3>
-            <p>Use any calculator smoothly on mobile or desktop.</p>
+            <h3>Mobile friendly</h3>
+            <p>Students often check attendance or GPA on the phone, so the layouts stay usable on small screens.</p>
           </div>
           <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>✅</div>
-            <h3>Accurate Formulas</h3>
-            <p>Standard academic formulas ensure reliable results.</p>
+            <div className={styles.featureIcon}>🎓</div>
+            <h3>Long-tail intent coverage</h3>
+            <p>GPA, CGPA, grade conversion, and attendance use cases give this category better ranking opportunities.</p>
           </div>
         </div>
       </section>
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
-          <h2>Frequently Asked Questions</h2>
-          <p>Quick answers to common questions.</p>
+          <h2>Frequently asked questions</h2>
+          <p>Common questions around academic calculators and study workflows.</p>
         </div>
         <div className={styles.faqGrid}>
           {faqs.map((item) => (
-            <div key={item.q} className={styles.faqCard}>
-              <h3>{item.q}</h3>
-              <p>{item.a}</p>
-            </div>
+            <article key={item.question} className={styles.faqCard}>
+              <h3>{item.question}</h3>
+              <p>{item.answer}</p>
+            </article>
           ))}
         </div>
       </section>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: faqs.map((item) => ({
-              "@type": "Question",
-              name: item.q,
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: item.a,
-              },
-            })),
-          }),
-        }}
-      />
+
+      <FaqSchema items={faqs} />
     </main>
   );
 }

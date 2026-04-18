@@ -1,6 +1,6 @@
-'use client';
+﻿'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './regextester.module.css';
 import ToolInfo from '@/components/ToolInfo';
 
@@ -13,6 +13,44 @@ interface HistoryItem {
   timestamp: number;
 }
 
+interface RegexMatch {
+  match: string;
+  index: number;
+  groups: string[];
+}
+
+interface StoredState {
+  history?: HistoryItem[];
+}
+
+const STORAGE_KEY = 'regex-tester-data';
+const createId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+const getInitialHistory = (): HistoryItem[] => {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (!saved) return [];
+    const parsed = JSON.parse(saved) as StoredState;
+    return parsed.history || [];
+  } catch (error) {
+    console.error('Error loading regex tester data:', error);
+    return [];
+  }
+};
+
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/\n/g, '<br />');
+
 export default function RegexTesterPage() {
   const [regex, setRegex] = useState('');
   const [testText, setTestText] = useState('');
@@ -22,119 +60,101 @@ export default function RegexTesterPage() {
     multiline: false,
     dotAll: false,
   });
-  const [matches, setMatches] = useState<any[]>([]);
-  const [error, setError] = useState('');
-  const [highlightedText, setHighlightedText] = useState('');
-  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [history, setHistory] = useState<HistoryItem[]>(getInitialHistory());
 
   useEffect(() => {
-    const saved = localStorage.getItem('regex-tester-data');
-    if (saved) {
-      const { history: savedHistory } = JSON.parse(saved);
-      setHistory(savedHistory || []);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('regex-tester-data', JSON.stringify({ history }));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ history }));
   }, [history]);
 
-  const testRegex = () => {
+  const flagString = useMemo(
+    () =>
+      `${flags.global ? 'g' : ''}${flags.caseInsensitive ? 'i' : ''}${flags.multiline ? 'm' : ''}${flags.dotAll ? 's' : ''}`,
+    [flags]
+  );
+
+  const regexResult = useMemo(() => {
     if (!regex) {
-      setMatches([]);
-      setError('');
-      setHighlightedText(testText);
-      return;
+      return {
+        matches: [] as RegexMatch[],
+        highlightedText: escapeHtml(testText),
+        errorMessage: '',
+      };
     }
 
     try {
-      const flagString = (flags.global ? 'g' : '') +
-        (flags.caseInsensitive ? 'i' : '') +
-        (flags.multiline ? 'm' : '') +
-        (flags.dotAll ? 's' : '');
+      const expression = new RegExp(regex, flagString);
+      const foundMatches: RegexMatch[] = [];
 
-      const regexObj = new RegExp(regex, flagString);
-      const foundMatches = [];
-      let match;
-
-      // Reset lastIndex for global regex
-      regexObj.lastIndex = 0;
-
-      while ((match = regexObj.exec(testText)) !== null) {
-        foundMatches.push({
-          match: match[0],
-          index: match.index,
-          groups: match.slice(1),
-          fullMatch: match,
-        });
-
-        // Prevent infinite loop for non-global regex
-        if (!flags.global) break;
-      }
-
-      setMatches(foundMatches);
-      setError('');
-
-      // Track in history
-      const newItem: HistoryItem = {
-        id: Date.now().toString(),
-        pattern: regex,
-        flags: flagString || 'none',
-        testText: testText.slice(0, 100),
-        matchCount: foundMatches.length,
-        timestamp: Date.now()
-      };
-      setHistory(prev => [newItem, ...prev].slice(0, 50));
-
-      // Create highlighted text
-      if (foundMatches.length > 0) {
-        let highlighted = testText;
-        let offset = 0;
-
-        foundMatches.forEach((m, idx) => {
-          const start = m.index + offset;
-          const end = start + m.match.length;
-          const before = highlighted.slice(0, start);
-          const matchText = highlighted.slice(start, end);
-          const after = highlighted.slice(end);
-
-          highlighted = `${before}<mark class="${styles.highlight}">${matchText}</mark>${after}`;
-          offset += `<mark class="${styles.highlight}"></mark>`.length;
-        });
-
-        setHighlightedText(highlighted);
+      if (flags.global) {
+        for (const match of testText.matchAll(expression)) {
+          foundMatches.push({
+            match: match[0],
+            index: match.index ?? 0,
+            groups: match.slice(1).filter((group): group is string => typeof group === 'string'),
+          });
+        }
       } else {
-        setHighlightedText(testText);
+        const singleMatch = expression.exec(testText);
+        if (singleMatch) {
+          foundMatches.push({
+            match: singleMatch[0],
+            index: singleMatch.index,
+            groups: singleMatch.slice(1).filter((group): group is string => typeof group === 'string'),
+          });
+        }
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Invalid regex pattern');
-      setMatches([]);
-      setHighlightedText(testText);
-    }
-  };
 
-  useEffect(() => {
-    testRegex();
-  }, [regex, testText, flags]);
+      let cursor = 0;
+      const fragments: string[] = [];
+      foundMatches.forEach((match) => {
+        const start = match.index;
+        const end = start + match.match.length;
+        fragments.push(escapeHtml(testText.slice(cursor, start)));
+        fragments.push(`<mark class="${styles.highlight}">${escapeHtml(match.match)}</mark>`);
+        cursor = end;
+      });
+      fragments.push(escapeHtml(testText.slice(cursor)));
+
+      return {
+        matches: foundMatches,
+        highlightedText: fragments.join('') || 'Enter text above to see matches...',
+        errorMessage: '',
+      };
+    } catch (caughtError) {
+      return {
+        matches: [] as RegexMatch[],
+        highlightedText: escapeHtml(testText),
+        errorMessage: caughtError instanceof Error ? caughtError.message : 'Invalid regex pattern',
+      };
+    }
+  }, [flagString, flags.global, regex, testText]);
+
+
+  const runTest = () => {
+    if (!regex || regexResult.errorMessage) {
+      return;
+    }
+
+    const nextItem: HistoryItem = {
+      id: createId(),
+      pattern: regex,
+      flags: flagString || 'none',
+      testText: testText.slice(0, 100),
+      matchCount: regexResult.matches.length,
+      timestamp: Date.now(),
+    };
+
+    setHistory((previous) => [nextItem, ...previous].slice(0, 50));
+  };
 
   const handleClear = () => {
     setRegex('');
     setTestText('');
-    setMatches([]);
-    setError('');
-    setHighlightedText('');
   };
 
   const loadSampleData = () => {
-    setRegex('\\b\\w+@\\w+\\.\\w+\\b');
-    setTestText(`Contact us at:
-support@example.com
-john.doe@gmail.com
-invalid-email
-admin@company.co.uk
-
-Phone: (123) 456-7890
-Another email: test@test-domain.org`);
+    setRegex('\\b[\\w.-]+@[\\w.-]+\\.\\w+\\b');
+    setTestText(`Contact us at:\nsupport@example.com\njohn.doe@gmail.com\ninvalid-email\nadmin@company.co.uk\n\nPhone: (123) 456-7890\nAnother email: test@test-domain.org`);
     setFlags({
       global: true,
       caseInsensitive: true,
@@ -146,26 +166,27 @@ Another email: test@test-domain.org`);
   const copyRegex = async () => {
     try {
       await navigator.clipboard.writeText(regex);
-      alert('Regex pattern copied to clipboard!');
-    } catch (err) {
-      console.error('Failed to copy: ', err);
+      alert('Regex pattern copied to clipboard.');
+    } catch (caughtError) {
+      console.error('Failed to copy:', caughtError);
     }
   };
 
   const copyMatches = async () => {
-    const matchesText = matches.map((m, idx) =>
-      `Match ${idx + 1}: "${m.match}" at position ${m.index}`
-    ).join('\n');
+    const matchesText = regexResult.matches
+      .map((match, index) => `Match ${index + 1}: "${match.match}" at position ${match.index}`)
+      .join('\n');
+
     try {
       await navigator.clipboard.writeText(matchesText);
-      alert('Matches copied to clipboard!');
-    } catch (err) {
-      console.error('Failed to copy: ', err);
+      alert('Matches copied to clipboard.');
+    } catch (caughtError) {
+      console.error('Failed to copy:', caughtError);
     }
   };
 
   const deleteHistoryItem = (id: string) => {
-    setHistory(prev => prev.filter(item => item.id !== id));
+    setHistory((previous) => previous.filter((item) => item.id !== id));
   };
 
   const clearHistory = () => {
@@ -181,66 +202,51 @@ Another email: test@test-domain.org`);
       global: item.flags.includes('g'),
       caseInsensitive: item.flags.includes('i'),
       multiline: item.flags.includes('m'),
-      dotAll: item.flags.includes('s')
+      dotAll: item.flags.includes('s'),
     });
   };
 
-  const getAnalytics = () => {
+  const analytics = useMemo(() => {
     const totalTests = history.length;
     const totalMatches = history.reduce((sum, item) => sum + item.matchCount, 0);
     const avgMatches = totalTests > 0 ? Math.round((totalMatches / totalTests) * 10) / 10 : 0;
-    const uniquePatterns = new Set(history.map(h => h.pattern)).size;
+    const uniquePatterns = new Set(history.map((item) => item.pattern)).size;
     return { totalTests, totalMatches, avgMatches, uniquePatterns };
-  };
-
-  const analytics = getAnalytics();
+  }, [history]);
 
   return (
     <div className={styles.container}>
       <h1 className={styles.pageTitle}>
-        <span className={styles.icon}>🔍</span>
+        <span className={styles.icon}>Regex</span>
         <span className={styles.textGradient}>Regex Tester</span>
       </h1>
-      <p className={styles.subtitle}>Test and visualize regular expressions with real-time matching and analytics.</p>
+      <p className={styles.subtitle}>Test and visualize regular expressions with live matching and readable history.</p>
 
       <div className={styles.tool}>
         <div className={styles.regexSection}>
           <div className={styles.regexHeader}>
             <h3>Regular Expression</h3>
-            <button onClick={loadSampleData} className={styles.sampleBtn}>
-              Load Sample
-            </button>
+            <button onClick={loadSampleData} className={styles.sampleBtn}>Load Sample</button>
           </div>
 
           <div className={styles.regexInput}>
             <input
               type="text"
               value={regex}
-              onChange={(e) => setRegex(e.target.value)}
-              placeholder="Enter regex pattern (e.g., \b\w+@\w+\.\w+\b)"
+              onChange={(event) => setRegex(event.target.value)}
+              placeholder="Enter regex pattern (e.g., \\b\\w+@\\w+\\.\\w+\\b)"
               className={styles.regexField}
             />
-            <button onClick={copyRegex} className={styles.copyRegexBtn}>
-              Copy
-            </button>
+            <button onClick={copyRegex} className={styles.copyRegexBtn}>Copy</button>
           </div>
 
-          {error && (
-            <div className={styles.error}>
-              ❌ {error}
-            </div>
-          )}
+          {regexResult.errorMessage && <div className={styles.error}>Error: {regexResult.errorMessage}</div>}
 
           <div className={styles.flagsSection}>
             <h4>Flags</h4>
             <div className={styles.flagsGrid}>
               <label className={styles.flagOption}>
-                <input
-                  type="checkbox"
-                  checked={flags.global}
-                  onChange={(e) => setFlags(prev => ({ ...prev, global: e.target.checked }))}
-                  className={styles.checkbox}
-                />
+                <input type="checkbox" checked={flags.global} onChange={(event) => setFlags((previous) => ({ ...previous, global: event.target.checked }))} className={styles.checkbox} />
                 <div className={styles.flagText}>
                   <strong>Global (g)</strong>
                   <small>Find all matches</small>
@@ -248,12 +254,7 @@ Another email: test@test-domain.org`);
               </label>
 
               <label className={styles.flagOption}>
-                <input
-                  type="checkbox"
-                  checked={flags.caseInsensitive}
-                  onChange={(e) => setFlags(prev => ({ ...prev, caseInsensitive: e.target.checked }))}
-                  className={styles.checkbox}
-                />
+                <input type="checkbox" checked={flags.caseInsensitive} onChange={(event) => setFlags((previous) => ({ ...previous, caseInsensitive: event.target.checked }))} className={styles.checkbox} />
                 <div className={styles.flagText}>
                   <strong>Case Insensitive (i)</strong>
                   <small>Ignore case</small>
@@ -261,28 +262,18 @@ Another email: test@test-domain.org`);
               </label>
 
               <label className={styles.flagOption}>
-                <input
-                  type="checkbox"
-                  checked={flags.multiline}
-                  onChange={(e) => setFlags(prev => ({ ...prev, multiline: e.target.checked }))}
-                  className={styles.checkbox}
-                />
+                <input type="checkbox" checked={flags.multiline} onChange={(event) => setFlags((previous) => ({ ...previous, multiline: event.target.checked }))} className={styles.checkbox} />
                 <div className={styles.flagText}>
                   <strong>Multiline (m)</strong>
-                  <small>^ and $ match line starts/ends</small>
+                  <small>Caret and dollar match line boundaries</small>
                 </div>
               </label>
 
               <label className={styles.flagOption}>
-                <input
-                  type="checkbox"
-                  checked={flags.dotAll}
-                  onChange={(e) => setFlags(prev => ({ ...prev, dotAll: e.target.checked }))}
-                  className={styles.checkbox}
-                />
+                <input type="checkbox" checked={flags.dotAll} onChange={(event) => setFlags((previous) => ({ ...previous, dotAll: event.target.checked }))} className={styles.checkbox} />
                 <div className={styles.flagText}>
                   <strong>Dot All (s)</strong>
-                  <small>. matches newlines</small>
+                  <small>Dot matches new lines</small>
                 </div>
               </label>
             </div>
@@ -291,62 +282,47 @@ Another email: test@test-domain.org`);
 
         <div className={styles.testSection}>
           <h3>Test Text</h3>
-          <textarea
-            value={testText}
-            onChange={(e) => setTestText(e.target.value)}
-            placeholder="Enter text to test regex against..."
-            className={styles.testTextarea}
-          />
+          <textarea value={testText} onChange={(event) => setTestText(event.target.value)} placeholder="Enter text to test regex against..." className={styles.testTextarea} />
         </div>
 
         <div className={styles.actions}>
-          <button onClick={handleClear} className={styles.clearBtn}>
-            Clear All
-          </button>
+          <button onClick={runTest} className={styles.copyMatchesBtn} disabled={!regex || !!regexResult.errorMessage}>Save Test</button>
+          <button onClick={handleClear} className={styles.clearBtn}>Clear All</button>
         </div>
 
         <div className={styles.resultsSection}>
           <div className={styles.highlightedText}>
             <h3>Highlighted Matches</h3>
-            <div
-              className={styles.textDisplay}
-              dangerouslySetInnerHTML={{ __html: highlightedText || testText || 'Enter text above to see matches...' }}
-            />
+            <div className={styles.textDisplay} dangerouslySetInnerHTML={{ __html: regexResult.highlightedText || 'Enter text above to see matches...' }} />
           </div>
 
           <div className={styles.matchesList}>
             <div className={styles.matchesHeader}>
-              <h3>Matches ({matches.length})</h3>
-              {matches.length > 0 && (
-                <button onClick={copyMatches} className={styles.copyMatchesBtn}>
-                  Copy Matches
-                </button>
-              )}
+              <h3>Matches ({regexResult.matches.length})</h3>
+              {regexResult.matches.length > 0 && <button onClick={copyMatches} className={styles.copyMatchesBtn}>Copy Matches</button>}
             </div>
 
-            {matches.length > 0 ? (
+            {regexResult.matches.length > 0 ? (
               <div className={styles.matches}>
-                {matches.map((match, idx) => (
-                  <div key={idx} className={styles.match}>
+                {regexResult.matches.map((match, index) => (
+                  <div key={`${match.index}-${index}`} className={styles.match}>
                     <div className={styles.matchHeader}>
-                      <strong>Match {idx + 1}</strong>
+                      <strong>Match {index + 1}</strong>
                       <span className={styles.matchPosition}>Position: {match.index}</span>
                     </div>
                     <div className={styles.matchContent}>
-                      <code>"{match.match}"</code>
+                      <code>&quot;{match.match}&quot;</code>
                     </div>
                     {match.groups.length > 0 && (
                       <div className={styles.matchGroups}>
-                        <small>Groups: {match.groups.map((g: string, i: number) => `$${i + 1}="${g}"`).join(', ')}</small>
+                        <small>Groups: {match.groups.map((group, groupIndex) => `$${groupIndex + 1}=&quot;${group}&quot;`).join(', ')}</small>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
-              <div className={styles.noMatches}>
-                No matches found
-              </div>
+              <div className={styles.noMatches}>No matches found</div>
             )}
           </div>
         </div>
@@ -354,7 +330,7 @@ Another email: test@test-domain.org`);
 
       {history.length > 0 && (
         <div className={styles.smartDashboard}>
-          <h3>📊 Analytics</h3>
+          <h3>Analytics</h3>
           <div className={styles.analyticsGrid}>
             <div className={styles.statCard}>
               <span className={styles.statValue}>{analytics.totalTests}</span>
@@ -379,48 +355,24 @@ Another email: test@test-domain.org`);
       {history.length > 0 && (
         <div className={styles.historySection}>
           <div className={styles.historyHeader}>
-            <h3>📜 Test History</h3>
-            <button onClick={clearHistory} className={styles.clearBtn}>
-              🗑️ Clear History
-            </button>
+            <h3>Test History</h3>
+            <button onClick={clearHistory} className={styles.clearBtn}>Clear History</button>
           </div>
           <div className={styles.historyList}>
             {history.map((item) => (
               <div key={item.id} className={styles.historyItem}>
                 <div className={styles.historyText}>
                   <div className={styles.historyMeta}>
-                    <span className={styles.historyPattern}>
-                      Pattern: <code>{item.pattern}</code>
-                    </span>
-                    <span className={styles.historyFlags}>
-                      Flags: {item.flags}
-                    </span>
-                    <span className={styles.historyMatches}>
-                      Matches: {item.matchCount}
-                    </span>
-                    <span className={styles.historyTime}>
-                      {new Date(item.timestamp).toLocaleTimeString()}
-                    </span>
+                    <span className={styles.historyPattern}>Pattern: <code>{item.pattern}</code></span>
+                    <span className={styles.historyFlags}>Flags: {item.flags}</span>
+                    <span className={styles.historyMatches}>Matches: {item.matchCount}</span>
+                    <span className={styles.historyTime}>{new Date(item.timestamp).toLocaleTimeString()}</span>
                   </div>
-                  <div className={styles.historyContent}>
-                    Text: {item.testText.slice(0, 60)}{item.testText.length > 60 ? '...' : ''}
-                  </div>
+                  <div className={styles.historyContent}>Text: {item.testText.slice(0, 60)}{item.testText.length > 60 ? '...' : ''}</div>
                 </div>
                 <div className={styles.historyActions}>
-                  <button
-                    onClick={() => loadFromHistory(item)}
-                    className={styles.historyBtn}
-                    title="Load this test"
-                  >
-                    🔄
-                  </button>
-                  <button
-                    onClick={() => deleteHistoryItem(item.id)}
-                    className={styles.historyBtn}
-                    title="Delete"
-                  >
-                    🗑️
-                  </button>
+                  <button onClick={() => loadFromHistory(item)} className={styles.historyBtn} title="Load this test">Load</button>
+                  <button onClick={() => deleteHistoryItem(item.id)} className={styles.historyBtn} title="Delete">Delete</button>
                 </div>
               </div>
             ))}
@@ -429,21 +381,20 @@ Another email: test@test-domain.org`);
       )}
 
       <ToolInfo
-        howItWorks="1. Enter a regex pattern (e.g., \\b\\w+@\\w+\\.\\w+\\b for emails)<br>2. Paste text to test<br>3. Select flags (Global, Case Insensitive, Multiline, Dot All)<br>4. See highlighted matches in real-time<br>5. View match details with groups<br>6. Copy patterns or matches<br>7. Track history and analytics"
+        howItWorks="Enter a regex pattern and test text<br>Choose the flags you want to apply<br>Review highlighted matches and captured groups instantly<br>Save useful tests to your local browser history"
         faqs={[
-          { title: "What is a regex?", content: "Regular Expression is a pattern for matching text. Used for validation, searching, and text replacement." },
-          { title: "What do flags do?", content: "Global (g): Find all matches. Case Insensitive (i): Ignore case. Multiline (m): ^ and $ match line boundaries. Dot All (s): . matches newlines." },
-          { title: "How to use groups?", content: "Use parentheses to create groups: (\\w+)@(\\w+). Groups are captured and shown as $1, $2, etc." },
-          { title: "Common patterns?", content: "Email: \\b[\\w.-]+@[\\w.-]+\\.\\w+\\b | Phone: \\d{3}-?\\d{3}-?\\d{4} | URL: https?://[\\S]+" }
+          { title: 'What is a regex?', content: 'A regular expression is a pattern used for searching, validating, and extracting text.' },
+          { title: 'What do regex flags do?', content: 'Flags control how matching behaves, such as finding all matches, ignoring case, or treating input as multiline text.' },
+          { title: 'How do capture groups work?', content: 'Parentheses create groups so you can isolate parts of a match, and the results appear as $1, $2, and so on.' },
+          { title: 'Does this store my text online?', content: 'No. Recent test history is saved only in your browser.' },
         ]}
         tips={[
-          "Use raw patterns - backslashes should be escaped (\\\\d not \\d)",
-          "Test simple patterns first, then add complexity",
-          "Use capturing groups () to extract specific parts",
-          "Global flag finds all matches; without it, stops at first match",
-          "Practice with online regex tools to understand patterns better"
+          'Start with a simple pattern, then add anchors or groups once the base match works.',
+          'Global mode is best when you want every match in long content blocks.',
+          'Use sample data to check that your flags and capture groups behave as expected.',
         ]}
       />
     </div>
   );
 }
+

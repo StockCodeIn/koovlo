@@ -1,6 +1,6 @@
-'use client';
+﻿'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ToolInfo from '@/components/ToolInfo';
 import styles from './base64.module.css';
 
@@ -14,45 +14,92 @@ interface HistoryItem {
   outputSize: number;
 }
 
+interface StoredState {
+  inputText?: string;
+  outputText?: string;
+  history?: HistoryItem[];
+}
+
+const STORAGE_KEY = 'base64-data';
+const createId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+const getByteSize = (value: string) => new Blob([value]).size;
+
+const getInitialState = (): StoredState => {
+  if (typeof window === 'undefined') {
+    return { inputText: '', outputText: '', history: [] };
+  }
+
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (!saved) {
+      return { inputText: '', outputText: '', history: [] };
+    }
+
+    const parsed = JSON.parse(saved) as StoredState;
+    return {
+      inputText: parsed.inputText || '',
+      outputText: parsed.outputText || '',
+      history: parsed.history || [],
+    };
+  } catch (error) {
+    console.error('Error loading Base64 data:', error);
+    return { inputText: '', outputText: '', history: [] };
+  }
+};
+
 export default function Base64Tool() {
-  const [inputText, setInputText] = useState('');
-  const [outputText, setOutputText] = useState('');
+  const initialState = getInitialState();
+  const [inputText, setInputText] = useState(initialState.inputText || '');
+  const [outputText, setOutputText] = useState(initialState.outputText || '');
   const [mode, setMode] = useState<'encode' | 'decode'>('encode');
   const [error, setError] = useState('');
-  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [history, setHistory] = useState<HistoryItem[]>(initialState.history || []);
 
   useEffect(() => {
-    const saved = localStorage.getItem('base64-data');
-    if (saved) {
-      const { inputText: savedInput, outputText: savedOutput, history: savedHistory } = JSON.parse(saved);
-      setInputText(savedInput || '');
-      setOutputText(savedOutput || '');
-      setHistory(savedHistory || []);
-    }
-  }, []);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ inputText, outputText, history }));
+  }, [history, inputText, outputText]);
 
-  useEffect(() => {
-    localStorage.setItem('base64-data', JSON.stringify({ inputText, outputText, history }));
-  }, [inputText, outputText, history]);
+  const analytics = useMemo(() => {
+    const totalEncodes = history.filter((item) => item.mode === 'encode').length;
+    const totalDecodes = history.filter((item) => item.mode === 'decode').length;
+    const totalOperations = history.length;
+    const encodeHistory = history.filter((item) => item.mode === 'encode');
+    const avgSizeIncrease = encodeHistory.length
+      ? Math.round(
+          (encodeHistory.reduce((sum, item) => {
+            if (item.inputSize === 0) return sum;
+            return sum + ((item.outputSize - item.inputSize) / item.inputSize) * 100;
+          }, 0) /
+            encodeHistory.length) *
+            10
+        ) / 10
+      : 0;
+
+    return { totalEncodes, totalDecodes, totalOperations, avgSizeIncrease };
+  }, [history]);
+
+  const saveHistory = (result: string, nextMode: 'encode' | 'decode') => {
+    const nextItem: HistoryItem = {
+      id: createId(),
+      inputPreview: inputText.slice(0, 100),
+      outputPreview: result.slice(0, 100),
+      mode: nextMode,
+      timestamp: Date.now(),
+      inputSize: getByteSize(inputText),
+      outputSize: getByteSize(result),
+    };
+
+    setHistory((previous) => [nextItem, ...previous].slice(0, 50));
+  };
 
   const encodeToBase64 = () => {
     try {
       const encoded = btoa(inputText);
       setOutputText(encoded);
       setError('');
-      
-      const newItem: HistoryItem = {
-        id: Date.now().toString(),
-        inputPreview: inputText.slice(0, 100),
-        outputPreview: encoded.slice(0, 100),
-        mode: 'encode',
-        timestamp: Date.now(),
-        inputSize: new Blob([inputText]).size,
-        outputSize: new Blob([encoded]).size
-      };
-      setHistory(prev => [newItem, ...prev].slice(0, 50));
-    } catch (err) {
-      setError('Failed to encode: ' + (err as Error).message);
+      saveHistory(encoded, 'encode');
+    } catch (caughtError) {
+      setError(`Failed to encode: ${(caughtError as Error).message}`);
     }
   };
 
@@ -61,19 +108,9 @@ export default function Base64Tool() {
       const decoded = atob(inputText);
       setOutputText(decoded);
       setError('');
-      
-      const newItem: HistoryItem = {
-        id: Date.now().toString(),
-        inputPreview: inputText.slice(0, 100),
-        outputPreview: decoded.slice(0, 100),
-        mode: 'decode',
-        timestamp: Date.now(),
-        inputSize: new Blob([inputText]).size,
-        outputSize: new Blob([decoded]).size
-      };
-      setHistory(prev => [newItem, ...prev].slice(0, 50));
-    } catch (err) {
-      setError('Invalid Base64 string: ' + (err as Error).message);
+      saveHistory(decoded, 'decode');
+    } catch (caughtError) {
+      setError(`Invalid Base64 string: ${(caughtError as Error).message}`);
     }
   };
 
@@ -88,9 +125,9 @@ export default function Base64Tool() {
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(outputText);
-      alert('Copied to clipboard!');
-    } catch (err) {
-      console.error('Failed to copy: ', err);
+      alert('Copied to clipboard.');
+    } catch (caughtError) {
+      console.error('Failed to copy:', caughtError);
     }
   };
 
@@ -111,11 +148,11 @@ export default function Base64Tool() {
   const swapTexts = () => {
     setInputText(outputText);
     setOutputText(inputText);
-    setMode(mode === 'encode' ? 'decode' : 'encode');
+    setMode((currentMode) => (currentMode === 'encode' ? 'decode' : 'encode'));
   };
 
   const deleteHistoryItem = (id: string) => {
-    setHistory(prev => prev.filter(item => item.id !== id));
+    setHistory((previous) => previous.filter((item) => item.id !== id));
   };
 
   const clearHistory = () => {
@@ -130,88 +167,41 @@ export default function Base64Tool() {
     setMode(item.mode);
   };
 
-  const getAnalytics = () => {
-    const totalEncodes = history.filter(h => h.mode === 'encode').length;
-    const totalDecodes = history.filter(h => h.mode === 'decode').length;
-    const totalOperations = history.length;
-    const avgSizeIncrease = history.filter(h => h.mode === 'encode').length > 0
-      ? Math.round((history.filter(h => h.mode === 'encode').reduce((sum, item) => sum + ((item.outputSize - item.inputSize) / item.inputSize * 100), 0) / history.filter(h => h.mode === 'encode').length) * 10) / 10
-      : 0;
-    return { totalEncodes, totalDecodes, totalOperations, avgSizeIncrease };
-  };
-
-  const analytics = getAnalytics();
-
   return (
     <main className={styles.container}>
       <h1 className={styles.pageTitle}>
-        <span className={styles.icon}>🔐</span>
-        <span className={styles.textGradient}>Base64 Encoder/Decoder</span>
+        <span className={styles.icon}>Base64</span>
+        <span className={styles.textGradient}>Base64 Encoder and Decoder</span>
       </h1>
-      <p>Encode text to Base64 or decode Base64 back to text with smart tracking.</p>
+      <p>Encode text to Base64 or decode Base64 back to text with saved local history.</p>
 
       <div className={styles.converter}>
         <div className={styles.inputSection}>
           <div className={styles.inputHeader}>
             <h2>Input {mode === 'encode' ? 'Text' : 'Base64'}</h2>
-            <button onClick={loadSample} className={styles.sampleBtn}>
-              Load Sample
-            </button>
+            <button onClick={loadSample} className={styles.sampleBtn}>Load Sample</button>
           </div>
-          <textarea
-            id="base64-input"
-            name="base64-input"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder={mode === 'encode' ? "Enter text to encode..." : "Enter Base64 to decode..."}
-            className={styles.textarea}
-          />
+          <textarea id="base64-input" name="base64-input" value={inputText} onChange={(event) => setInputText(event.target.value)} placeholder={mode === 'encode' ? 'Enter text to encode...' : 'Enter Base64 to decode...'} className={styles.textarea} />
         </div>
 
         <div className={styles.controls}>
           <h2>Mode</h2>
           <div className={styles.modeSelector}>
-            <button
-              onClick={() => setMode('encode')}
-              className={`${styles.modeBtn} ${mode === 'encode' ? styles.active : ''}`}
-            >
-              🔒 Encode to Base64
-            </button>
-            <button
-              onClick={() => setMode('decode')}
-              className={`${styles.modeBtn} ${mode === 'decode' ? styles.active : ''}`}
-            >
-              🔓 Decode from Base64
-            </button>
+            <button onClick={() => setMode('encode')} className={`${styles.modeBtn} ${mode === 'encode' ? styles.active : ''}`}>Encode to Base64</button>
+            <button onClick={() => setMode('decode')} className={`${styles.modeBtn} ${mode === 'decode' ? styles.active : ''}`}>Decode from Base64</button>
           </div>
 
-          <button onClick={handleConvert} className={styles.convertBtn} disabled={!inputText}>
-            {mode === 'encode' ? '🔒 Encode' : '🔓 Decode'}
-          </button>
-
-          <button onClick={swapTexts} className={styles.swapBtn} disabled={!inputText || !outputText}>
-            🔄 Swap
-          </button>
+          <button onClick={handleConvert} className={styles.convertBtn} disabled={!inputText}>{mode === 'encode' ? 'Encode' : 'Decode'}</button>
+          <button onClick={swapTexts} className={styles.swapBtn} disabled={!inputText || !outputText}>Swap</button>
         </div>
 
         <div className={styles.outputSection}>
           <h2>Output {mode === 'encode' ? 'Base64' : 'Text'}</h2>
           {error && <div className={styles.error}>{error}</div>}
-          <textarea
-            id="base64-output"
-            name="base64-output"
-            value={outputText}
-            readOnly
-            placeholder={mode === 'encode' ? "Base64 will appear here..." : "Decoded text will appear here..."}
-            className={`${styles.textarea} ${error ? styles.errorTextarea : ''}`}
-          />
+          <textarea id="base64-output" name="base64-output" value={outputText} readOnly placeholder={mode === 'encode' ? 'Base64 will appear here...' : 'Decoded text will appear here...'} className={`${styles.textarea} ${error ? styles.errorTextarea : ''}`} />
           <div className={styles.outputActions}>
-            <button onClick={copyToClipboard} className={styles.actionBtn} disabled={!outputText}>
-              📋 Copy
-            </button>
-            <button onClick={clearAll} className={styles.actionBtn}>
-              🗑️ Clear
-            </button>
+            <button onClick={copyToClipboard} className={styles.actionBtn} disabled={!outputText}>Copy</button>
+            <button onClick={clearAll} className={styles.actionBtn}>Clear</button>
           </div>
         </div>
       </div>
@@ -219,7 +209,7 @@ export default function Base64Tool() {
       {history.length > 0 && (
         <>
           <div className={styles.smartDashboard}>
-            <h3>📊 Analytics</h3>
+            <h3>Analytics</h3>
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
                 <div className={styles.statValue}>{analytics.totalOperations}</div>
@@ -242,43 +232,23 @@ export default function Base64Tool() {
 
           <div className={styles.historySection}>
             <div className={styles.historyHeader}>
-              <h3>📜 History</h3>
+              <h3>History</h3>
               <button onClick={clearHistory} className={styles.clearBtn}>Clear All</button>
             </div>
             <div className={styles.historyList}>
-              {history.map(item => (
+              {history.map((item) => (
                 <div key={item.id} className={styles.historyItem}>
                   <div className={styles.historyText}>
                     <div className={styles.historyMeta}>
-                      <span className={styles.historyMode}>
-                        {item.mode === 'encode' ? '🔒 Encode' : '🔓 Decode'}
-                      </span>
-                      <span className={styles.historyTime}>
-                        {new Date(item.timestamp).toLocaleTimeString()}
-                      </span>
-                      <span className={styles.historySize}>
-                        {item.inputSize}B → {item.outputSize}B
-                      </span>
+                      <span className={styles.historyMode}>{item.mode === 'encode' ? 'Encode' : 'Decode'}</span>
+                      <span className={styles.historyTime}>{new Date(item.timestamp).toLocaleTimeString()}</span>
+                      <span className={styles.historySize}>{item.inputSize}B to {item.outputSize}B</span>
                     </div>
-                    <div className={styles.historyContent}>
-                      {item.inputPreview.slice(0, 80)}{item.inputPreview.length > 80 ? '...' : ''}
-                    </div>
+                    <div className={styles.historyContent}>{item.inputPreview.slice(0, 80)}{item.inputPreview.length > 80 ? '...' : ''}</div>
                   </div>
                   <div className={styles.historyActions}>
-                    <button
-                      onClick={() => loadFromHistory(item)}
-                      className={styles.historyBtn}
-                      title="Load this"
-                    >
-                      🔄
-                    </button>
-                    <button
-                      onClick={() => deleteHistoryItem(item.id)}
-                      className={styles.historyBtn}
-                      title="Delete"
-                    >
-                      🗑️
-                    </button>
+                    <button onClick={() => loadFromHistory(item)} className={styles.historyBtn} title="Load this">Load</button>
+                    <button onClick={() => deleteHistoryItem(item.id)} className={styles.historyBtn} title="Delete">Delete</button>
                   </div>
                 </div>
               ))}
@@ -290,12 +260,16 @@ export default function Base64Tool() {
       <ToolInfo
         howItWorks="Choose encode or decode mode<br>Enter your text or Base64 string<br>Click the convert button<br>Copy the result or clear to start over"
         faqs={[
-          { title: "What is Base64?", content: "Base64 is a binary-to-text encoding scheme that represents binary data in an ASCII string format" },
-          { title: "When to use Base64?", content: "For encoding binary data in text formats like JSON, XML, or email attachments" },
-          { title: "Is Base64 secure?", content: "No, Base64 is encoding, not encryption. Anyone can decode it." },
-          { title: "What characters are used?", content: "A-Z, a-z, 0-9, +, /, and = for padding" }
+          { title: 'What is Base64?', content: 'Base64 is a binary-to-text encoding format that represents data using only ASCII-safe characters.' },
+          { title: 'When should I use Base64?', content: 'It is useful for embedding binary data inside text-based formats such as JSON, HTML, or email content.' },
+          { title: 'Is Base64 secure?', content: 'No. Base64 is only encoding, not encryption, so anyone can decode it.' },
+          { title: 'What characters are used?', content: 'Standard Base64 uses A-Z, a-z, 0-9, plus, slash, and equals for padding.' },
         ]}
-        tips={["Use for embedding images in HTML/CSS", "Useful for API data transmission", "Base64 increases data size by ~33%", "Always validate input before decoding"]}
+        tips={[
+          'Use Base64 for compact transport of text-safe payloads, not for security.',
+          'Encoded output is usually larger than the original by about one third.',
+          'If decoding fails, check for invalid characters or missing padding.',
+        ]}
       />
     </main>
   );

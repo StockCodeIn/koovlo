@@ -2,8 +2,10 @@
 
 import { useState, useCallback } from "react";
 import { PDFDocument } from "pdf-lib";
+import FaqSchema from "@/components/FaqSchema";
+import RichSeoContent from "@/components/RichSeoContent";
+import { getRelatedTools } from "@/lib/siteData";
 import styles from "./merge.module.css";
-import ToolInfo from "@/components/ToolInfo";
 
 export default function PdfMergePage() {
     const [files, setFiles] = useState<File[]>([]);
@@ -107,6 +109,35 @@ export default function PdfMergePage() {
         }
     };
 
+    const faqItems = [
+        {
+            question: "Why would I merge PDF files?",
+            answer: "Merging PDFs is useful when you have multiple documents to share as one file, create a complete report from separate chapters, combine scans into one document, or prepare files for printing or archiving.",
+        },
+        {
+            question: "Can I reorder files before merging?",
+            answer: "Yes. Use the up and down arrow buttons to change the order of files before starting the merge. Files are combined in the order shown.",
+        },
+        {
+            question: "Is there a file size limit?",
+            answer: "The limit depends on your browser and device memory, but most browsers can handle 100MB+ of files. Very large batches may be slower.",
+        },
+        {
+            question: "Does the merge keep the original quality?",
+            answer: "Yes. PDF merge is a lossless operation—pages are copied exactly as they are without re-compression or quality loss.",
+        },
+        {
+            question: "Can I merge PDFs from different sources?",
+            answer: "Yes. The tool works with any PDF files, even if they were created by different software or have different page sizes.",
+        },
+        {
+            question: "Do you store my files after merging?",
+            answer: "No. All merging happens in your browser, and no files are uploaded to any server.",
+        },
+    ];
+
+    const relatedTools = getRelatedTools("/tools/pdf/merge");
+
     return (
         <main className={styles.container}>
             <section className={styles.box}>
@@ -197,15 +228,30 @@ export default function PdfMergePage() {
                 {message && <p className={styles.message}>{message}</p>}
             </section>
 
-            <ToolInfo
-                howItWorks="1. Select multiple PDF files using the file picker or drag & drop.<br>2. Reorder files if needed using the arrow buttons.<br>3. Click 'Merge PDFs' to combine them.<br>4. Download the merged PDF."
-                faqs={[
-                    { title: "Is my data secure?", content: "Yes, all processing happens in your browser. Files are not uploaded to any server." },
-                    { title: "What's the maximum file size?", content: "Depends on your browser, but typically up to 100MB total." },
-                    { title: "Can I reorder the files?", content: "Yes, use the up/down arrows to change the merge order." }
+            <RichSeoContent
+                introTitle="When PDF merging matters"
+                introText={[
+                    "People merge PDFs for many reasons: combining multiple scan pages into one document, consolidating chapters into a complete report, preparing files for submission or printing, or creating a master file from separate sources. The difference between a strong PDF merge tool and a weak one is speed, reliability, and the ability to reorder files.",
+                    "This page explains why browser-side merging is useful (faster, more private), how to use it, and when it makes sense. It also helps search engines understand that this page is about practical PDF workflows, not just a generic file converter.",
                 ]}
-                tips={["For best results, ensure all PDFs have the same page size.<br>Large files may take longer to process.<br>Files are processed in the order shown."]}
+                steps={[
+                    "Select multiple PDF files using the file picker or drag them into the drop zone.",
+                    "Reorder files if needed using the up and down arrow buttons to set the merge sequence.",
+                    "Click 'Merge PDFs' to start combining. The progress bar shows the merge status.",
+                    "Download the merged PDF when complete. It contains all pages in the order you specified.",
+                ]}
+                benefits={[
+                    "Useful for consolidating scans, reports, chapters, and documents from multiple sources.",
+                    "Reorder files before merging—no need to guess or redo the process.",
+                    "Browser-based processing means files stay private and merge happens fast.",
+                    "Works with PDFs of different sizes, page counts, and origins.",
+                    "No file size limits within browser capabilities—often 100MB+.",
+                ]}
+                faqItems={faqItems}
+                relatedTools={relatedTools}
             />
+
+            <FaqSchema items={faqItems} />
         </main>
     );
 }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { FormField } from "./types/form-schema";
@@ -20,32 +20,59 @@ type ExtendedFormField = FormField & {
 };
 
 const FIELD_TYPES = [
-  { type: "text" as const, name: "Text Input", icon: "📝", desc: "Single line text" },
-  { type: "textarea" as const, name: "Text Area", icon: "📄", desc: "Multi-line text" },
-  { type: "checkbox" as const, name: "Checkbox", icon: "☑️", desc: "Yes/No option" },
-  { type: "radio" as const, name: "Radio Group", icon: "🔘", desc: "Select one" },
-  { type: "select" as const, name: "Dropdown", icon: "📋", desc: "Select from list" },
-  { type: "signature" as const, name: "Signature", icon: "✓", desc: "Sign here" },
+  { type: "text" as const, name: "Text Input", icon: "ðŸ“", desc: "Single line text" },
+  { type: "textarea" as const, name: "Text Area", icon: "ðŸ“„", desc: "Multi-line text" },
+  { type: "checkbox" as const, name: "Checkbox", icon: "â˜‘ï¸", desc: "Yes/No option" },
+  { type: "radio" as const, name: "Radio Group", icon: "ðŸ”˜", desc: "Select one" },
+  { type: "select" as const, name: "Dropdown", icon: "ðŸ“‹", desc: "Select from list" },
+  { type: "signature" as const, name: "Signature", icon: "âœ“", desc: "Sign here" },
 ];
 
+function createId() {
+  return typeof crypto !== "undefined" && "randomUUID" in crypto
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function getInitialBuilderState(): {
+  fields: ExtendedFormField[];
+  formName: string;
+  pageSize: keyof typeof PAGE_SIZES;
+} {
+  if (typeof window === "undefined") {
+    return { fields: [], formName: "My Form", pageSize: "A4" };
+  }
+
+  try {
+    const saved = localStorage.getItem("pdf-form-builder-data");
+    if (!saved) {
+      return { fields: [], formName: "My Form", pageSize: "A4" };
+    }
+
+    const data = JSON.parse(saved) as {
+      fields?: ExtendedFormField[];
+      formName?: string;
+      pageSize?: keyof typeof PAGE_SIZES;
+    };
+
+    return {
+      fields: data.fields || [],
+      formName: data.formName || "My Form",
+      pageSize: data.pageSize || "A4",
+    };
+  } catch {
+    return { fields: [], formName: "My Form", pageSize: "A4" };
+  }
+}
+
 export default function FormBuilder() {
-  const [fields, setFields] = useState<ExtendedFormField[]>([]);
+  const initialState = getInitialBuilderState();
+  const [fields, setFields] = useState<ExtendedFormField[]>(initialState.fields);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [formName, setFormName] = useState("My Form");
-  const [pageSize, setPageSize] = useState<keyof typeof PAGE_SIZES>("A4");
+  const [formName, setFormName] = useState(initialState.formName);
+  const [pageSize, setPageSize] = useState<keyof typeof PAGE_SIZES>(initialState.pageSize);
   const canvasRef = useRef<HTMLDivElement>(null);
   const [dragType, setDragType] = useState<FormField["type"] | null>(null);
-
-  // Auto-save to localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("pdf-form-builder-data");
-    if (saved) {
-      const data = JSON.parse(saved);
-      setFields(data.fields || []);
-      setFormName(data.formName || "My Form");
-      setPageSize(data.pageSize || "A4");
-    }
-  }, []);
 
   useEffect(() => {
     if (fields.length > 0) {
@@ -61,7 +88,7 @@ export default function FormBuilder() {
 
     if (type === "select" || type === "radio") {
       newField = {
-        id: Date.now().toString(),
+        id: createId(),
         type,
         label: `New ${type} field`,
         required: false,
@@ -76,7 +103,7 @@ export default function FormBuilder() {
       };
     } else {
       newField = {
-        id: Date.now().toString(),
+        id: createId(),
         type,
         label: `New ${type} field`,
         required: false,
@@ -145,7 +172,7 @@ export default function FormBuilder() {
           setFields(data.fields || []);
           setFormName(data.formName || "My Form");
           setSelectedId(null);
-        } catch (error) {
+        } catch {
           alert("Invalid form file");
         }
       };
@@ -159,7 +186,7 @@ export default function FormBuilder() {
       return;
     }
     try {
-      const pdfBytes = await generateFillablePdf(fields as any, formName);
+      const pdfBytes = await generateFillablePdf(fields, formName);
       const bytes = new Uint8Array(pdfBytes);
       const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
       const blob = new Blob([buffer], { type: "application/pdf" });
@@ -201,7 +228,7 @@ export default function FormBuilder() {
     let newField: ExtendedFormField;
     if (dragType === "select" || dragType === "radio") {
       newField = {
-        id: Date.now().toString(),
+        id: createId(),
         type: dragType,
         label: `New ${dragType} field`,
         required: false,
@@ -216,7 +243,7 @@ export default function FormBuilder() {
       };
     } else {
       newField = {
-        id: Date.now().toString(),
+        id: createId(),
         type: dragType,
         label: `New ${dragType} field`,
         required: false,
@@ -256,24 +283,24 @@ export default function FormBuilder() {
           >
             {Object.keys(PAGE_SIZES).map((size) => (
               <option key={size} value={size}>
-                📄 {size}
+                ðŸ“„ {size}
               </option>
             ))}
           </select>
         </div>
         <div className={styles.toolbarRight}>
           <button className={styles.toolBtn} onClick={clearForm}>
-            🗑️ Clear
+            ðŸ—‘ï¸ Clear
           </button>
           <label className={styles.toolBtn}>
-            📂 Load
+            ðŸ“‚ Load
             <input type="file" accept=".json" onChange={loadForm} style={{ display: "none" }} />
           </label>
           <button className={styles.toolBtn} onClick={saveForm}>
-            💾 Save
+            ðŸ’¾ Save
           </button>
           <button className={`${styles.toolBtn} ${styles.primary}`} onClick={exportPdf}>
-            📥 Download PDF
+            ðŸ“¥ Download PDF
           </button>
         </div>
       </div>
@@ -283,7 +310,7 @@ export default function FormBuilder() {
         {/* Left Sidebar - Fields */}
         <div className={styles.sidebar}>
           <div className={styles.sidebarHeader}>
-            <h2>🎨 Fields</h2>
+            <h2>ðŸŽ¨ Fields</h2>
             <p>Drag to canvas</p>
           </div>
           <div className={styles.sidebarContent}>
@@ -329,7 +356,7 @@ export default function FormBuilder() {
           >
             {fields.length === 0 ? (
               <div className={styles.emptyState}>
-                <h3>👆 Start Building</h3>
+                <h3>ðŸ‘† Start Building</h3>
                 <p>Click or drag fields from left sidebar</p>
               </div>
             ) : (
@@ -368,7 +395,7 @@ export default function FormBuilder() {
                   }}
                 >
                   <button className={styles.deleteBtn} onClick={(e) => { e.stopPropagation(); deleteField(); }}>
-                    ✕
+                    âœ•
                   </button>
                   <div className={styles.fieldLabel} style={{ color: field.textColor || "#000000" }}>
                     {field.label}
@@ -390,7 +417,7 @@ export default function FormBuilder() {
                     )}
                     {field.type === "signature" && (
                       <div style={{ border: "1px dashed #ccc", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#999" }}>
-                        ✓ Sign here
+                        âœ“ Sign here
                       </div>
                     )}
                   </div>
@@ -427,13 +454,13 @@ export default function FormBuilder() {
         <div className={styles.propertiesPanel}>
           {!selectedField ? (
             <div className={styles.propertiesEmpty}>
-              <h3>⚙️ Properties</h3>
+              <h3>âš™ï¸ Properties</h3>
               <p>Select a field to edit</p>
             </div>
           ) : (
             <div className={styles.propertiesContent}>
               <div className={styles.sidebarHeader}>
-                <h2>⚙️ Properties</h2>
+                <h2>âš™ï¸ Properties</h2>
                 <p>{selectedField.type} field</p>
               </div>
 
@@ -584,7 +611,7 @@ export default function FormBuilder() {
                         <button onClick={() => {
                           const newOptions = selectedField.options?.filter((_, idx) => idx !== i);
                           updateField({ ...selectedField, options: newOptions });
-                        }}>✕</button>
+                        }}>âœ•</button>
                       </div>
                     ))}
                   </div>
@@ -601,7 +628,7 @@ export default function FormBuilder() {
                   style={{ width: "100%", background: "#ef4444", color: "white", border: "none" }}
                   onClick={deleteField}
                 >
-                  🗑️ Delete Field
+                  ðŸ—‘ï¸ Delete Field
                 </button>
               </div>
             </div>
@@ -611,3 +638,8 @@ export default function FormBuilder() {
     </div>
   );
 }
+
+
+
+
+

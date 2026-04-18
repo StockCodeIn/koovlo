@@ -1,82 +1,70 @@
-"use client";
+﻿"use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { FormField } from "../types/form-schema";
 
 type Props = {
   field: FormField;
   selected: boolean;
   onSelect: () => void;
+  onChange?: (field: FormField) => void;
 };
 
-export default function FieldRenderer({
-  field,
-  selected,
-  onSelect,
-}: Props) {
+export default function FieldRenderer({ field, selected, onSelect, onChange }: Props) {
   const ref = useRef<HTMLDivElement>(null);
-  const [dragging, setDragging] = useState(false);
-  const [resizing, setResizing] = useState(false);
 
-  const startPos = useRef({ x: 0, y: 0 });
-  const startSize = useRef({ w: 0, h: 0 });
-
-  const onMouseDownDrag = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const startDrag = (event: React.MouseEvent) => {
+    event.stopPropagation();
     onSelect();
-    setDragging(true);
-    startPos.current = {
-      x: e.clientX - field.x,
-      y: e.clientY - field.y,
+
+    const startX = event.clientX - field.x;
+    const startY = event.clientY - field.y;
+
+    const handleMove = (moveEvent: MouseEvent) => {
+      onChange?.({
+        ...field,
+        x: Math.max(0, moveEvent.clientX - startX),
+        y: Math.max(0, moveEvent.clientY - startY),
+      });
     };
-    window.addEventListener("mousemove", onDrag);
-    window.addEventListener("mouseup", stopAll);
-  };
 
-  const onDrag = (e: MouseEvent) => {
-    if (!dragging) return;
-    field.x = Math.max(0, e.clientX - startPos.current.x);
-    field.y = Math.max(0, e.clientY - startPos.current.y);
-    ref.current?.style.setProperty("left", field.x + "px");
-    ref.current?.style.setProperty("top", field.y + "px");
-  };
-
-  const onMouseDownResize = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setResizing(true);
-    startSize.current = {
-      w: field.width,
-      h: field.height,
+    const handleUp = () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
     };
-    startPos.current = { x: e.clientX, y: e.clientY };
-    window.addEventListener("mousemove", onResize);
-    window.addEventListener("mouseup", stopAll);
+
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
   };
 
-  const onResize = (e: MouseEvent) => {
-    if (!resizing) return;
-    const dx = e.clientX - startPos.current.x;
-    const dy = e.clientY - startPos.current.y;
+  const startResize = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    const startX = event.clientX;
+    const startY = event.clientY;
+    const startWidth = field.width;
+    const startHeight = field.height;
 
-    field.width = Math.max(40, startSize.current.w + dx);
-    field.height = Math.max(30, startSize.current.h + dy);
+    const handleMove = (moveEvent: MouseEvent) => {
+      onChange?.({
+        ...field,
+        width: Math.max(40, startWidth + (moveEvent.clientX - startX)),
+        height: Math.max(30, startHeight + (moveEvent.clientY - startY)),
+      });
+    };
 
-    ref.current?.style.setProperty("width", field.width + "px");
-    ref.current?.style.setProperty("height", field.height + "px");
-  };
+    const handleUp = () => {
+      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("mouseup", handleUp);
+    };
 
-  const stopAll = () => {
-    setDragging(false);
-    setResizing(false);
-    window.removeEventListener("mousemove", onDrag);
-    window.removeEventListener("mousemove", onResize);
-    window.removeEventListener("mouseup", stopAll);
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("mouseup", handleUp);
   };
 
   return (
     <div
       ref={ref}
-      onMouseDown={onMouseDownDrag}
+      onMouseDown={startDrag}
       style={{
         position: "absolute",
         left: field.x,
@@ -92,10 +80,9 @@ export default function FieldRenderer({
     >
       <strong>{field.label}</strong>
 
-      {/* resize handle */}
       {selected && (
         <div
-          onMouseDown={onMouseDownResize}
+          onMouseDown={startResize}
           style={{
             position: "absolute",
             right: -6,
