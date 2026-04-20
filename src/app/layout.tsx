@@ -1,8 +1,11 @@
+// src/app/layout.tsx
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css" with { type: "css" };
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ToolsNavServer from "@/components/ToolsNavServer";
+import ToolsNavClient from "@/components/ToolsNavClient";
 import ToolsNav from "@/components/ToolsNav";
 import { GoogleAnalytics } from "@/components/Analytics";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
@@ -139,7 +142,9 @@ export default function RootLayout({
           <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
         )}
         <Header />
-        <ToolsNav />
+        <ToolsNavServer />   {/* SEO */}
+        {/* <ToolsNavClient />   */}
+        {/* <ToolsNav /> */}
         <main>{children}</main>
         <Footer />
         <VercelAnalytics />
