@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useRef, useEffect } from 'react';
 import ToolInfo from '@/components/ToolInfo';
 import styles from './invoice.module.css';
@@ -104,7 +105,7 @@ export default function InvoiceGeneratorPage() {
     if (saved) {
       try {
         setInvoiceData(JSON.parse(saved));
-      } catch (e) {
+      } catch {
         console.error('Failed to load saved invoice');
       }
     }
@@ -318,7 +319,7 @@ export default function InvoiceGeneratorPage() {
               />
               {invoiceData.companyLogo && (
                 <div className={styles.logoPreview}>
-                  <img src={invoiceData.companyLogo} alt="Logo" />
+                  <Image src={invoiceData.companyLogo} alt="Logo" width={120} height={60} unoptimized />
                   <button onClick={() => setInvoiceData({ ...invoiceData, companyLogo: '' })}>Remove</button>
                 </div>
               )}
@@ -611,7 +612,7 @@ export default function InvoiceGeneratorPage() {
                 />
                 {invoiceData.signature && (
                   <div className={styles.signaturePreview}>
-                    <img src={invoiceData.signature} alt="Signature" />
+                    <Image src={invoiceData.signature} alt="Signature" width={180} height={72} unoptimized />
                     <button onClick={() => setInvoiceData({ ...invoiceData, signature: '' })}>Remove</button>
                   </div>
                 )}
@@ -702,7 +703,7 @@ export default function InvoiceGeneratorPage() {
             <div className={styles.invoiceHeader}>
               <div className={styles.companyInfo}>
                 {invoiceData.companyLogo && (
-                  <img src={invoiceData.companyLogo} alt="Logo" className={styles.logo} />
+                  <Image src={invoiceData.companyLogo} alt="Logo" className={styles.logo} width={160} height={80} unoptimized />
                 )}
                 <h1>{invoiceData.companyName || 'Your Company'}</h1>
                 {invoiceData.companyEmail && <p>{invoiceData.companyEmail}</p>}
@@ -813,7 +814,7 @@ export default function InvoiceGeneratorPage() {
                   <h4>Authorized Signature</h4>
                   <div className={styles.signatureDisplay}>
                     {invoiceData.signatureType === 'image' && invoiceData.signature ? (
-                      <img src={invoiceData.signature} alt="Signature" />
+                      <Image src={invoiceData.signature} alt="Signature" width={180} height={72} unoptimized />
                     ) : (
                       <span className={styles.handwritingSignature}>{invoiceData.signatureText}</span>
                     )}

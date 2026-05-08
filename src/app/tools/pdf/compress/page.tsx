@@ -143,13 +143,13 @@ export default function PdfCompress() {
         try {
           // Additional cleanup for high compression - forms and annotations removal would require more complex logic
           console.log('Applying high compression optimizations...');
-        } catch (cleanupErr) {
+        } catch {
           console.log('Additional cleanup not applicable for this PDF');
         }
       }
 
       // Apply different compression strategies based on level
-      let compressionOptions: any = {
+      let compressionOptions: Record<string, unknown> = {
         useObjectStreams: true,
         addDefaultPage: false,
         compress: true,
@@ -180,7 +180,7 @@ export default function PdfCompress() {
       }
 
       // Remove unused objects and optimize
-      const optimizedPdf = await pdfDoc.save(compressionOptions);
+      const optimizedPdf = await pdfDoc.save(compressionOptions as Parameters<PDFDocument["save"]>[0]);
 
       setProgress(75);
       setMessage('Finalizing compression...');

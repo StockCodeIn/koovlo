@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { PDFDocument, PDFName } from "pdf-lib";
+import { PDFDocument } from "pdf-lib";
 import styles from "./metadata.module.css";
 
 const formatFileSize = (bytes: number): string => {
@@ -26,6 +26,8 @@ type MetaInfo = {
   pdfVersion?: string;
   fileSize?: string;
 };
+
+type EditableMetaKey = "title" | "author" | "subject" | "keywords";
 
 export default function PdfMetadataEditorPro() {
   const [file, setFile] = useState<File | null>(null);
@@ -99,8 +101,6 @@ export default function PdfMetadataEditorPro() {
       setProgress(75);
 
       // ✅ safer access, avoids PDFName type errors
-      const infoDict = pdfDoc.context.lookup(pdfDoc.catalog.get(PDFName.of("Info")));
-
       const meta: MetaInfo = {
         title: pdfDoc.getTitle() || "",
         author: pdfDoc.getAuthor() || "",
@@ -247,12 +247,12 @@ export default function PdfMetadataEditorPro() {
             <div className={styles.editSection}>
               <h2>Editable Fields</h2>
 
-              {["title", "author", "subject", "keywords"].map((key) => (
+              {(["title", "author", "subject", "keywords"] as EditableMetaKey[]).map((key) => (
                 <div className={styles.inputGroup} key={key}>
                   <label>{key.charAt(0).toUpperCase() + key.slice(1)}</label>
                   <input
                     name={key}
-                    value={(metadata as any)[key] || ""}
+                    value={metadata[key] || ""}
                     onChange={handleChange}
                     placeholder={`Enter ${key}`}
                     disabled={loading}

@@ -139,7 +139,7 @@ export default function PdfPageRangeSplitPage() {
 
       setProgress(100);
       setSuccess('PDF split successfully!');
-    } catch (err) {
+    } catch {
       setError('Failed to split PDF. Please try again.');
     }
 

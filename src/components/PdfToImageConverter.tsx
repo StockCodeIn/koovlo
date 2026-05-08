@@ -5,6 +5,8 @@ import * as pdfjsLib from "pdfjs-dist";
 import JSZip from "jszip";
 import styles from "@/app/tools/pdf/to-image/toimage.module.css";
 
+type OutputQuality = "high" | "medium" | "low";
+
 // ✅ Worker setup using CDN (safe for local + production)
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
@@ -21,7 +23,7 @@ export default function PdfToImageConverter() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | "info">("info");
-  const [quality, setQuality] = useState<"high" | "medium" | "low">("high");
+  const [quality, setQuality] = useState<OutputQuality>("high");
   const [progress, setProgress] = useState(0);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -194,7 +196,7 @@ export default function PdfToImageConverter() {
           <label>Output Quality:</label>
           <select
             value={quality}
-            onChange={(e) => setQuality(e.target.value as any)}
+            onChange={(e) => setQuality(e.target.value as OutputQuality)}
             disabled={loading}
             className={styles.select}
           >

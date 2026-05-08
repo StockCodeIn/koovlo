@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import { PDFDocument } from "pdf-lib";
@@ -185,7 +186,7 @@ export default function PdfGrayscaleClient() {
             <div className={styles.previewSection}>
               <p className={styles.stepLabel}>Preview · First Page</p>
               <div className={styles.previewBox}>
-                <img src={preview} alt="PDF Preview" className={styles.previewImage} />
+                <Image src={preview} alt="PDF Preview" className={styles.previewImage} width={800} height={1131} unoptimized />
               </div>
             </div>
           )}

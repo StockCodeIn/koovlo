@@ -151,7 +151,7 @@ export default function DuplicatePages() {
       setProgress(95);
 
       const pdfBytes = await newPdf.save();
-      const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

@@ -5,8 +5,6 @@ import "./globals.css" with { type: "css" };
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ToolsNavServer from "@/components/ToolsNavServer";
-import ToolsNavClient from "@/components/ToolsNavClient";
-import ToolsNav from "@/components/ToolsNav";
 import { GoogleAnalytics } from "@/components/Analytics";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";

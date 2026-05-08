@@ -140,6 +140,10 @@ export default function HomePage() {
           The biggest near-term opportunity is to build trust around privacy, speed, and education-oriented use cases while targeting
           less competitive long-tail searches such as GPA and CGPA calculators, browser-based PDF tasks, and lightweight image workflows.
         </p>
+        <p>
+          Supporting content also matters. Browse the <Link href="/guides">Koovlo guides hub</Link> for tutorials that connect
+          real-world questions with the right tools and improve internal linking across the site.
+        </p>
       </section>
 
       <section className={styles.faqSection}>

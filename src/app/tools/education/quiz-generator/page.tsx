@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styles from './quizgenerator.module.css';
 
 interface QuizQuestion {
@@ -42,11 +42,7 @@ interface QuizPreset {
   questionCount: number;
 }
 
-interface QuestionBank {
-  id: string;
-  topic: string;
-  questions: QuizQuestion[];
-}
+type QuizQuestionType = QuizQuestion['type'];
 
 const quizPresets: QuizPreset[] = [
   { name: 'General Knowledge 101', description: 'Basic GK questions', category: 'General Knowledge', difficulty: 'easy', questionCount: 10 },
@@ -81,54 +77,9 @@ export default function QuizGeneratorTool() {
   const [attempts, setAttempts] = useState<QuizAttempt[]>([]);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [weakAreas, setWeakAreas] = useState<Map<string, number>>(new Map());
-  const [questionBank, setQuestionBank] = useState<QuestionBank[]>([]);
   const [lastSaved, setLastSaved] = useState('');
   const [currentStreak, setCurrentStreak] = useState(0);
   const [showPresets, setShowPresets] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('quizzes');
-    const savedAttempts = localStorage.getItem('quiz-attempts');
-    if (saved) {
-      setQuizzes(JSON.parse(saved));
-    }
-    if (savedAttempts) {
-      const parsedAttempts = JSON.parse(savedAttempts);
-      setAttempts(parsedAttempts);
-      analyzeWeakAreas(parsedAttempts);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('quizzes', JSON.stringify(quizzes));
-    setLastSaved(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
-  }, [quizzes]);
-
-  useEffect(() => {
-    localStorage.setItem('quiz-attempts', JSON.stringify(attempts));
-  }, [attempts]);
-
-  // Timer effect
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (isTakingQuiz && timeRemaining !== null && timeRemaining > 0) {
-      interval = setInterval(() => {
-        setTimeRemaining(prev => {
-          if (prev === null || prev <= 1) {
-            // Time's up - auto-submit
-            handleSubmitQuiz();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isTakingQuiz, timeRemaining]);
 
   const createNewQuiz = () => {
     const newQuiz: Quiz = {
@@ -163,7 +114,7 @@ export default function QuizGeneratorTool() {
     setShowPresets(false);
   };
 
-  const analyzeWeakAreas = (quizAttempts: QuizAttempt[]) => {
+  const analyzeWeakAreas = useCallback((quizAttempts: QuizAttempt[]) => {
     const weakMap = new Map<string, number>();
     
     quizAttempts.forEach(attempt => {
@@ -188,7 +139,7 @@ export default function QuizGeneratorTool() {
     });
 
     setWeakAreas(weakMap);
-  };
+  }, [quizzes]);
 
   const getPerformanceStats = () => {
     if (attempts.length === 0) return { avgScore: 0, totalAttempts: 0, bestScore: 0, passingRate: 0 };
@@ -284,7 +235,7 @@ export default function QuizGeneratorTool() {
     }
   };
 
-  const calculateScore = (): { score: number; totalPoints: number; percentage: number; correct: number; total: number } => {
+  const calculateScore = useCallback((): { score: number; totalPoints: number; percentage: number; correct: number; total: number } => {
     if (!currentQuiz) return { score: 0, totalPoints: 0, percentage: 0, correct: 0, total: 0 };
 
     let correct = 0;
@@ -313,9 +264,9 @@ export default function QuizGeneratorTool() {
     const percentage = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
 
     return { score: earnedPoints, totalPoints, percentage, correct, total: currentQuiz.questions.length };
-  };
+  }, [answers, currentQuiz]);
 
-  const handleSubmitQuiz = () => {
+  const handleSubmitQuiz = useCallback(() => {
     if (!currentQuiz) return;
 
     const endTime = Date.now();
@@ -358,7 +309,49 @@ export default function QuizGeneratorTool() {
     analyzeWeakAreas([...attempts, attempt]);
     setShowResults(true);
     setIsTakingQuiz(false);
-  };
+  }, [analyzeWeakAreas, answers, attempts, calculateScore, currentQuiz, quizStartTime]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('quizzes');
+    const savedAttempts = localStorage.getItem('quiz-attempts');
+    if (saved) {
+      setQuizzes(JSON.parse(saved));
+    }
+    if (savedAttempts) {
+      const parsedAttempts = JSON.parse(savedAttempts);
+      setAttempts(parsedAttempts);
+      analyzeWeakAreas(parsedAttempts);
+    }
+  }, [analyzeWeakAreas]);
+
+  useEffect(() => {
+    localStorage.setItem('quizzes', JSON.stringify(quizzes));
+    setLastSaved(new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+  }, [quizzes]);
+
+  useEffect(() => {
+    localStorage.setItem('quiz-attempts', JSON.stringify(attempts));
+  }, [attempts]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (isTakingQuiz && timeRemaining !== null && timeRemaining > 0) {
+      interval = setInterval(() => {
+        setTimeRemaining(prev => {
+          if (prev === null || prev <= 1) {
+            handleSubmitQuiz();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [handleSubmitQuiz, isTakingQuiz, timeRemaining]);
 
   const resetQuiz = () => {
     setIsTakingQuiz(false);
@@ -400,7 +393,7 @@ export default function QuizGeneratorTool() {
         if (data.quiz) {
           setQuizzes(prev => [...prev, { ...data.quiz, id: Date.now().toString() }]);
         }
-      } catch (error) {
+      } catch {
         alert('Invalid file format');
       }
     };
@@ -605,7 +598,7 @@ export default function QuizGeneratorTool() {
 
               {quizzes.length === 0 && (
                 <div className={styles.emptyState}>
-                  <p>No quizzes created yet. Click "Create New Quiz" to get started!</p>
+                  <p>No quizzes created yet. Click &quot;Create New Quiz&quot; to get started.</p>
                 </div>
               )}
             </div>
@@ -705,7 +698,7 @@ export default function QuizGeneratorTool() {
                       <span className={styles.questionNumber}>Q{index + 1}</span>
                       <select
                         value={question.type}
-                        onChange={(e) => updateQuestion(currentQuiz.id, question.id, { type: e.target.value as any })}
+                        onChange={(e) => updateQuestion(currentQuiz.id, question.id, { type: e.target.value as QuizQuestionType })}
                         className={styles.typeSelect}
                       >
                         <option value="multiple-choice">Multiple Choice</option>
@@ -809,7 +802,7 @@ export default function QuizGeneratorTool() {
 
                 {currentQuiz.questions.length === 0 && (
                   <div className={styles.emptyQuestions}>
-                    <p>No questions added yet. Click "Add Question" to create your first question!</p>
+                    <p>No questions added yet. Click &quot;Add Question&quot; to create your first question.</p>
                   </div>
                 )}
               </div>
@@ -871,7 +864,7 @@ export default function QuizGeneratorTool() {
                         name={`question-${currentQuestion.id}`}
                         value={0}
                         checked={answers[currentQuestion.id] === 0}
-                        onChange={(e) => handleAnswerChange(currentQuestion.id, 0)}
+                        onChange={() => handleAnswerChange(currentQuestion.id, 0)}
                       />
                       True
                     </label>
@@ -881,7 +874,7 @@ export default function QuizGeneratorTool() {
                         name={`question-${currentQuestion.id}`}
                         value={1}
                         checked={answers[currentQuestion.id] === 1}
-                        onChange={(e) => handleAnswerChange(currentQuestion.id, 1)}
+                        onChange={() => handleAnswerChange(currentQuestion.id, 1)}
                       />
                       False
                     </label>

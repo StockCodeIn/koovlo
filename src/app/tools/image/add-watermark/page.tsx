@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
+import NextImage from "next/image";
+import { useCallback, useRef, useState } from "react";
 import React from "react";
 import styles from "./addwatermark.module.css";
 import ToolInfo from "@/components/ToolInfo";
@@ -14,6 +15,7 @@ type ImageItem = {
 };
 
 type WatermarkMode = "text" | "image";
+type WatermarkPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right" | "center";
 
 export default function AddWatermark() {
   const [images, setImages] = useState<ImageItem[]>([]);
@@ -22,7 +24,7 @@ export default function AddWatermark() {
   const [watermarkText, setWatermarkText] = useState("© My Brand");
   const [watermarkImage, setWatermarkImage] = useState<string | null>(null);
   const [watermarkFile, setWatermarkFile] = useState<File | null>(null);
-  const [position, setPosition] = useState<"top-left" | "top-right" | "bottom-left" | "bottom-right" | "center">("bottom-right");
+  const [position, setPosition] = useState<WatermarkPosition>("bottom-right");
   const [opacity, setOpacity] = useState(70);
   const [fontSize, setFontSize] = useState(32);
   const [fontColor, setFontColor] = useState("#000000");
@@ -84,7 +86,7 @@ export default function AddWatermark() {
   };
 
   // Live preview update
-  const updatePreview = () => {
+  const updatePreview = useCallback(() => {
     if (images.length === 0 || !previewCanvasRef.current) return;
 
     const canvas = previewCanvasRef.current;
@@ -183,12 +185,12 @@ export default function AddWatermark() {
 
       ctx.globalAlpha = 1;
     };
-  };
+  }, [fontColor, fontSize, images, opacity, position, scale, watermarkImage, watermarkMode, watermarkText]);
 
   // Update preview when settings or images change
   React.useEffect(() => {
     updatePreview();
-  }, [images, watermarkMode, watermarkText, watermarkImage, position, opacity, fontSize, fontColor, scale]);
+  }, [updatePreview]);
 
   const applyWatermark = async (img: ImageItem): Promise<ImageItem> => {
     return new Promise((resolve) => {
@@ -507,7 +509,7 @@ export default function AddWatermark() {
             {positions.map((pos) => (
               <button
                 key={pos.value}
-                onClick={() => setPosition(pos.value as any)}
+                onClick={() => setPosition(pos.value as WatermarkPosition)}
                 className={position === pos.value ? styles.active : ""}
               >
                 {pos.label}
@@ -614,7 +616,7 @@ export default function AddWatermark() {
             <div className={styles.imageList}>
               {images.map((img) => (
                 <div key={img.id} className={styles.imageRow}>
-                  <img src={img.preview} alt={img.file.name} className={styles.imageThumbnail} />
+                  <NextImage src={img.preview} alt={img.file.name} className={styles.imageThumbnail} width={96} height={96} unoptimized />
                   <span className={styles.imageName}>{img.file.name}</span>
                   <span className={`${styles.imageStatus} ${styles['status' + img.status.charAt(0).toUpperCase() + img.status.slice(1)]}`}>
                     {img.status === "pending" && "⏳ Waiting"}

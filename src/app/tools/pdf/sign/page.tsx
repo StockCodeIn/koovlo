@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
 import { PDFDocument } from "pdf-lib";
 import SignatureCanvas from "react-signature-canvas";
@@ -20,8 +21,10 @@ interface Signature {
   text?: string;
 }
 
+type PdfJsModule = typeof import("pdfjs-dist");
+
 export default function PdfSignPro() {
-  const [pdfjsLib, setPdfjsLib] = useState<any>(null);
+  const [pdfjsLib, setPdfjsLib] = useState<PdfJsModule | null>(null);
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfPages, setPdfPages] = useState<string[]>([]);
   const [pageDimensions, setPageDimensions] = useState<{ width: number; height: number }[]>([]);
@@ -74,7 +77,7 @@ export default function PdfSignPro() {
         const context = canvas.getContext("2d")!;
         canvas.width = viewport.width;
         canvas.height = viewport.height;
-        await page.render({ canvasContext: context, viewport }).promise;
+        await page.render({ canvasContext: context, viewport, canvas }).promise;
         pages.push(canvas.toDataURL());
       }
 
@@ -450,11 +453,14 @@ export default function PdfSignPro() {
                 {/* Preview Area */}
                 <div className={styles.previewContainer}>
                   <div className={styles.previewArea}>
-                    <img
+                    <Image
                       ref={previewImgRef}
                       src={pdfPages[activePage]}
                       className={styles.pdfPage}
                       alt="PDF Page"
+                      width={800}
+                      height={1131}
+                      unoptimized
                     />
                     {signatures
                       .filter((s) => s.page === activePage)
@@ -502,10 +508,13 @@ export default function PdfSignPro() {
                           }}
                         >
                           <div className={styles.signatureWrapper}>
-                            <img
+                            <Image
                               src={sig.img}
                               alt={sig.type}
                               className={styles.signImg}
+                              width={160}
+                              height={64}
+                              unoptimized
                             />
                             <button
                               onClick={() => removeSignature(sig.id)}

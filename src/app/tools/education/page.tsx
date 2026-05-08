@@ -1,4 +1,5 @@
 import FaqSchema from "@/components/FaqSchema";
+import Link from "next/link";
 import ToolCard from "@/components/ToolCard";
 import { getToolsByCategory } from "@/lib/siteData";
 import styles from "../tools-common.module.css";
@@ -91,6 +92,19 @@ export default function EducationToolsPage() {
               <p>{item.answer}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2>Study guides and explanations</h2>
+          <p>Students often need formulas and examples in addition to calculators, so these pages support both users and SEO.</p>
+        </div>
+        <div className={styles.faqGrid}>
+          <article className={styles.faqCard}>
+            <h3><Link href="/guides/gpa-vs-cgpa-calculator-guide">GPA vs CGPA: what is the difference and how do you calculate both?</Link></h3>
+            <p>Read the plain-English difference between semester GPA, cumulative CGPA, and percentage conversions.</p>
+          </article>
         </div>
       </section>
 

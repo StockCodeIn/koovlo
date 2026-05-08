@@ -1,5 +1,6 @@
 "use client";
 
+import NextImage from "next/image";
 import { useState, useRef } from "react";
 import styles from "./convert.module.css";
 import ToolInfo from "@/components/ToolInfo";
@@ -317,7 +318,7 @@ export default function ImageConvert() {
             {images.map((img) => (
               <div key={img.id} className={styles.card}>
                 <div className={styles.cardImage}>
-                  <img src={img.preview} alt={img.file.name} />
+                  <NextImage src={img.preview} alt={img.file.name} width={320} height={220} unoptimized />
                   <div className={styles.cardStatus}>
                     {img.status === "pending" && <span className={styles.badge}>Pending</span>}
                     {img.status === "converting" && <span className={`${styles.badge} ${styles.badgeProcessing}`}>Converting...</span>}

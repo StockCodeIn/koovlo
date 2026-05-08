@@ -86,6 +86,23 @@ export default function PdfToolsPage() {
 
       <section className={styles.section}>
         <div className={styles.sectionHeader}>
+          <h2>PDF guides worth reading</h2>
+          <p>Support articles help users compare workflows and give these tool pages stronger topical context.</p>
+        </div>
+        <div className={styles.faqGrid}>
+          <article className={styles.faqCard}>
+            <h3><Link href="/guides/compress-pdf-for-email">How to Compress a PDF for Email Without Ruining Readability</Link></h3>
+            <p>Understand which files compress well, how to keep text readable, and when to merge or optimize first.</p>
+          </article>
+          <article className={styles.faqCard}>
+            <h3><Link href="/guides/pdf-to-jpg-without-losing-quality">How to Convert PDF to JPG Without Losing Too Much Quality</Link></h3>
+            <p>Learn how render quality, image format, and follow-up compression affect the final result.</p>
+          </article>
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <div className={styles.sectionHeader}>
           <h2>Frequently asked questions</h2>
           <p>Helpful answers for users and richer context for search engines.</p>
         </div>

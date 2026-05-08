@@ -40,15 +40,23 @@ interface SubjectPerformance {
   efficiency: number;
 }
 
+type SubjectPriority = Subject["priority"];
+type NewSubjectForm = {
+  name: string;
+  topics: string;
+  hoursNeeded: number;
+  priority: SubjectPriority;
+};
+
 export default function RevisionPlanner() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [sessions, setSessions] = useState<StudySession[]>([]);
   const [plans, setPlans] = useState<StudyPlan[]>([]);
-  const [newSubject, setNewSubject] = useState({
+  const [newSubject, setNewSubject] = useState<NewSubjectForm>({
     name: "",
     topics: "",
     hoursNeeded: 0,
-    priority: "medium" as const
+    priority: "medium"
   });
   const [examDate, setExamDate] = useState("");
   const [dailyStudyHours, setDailyStudyHours] = useState(2);
@@ -65,8 +73,8 @@ export default function RevisionPlanner() {
         setSubjects(data.subjects || []);
         setSessions(data.sessions || []);
         setPlans(data.plans || []);
-      } catch (e) {
-        console.error("Error loading data:", e);
+      } catch (error) {
+        console.error("Error loading data:", error);
       }
     }
   }, []);
@@ -329,7 +337,7 @@ export default function RevisionPlanner() {
                 <div className={styles.insightCard}>
                   {studyInsights.onTrack ? (
                     <div className={styles.insightPositive}>
-                      ✅ You're on track! Continue at {dailyStudyHours}h/day to finish on time.
+                      ✅ You&apos;re on track! Continue at {dailyStudyHours}h/day to finish on time.
                     </div>
                   ) : (
                     <div className={styles.insightWarning}>
@@ -396,7 +404,7 @@ export default function RevisionPlanner() {
                 />
                 <select
                   value={newSubject.priority}
-                  onChange={(e) => setNewSubject({...newSubject, priority: e.target.value as any})}
+                  onChange={(e) => setNewSubject({...newSubject, priority: e.target.value as SubjectPriority})}
                 >
                   <option value="low">Low Priority</option>
                   <option value="medium">Medium Priority</option>

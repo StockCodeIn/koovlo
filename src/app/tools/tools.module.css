@@ -127,6 +127,58 @@
   grid-template-columns: repeat(3, 1fr);
 }
 
+.categoriesGrid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.categoryPanel {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.categoryPanel h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+}
+
+.categoryPanel h3 a {
+  color: var(--brand-text);
+  text-decoration: none;
+}
+
+.categoryPanel h3 a:hover {
+  color: var(--brand-primary);
+}
+
+.categoryPanel p {
+  margin: 0 0 14px;
+  color: var(--brand-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.toolList {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+}
+
+.toolList a {
+  color: var(--brand-text);
+  text-decoration: none;
+}
+
+.toolList a:hover {
+  color: var(--brand-primary);
+  text-decoration: underline;
+}
+
 .featuresGrid,
 .faqGrid {
   display: grid;
@@ -235,6 +287,7 @@
   }
 
   .grid,
+  .categoriesGrid,
   .featuresGrid,
   .faqGrid {
     grid-template-columns: 1fr;

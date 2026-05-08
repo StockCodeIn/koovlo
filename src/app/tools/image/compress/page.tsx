@@ -1,5 +1,6 @@
 "use client";
 
+import NextImage from "next/image";
 import { useState, useRef, useEffect } from "react";
 import styles from "./compress.module.css";
 import ToolInfo from "@/components/ToolInfo";
@@ -26,11 +27,10 @@ export default function ImageCompress() {
   useEffect(() => {
     return () => {
       images.forEach((img) => {
-        if (img.preview) URL.revokeObjectURL(img.preview);
-        if (img.compressedBlob) URL.revokeObjectURL(URL.createObjectURL(img.compressedBlob));
+        URL.revokeObjectURL(img.preview);
       });
     };
-  }, []);
+  }, [images]);
 
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
@@ -292,7 +292,7 @@ export default function ImageCompress() {
             {images.map((img) => (
               <div key={img.id} className={styles.card}>
                 <div className={styles.cardImage}>
-                  <img src={img.preview} alt={img.file.name} />
+                  <NextImage src={img.preview} alt={img.file.name} width={320} height={220} unoptimized />
                   <div className={styles.cardStatus}>
                     {img.status === "pending" && <span className={styles.badge}>Pending</span>}
                     {img.status === "compressing" && <span className={`${styles.badge} ${styles.badgeProcessing}`}>Processing...</span>}

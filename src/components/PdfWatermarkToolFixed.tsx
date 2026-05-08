@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { PDFDocument, rgb, degrees, StandardFonts } from "pdf-lib";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { PDFDocument, PDFImage, rgb, degrees, StandardFonts } from "pdf-lib";
 import styles from "@/app/tools/pdf/watermark/watermark.module.css";
 
 interface Watermark {
@@ -57,9 +58,9 @@ export default function PdfWatermarkPro() {
     return bytes;
   };
 
-  const getCurrentWatermark = () => {
+  const getCurrentWatermark = useCallback(() => {
     return watermarks.find((w) => w.id === selectedWatermarkId) || watermarks[0];
-  };
+  }, [selectedWatermarkId, watermarks]);
 
   const updateWatermark = (updates: Partial<Watermark>) => {
     setWatermarks(
@@ -92,7 +93,7 @@ export default function PdfWatermarkPro() {
     }
   };
 
-  const generatePreview = async () => {
+  const generatePreview = useCallback(async () => {
     if (!file) return;
 
     try {
@@ -167,11 +168,11 @@ export default function PdfWatermarkPro() {
     } catch (err) {
       console.error("Preview generation failed:", err);
     }
-  };
+  }, [file, getCurrentWatermark, isMobile, watermarks]);
 
   useEffect(() => {
     generatePreview();
-  }, [file, watermarks, isMobile]);
+  }, [generatePreview]);
 
   useEffect(() => {
     const updateIsMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -266,7 +267,7 @@ export default function PdfWatermarkPro() {
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
       setProgress(50);
 
-      const imageMap = new Map<string, any>();
+      const imageMap = new Map<string, PDFImage>();
       const wmToApply = isMobile ? ([getCurrentWatermark()].filter(Boolean) as Watermark[]) : watermarks;
       for (const wm of wmToApply) {
         if (wm.type === "image" && wm.content.startsWith("data:")) {
@@ -280,7 +281,7 @@ export default function PdfWatermarkPro() {
               img = await pdfDoc.embedJpg(imgBytes);
             }
             imageMap.set(wm.id, img);
-          } catch (e) {
+          } catch {
             console.warn(`Could not load image for watermark ${wm.id}`);
           }
         }
@@ -321,6 +322,9 @@ export default function PdfWatermarkPro() {
           try {
             if (wm.type === "image" && imageMap.has(wm.id)) {
               const img = imageMap.get(wm.id);
+              if (!img) {
+                return;
+              }
               page.drawImage(img, {
                 x,
                 y,
@@ -340,8 +344,8 @@ export default function PdfWatermarkPro() {
                 rotate: degrees(wm.rotation),
               });
             }
-          } catch (e) {
-            console.warn(`Could not apply watermark ${wm.id}:`, e);
+          } catch (error) {
+            console.warn(`Could not apply watermark ${wm.id}:`, error);
           }
         });
 
@@ -642,10 +646,13 @@ export default function PdfWatermarkPro() {
               </div>
             ) : (
               <div className={styles.previewWrapper}>
-                <img
+                <Image
                   src={previewImage}
                   alt="PDF Preview with Watermark"
                   className={styles.previewImage}
+                  width={800}
+                  height={1131}
+                  unoptimized
                 />
               </div>
             )}

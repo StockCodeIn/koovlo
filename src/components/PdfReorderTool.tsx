@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useCallback } from "react";
 import { PDFDocument } from "pdf-lib";
 import * as pdfjsLib from "pdfjs-dist";
@@ -133,7 +134,7 @@ export default function PdfReorderTool() {
 
       setProgress(100);
       setSuccess(`✅ PDF exported successfully! (${pages.length} pages)`);
-    } catch (err) {
+    } catch {
       setError("❌ Failed to export PDF. Please try again.");
     } finally {
       setProcessing(false);
@@ -207,7 +208,7 @@ export default function PdfReorderTool() {
             {pages.map((p, i) => (
               <div key={i} className={styles.pageCard}>
                 <div className={styles.pageNumber}>{i + 1}</div>
-                <img src={p.image} alt={`Page ${i + 1}`} />
+                <Image src={p.image} alt={`Page ${i + 1}`} width={240} height={320} unoptimized />
                 <div className={styles.pageActions}>
                   <button
                     onClick={() => movePage(i, "left")}

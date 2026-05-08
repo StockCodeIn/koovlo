@@ -8,6 +8,13 @@ import styles from "@/app/tools/pdf/unlock/unlock.module.css";
 // Worker for PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
+const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return "";
+};
+
 export default function PdfUnlocker() {
   const [file, setFile] = useState<File | null>(null);
   const [password, setPassword] = useState("");
@@ -49,7 +56,7 @@ export default function PdfUnlocker() {
       });
 
       let passwordAttempts = 0;
-      loadingTask.onPassword = (updatePassword: any, reason: any) => {
+      loadingTask.onPassword = (updatePassword: (password: string) => void, reason: number) => {
         passwordAttempts++;
         if (reason === pdfjsLib.PasswordResponses.NEED_PASSWORD) {
           if (passwordAttempts === 1 && password) {
@@ -134,12 +141,13 @@ export default function PdfUnlocker() {
         setPageCount(0);
         if (fileInputRef.current) fileInputRef.current.value = "";
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Unlock error:", err);
+      const errorMessage = getErrorMessage(err);
 
-      if (err?.name === "PasswordException" || err?.message?.includes("password")) {
+      if ((err instanceof Error && err.name === "PasswordException") || errorMessage.includes("password")) {
         setMessage("🔒 Password-protected PDF. Please enter the correct password.");
-      } else if (err?.message?.includes("encrypted")) {
+      } else if (errorMessage.includes("encrypted")) {
         setMessage("🔐 This PDF is DRM-encrypted. Browser decryption not possible.");
       } else {
         setMessage("⚠️ Unable to unlock this PDF. Try another file.");

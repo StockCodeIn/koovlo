@@ -69,7 +69,7 @@ export default function PdfRotatePage() {
       const pdfDoc = await PDFDocument.load(bytes);
       setTotalPages(pdfDoc.getPageCount());
       setMessage(`✅ PDF loaded successfully! (${pdfDoc.getPageCount()} pages)`);
-    } catch (err) {
+    } catch {
       setError("❌ Failed to load PDF. Please try another file.");
     }
   }, []);
@@ -134,8 +134,8 @@ export default function PdfRotatePage() {
 
       setProgress(100);
       setSuccess(`✅ PDF rotated successfully! All ${pages.length} pages rotated by ${angle}°`);
-    } catch (err) {
-      console.error("Rotate PDF Error:", err);
+    } catch (error) {
+      console.error("Rotate PDF Error:", error);
       setError("❌ Error rotating PDF. Please try again.");
     } finally {
       setLoading(false);
